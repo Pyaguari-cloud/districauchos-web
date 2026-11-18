@@ -55,6 +55,10 @@ public class TextNormTests
     }
 
     [Fact]
+    public void Slug_is_url_safe_with_odd_oem_chars() =>
+        Assert.Equal("48609-87402-base-amortiguador", Slug.ForItem("48609'87402", "BASE AMORTIGUADOR"));
+
+    [Fact]
     public void Slug_has_oem_and_short_title() =>
         Assert.Equal("96180071-manguera-tubo-distribuidor-agua-chevrolet-aveo",
             Slug.ForItem("96180071", "MANGUERA TUBO DISTRIBUIDOR AGUA CHEVROLET AVEO, CHEVYTAXI"));

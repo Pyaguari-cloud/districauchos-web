@@ -18,6 +18,8 @@ public sealed record AppSettings
     public string? DatabaseUrl { get; init; }
     public string? AdminToken { get; init; }
     public string VehiclesJsonPath { get; init; } = "data/vehicles.json";
+    public string MeiliUrl { get; init; } = "http://localhost:7700";
+    public string? MeiliMasterKey { get; init; }
 
     /// <summary>
     /// Columna de stock en Tabiazo/Cusubamba/Maldonado cuando hay dos "Stock actual" (pregunta abierta 12.4).
@@ -42,6 +44,8 @@ public sealed record AppSettings
         DatabaseUrl = c["DATABASE_URL"],
         AdminToken = c["ADMIN_TOKEN"],
         VehiclesJsonPath = c["VEHICLES_JSON_PATH"] ?? "data/vehicles.json",
+        MeiliUrl = c["MEILI_URL"] ?? "http://localhost:7700",
+        MeiliMasterKey = c["MEILI_MASTER_KEY"],
         StockColumnOccurrence = int.TryParse(c["STOCK_COLUMN_OCCURRENCE"], out var o) && o is 1 or 2 ? o : 1,
         LocalCsvDir = c["LOCAL_CSV_DIR"],
     };

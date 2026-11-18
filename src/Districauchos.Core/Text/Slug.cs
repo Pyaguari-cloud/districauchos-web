@@ -11,9 +11,12 @@ public static partial class Slug
             .ToLowerInvariant()
             .Split(' ', StringSplitOptions.RemoveEmptyEntries)
             .Take(maxWords);
-        var slug = $"{oemNorm.ToLowerInvariant()}-{string.Join('-', words)}";
+        // El OEM puede traer caracteres raros (p. ej. "48609'87402"): en la URL solo [a-z0-9-].
+        var oem = NonSlug().Replace(TextNorm.StripAccents(oemNorm).ToLowerInvariant(), "-");
+        var slug = $"{oem}-{string.Join('-', words)}";
         return Dashes().Replace(slug, "-").Trim('-');
     }
 
     [GeneratedRegex("-{2,}")] private static partial Regex Dashes();
+    [GeneratedRegex("[^a-z0-9]+")] private static partial Regex NonSlug();
 }

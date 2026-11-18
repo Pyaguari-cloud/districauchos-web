@@ -15,5 +15,6 @@
     <ProjectReference Include="..\Districauchos.Core\Districauchos.Core.csproj" />
     <ProjectReference Include="..\Districauchos.Sheets\Districauchos.Sheets.csproj" />
     <ProjectReference Include="..\Districauchos.Data\Districauchos.Data.csproj" />
+    <ProjectReference Include="..\Districauchos.Search\Districauchos.Search.csproj" />
   </ItemGroup>
 </Project>

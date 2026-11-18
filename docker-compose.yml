@@ -33,6 +33,10 @@ services:
       - districauchos_meili:/meili_data
     ports: ["127.0.0.1:7700:7700"]
     mem_limit: 512m
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:7700/health || wget -qO- http://localhost:7700/health"]
+      interval: 10s
+      retries: 6
     restart: unless-stopped
     networks: [districauchos_net]
 
@@ -43,11 +47,14 @@ services:
       DATABASE_URL: postgres://districauchos:${POSTGRES_PASSWORD}@db:5432/districauchos
       GOOGLE_SERVICE_ACCOUNT_JSON_PATH: /run/secrets/google-sa.json
       VEHICLES_JSON_PATH: /app/data/vehicles.json
+      MEILI_URL: http://search:7700
     volumes:
       - ./data:/app/data:ro
       - ./media:/app/media
     secrets: [google-sa.json]
-    depends_on: { db: { condition: service_healthy } }
+    depends_on:
+      db: { condition: service_healthy }
+      search: { condition: service_healthy }
     mem_limit: 384m
     restart: unless-stopped
     networks: [districauchos_net]
@@ -58,10 +65,13 @@ services:
     environment:
       DATABASE_URL: postgres://districauchos:${POSTGRES_PASSWORD}@db:5432/districauchos
       ASPNETCORE_URLS: http://+:8080
+      MEILI_URL: http://search:7700
     volumes:
       - ./media:/app/media:ro
     ports: ["127.0.0.1:8080:8080"]
-    depends_on: { db: { condition: service_healthy } }
+    depends_on:
+      db: { condition: service_healthy }
+      search: { condition: service_healthy }
     mem_limit: 384m
     restart: unless-stopped
     networks: [districauchos_net]

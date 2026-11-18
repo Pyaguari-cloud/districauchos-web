@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Districauchos.Core\Districauchos.Core.csproj" />
     <ProjectReference Include="..\..\src\Districauchos.Sheets\Districauchos.Sheets.csproj" />
+    <ProjectReference Include="..\..\src\Districauchos.Search\Districauchos.Search.csproj" />
   </ItemGroup>
 
 </Project>

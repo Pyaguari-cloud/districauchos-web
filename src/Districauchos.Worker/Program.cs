@@ -1,5 +1,6 @@
 using Districauchos.Core;
 using Districauchos.Data;
+using Districauchos.Search;
 using Districauchos.Sheets;
 using Districauchos.Worker;
 
@@ -11,6 +12,8 @@ builder.Services.AddSingleton(_ => SheetSourceFactory.Create(settings));
 builder.Services.AddSingleton(_ => CatalogRepository.CreateDataSource(
     settings.DatabaseUrl ?? throw new InvalidOperationException("Falta DATABASE_URL")));
 builder.Services.AddSingleton<CatalogRepository>();
+builder.Services.AddSingleton(_ => MeiliClient.Create(settings));
+builder.Services.AddSingleton<ProductIndex>();
 builder.Services.AddHostedService<SyncBackgroundService>();
 
 builder.Build().Run();

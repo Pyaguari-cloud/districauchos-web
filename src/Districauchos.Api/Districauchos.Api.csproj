@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Districauchos.Core\Districauchos.Core.csproj" />
     <ProjectReference Include="..\Districauchos.Data\Districauchos.Data.csproj" />
+    <ProjectReference Include="..\Districauchos.Search\Districauchos.Search.csproj" />
   </ItemGroup>
 
   <ItemGroup>

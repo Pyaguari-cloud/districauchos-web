@@ -1,5 +1,6 @@
 using Districauchos.Core;
 using Districauchos.Data;
+using Districauchos.Search;
 using Districauchos.Sheets;
 
 namespace Districauchos.Worker;
@@ -12,6 +13,7 @@ public sealed class SyncBackgroundService(
     AppSettings settings,
     ISheetSource source,
     CatalogRepository repo,
+    ProductIndex index,
     ILogger<SyncBackgroundService> log) : BackgroundService
 {
     private readonly SemaphoreSlim _gate = new(1, 1);
@@ -40,7 +42,11 @@ public sealed class SyncBackgroundService(
             var overrides = await repo.LoadPriceOverridesAsync(ct);
             snapshot = await CatalogSnapshot.BuildAsync(source, settings, overrides, ct);
 
+            // Orden: índice temporal → Postgres (transacción) → intercambio del índice.
+            // Si falla antes del intercambio, la página sigue con la versión anterior en ambos.
+            await index.PrepareAsync(ProductIndex.BuildDocuments(snapshot.Catalog), ct);
             await repo.WriteSnapshotAsync(snapshot.Sheets.Master, snapshot.Sheets.Stock, snapshot.Catalog, ct);
+            await index.SwapAsync(ct);
             await repo.FinishRunAsync(runId, "ok", snapshot.Sheets.RowsRead, snapshot.Catalog.Items.Count,
                 snapshot.AllWarnings, null, ct);
 
