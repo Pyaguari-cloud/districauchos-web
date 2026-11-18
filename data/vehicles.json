@@ -1,0 +1,996 @@
+{
+  "_notas": [
+    "Diccionario versionado marca -> modelos -> alias (brief 6.5).",
+    "Los alias se comparan por palabra completa sobre la descripcion normalizada (mayusculas, sin tildes, guiones/puntos = espacio).",
+    "Evitar alias que sean palabras comunes (UNO, DELTA, ESCAPE): usar la forma con marca, p. ej. FORD ESCAPE.",
+    "Subir version en cada cambio y revisar detalle_vehiculos_*.csv buscando falsos positivos.",
+    "equivalents: el mismo vehiculo con distinta marca; un repuesto de uno se asigna a todos (confirmado por el cliente 2026-11-18)."
+  ],
+  "version": "2026-11-18.5",
+  "equivalents": [
+    {
+      "brands": [
+        "Chevrolet",
+        "Suzuki"
+      ],
+      "models": [
+        "Vitara",
+        "Grand Vitara",
+        "Forsa"
+      ]
+    }
+  ],
+  "brands": [
+    {
+      "name": "Chevrolet",
+      "aliases": [
+        "CHEVROLET",
+        "CHEV",
+        "CHEVY",
+        "GM"
+      ],
+      "models": [
+        {
+          "name": "Aveo",
+          "aliases": [
+            "AVEO",
+            "AVEO ACTIVO",
+            "AVEO EMOTION",
+            "AVEO FAMILY",
+            "CHEVYTAXI",
+            "CHEVY TAXI"
+          ]
+        },
+        {
+          "name": "Spark",
+          "aliases": [
+            "SPARK",
+            "SPARK GT",
+            "SPARK LIFE"
+          ]
+        },
+        {
+          "name": "Sail",
+          "aliases": [
+            "SAIL"
+          ]
+        },
+        {
+          "name": "Optra",
+          "aliases": [
+            "OPTRA",
+            "OPTRA LIMITED",
+            "OPTRA ADVANCE"
+          ]
+        },
+        {
+          "name": "Corsa",
+          "aliases": [
+            "CORSA",
+            "CORSA EVOLUTION",
+            "CORSA WIND"
+          ]
+        },
+        {
+          "name": "Cruze",
+          "aliases": [
+            "CRUZE"
+          ]
+        },
+        {
+          "name": "Captiva",
+          "aliases": [
+            "CAPTIVA"
+          ]
+        },
+        {
+          "name": "Grand Vitara",
+          "aliases": [
+            "G VITARA",
+            "GR VITARA",
+            "GRAN VITARA",
+            "GRAND VITARA"
+          ]
+        },
+        {
+          "name": "Vitara",
+          "aliases": [
+            "VITARA"
+          ]
+        },
+        {
+          "name": "Luv",
+          "aliases": [
+            "LUV"
+          ]
+        },
+        {
+          "name": "D-Max",
+          "aliases": [
+            "D MAX",
+            "DMAX",
+            "LUV D MAX",
+            "LUV DMAX"
+          ]
+        },
+        {
+          "name": "Esteem",
+          "aliases": [
+            "ESTEEM"
+          ]
+        },
+        {
+          "name": "Forsa",
+          "aliases": [
+            "FORSA",
+            "FORZA"
+          ]
+        },
+        {
+          "name": "Trooper",
+          "aliases": [
+            "TROOPER",
+            "TROPER"
+          ]
+        },
+        {
+          "name": "Rodeo",
+          "aliases": [
+            "RODEO"
+          ]
+        },
+        {
+          "name": "Beat",
+          "aliases": [
+            "BEAT"
+          ]
+        },
+        {
+          "name": "Onix",
+          "aliases": [
+            "ONIX"
+          ]
+        },
+        {
+          "name": "Tracker",
+          "aliases": [
+            "TRACKER"
+          ]
+        },
+        {
+          "name": "N300",
+          "aliases": [
+            "N300",
+            "N 300"
+          ]
+        },
+        {
+          "name": "NHR",
+          "aliases": [
+            "NHR"
+          ]
+        },
+        {
+          "name": "NKR",
+          "aliases": [
+            "NKR"
+          ]
+        },
+        {
+          "name": "NPR",
+          "aliases": [
+            "NPR"
+          ]
+        },
+        {
+          "name": "Super Carry",
+          "aliases": [
+            "SUPER CARRY",
+            "SUPERCARRY"
+          ]
+        },
+        {
+          "name": "Chevette",
+          "aliases": [
+            "CHEVETTE",
+            "CHEVETEE",
+            "CHEVET"
+          ]
+        },
+        {
+          "name": "Sprint",
+          "aliases": [
+            "SPRINT"
+          ]
+        },
+        {
+          "name": "Monza",
+          "aliases": [
+            "MONZA"
+          ]
+        },
+        {
+          "name": "San Remo",
+          "aliases": [
+            "SAN REMO"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Suzuki",
+      "aliases": [
+        "SUSUKI",
+        "SUZUKI",
+        "SUZUKY"
+      ],
+      "models": [
+        {
+          "name": "Forsa",
+          "aliases": [
+            "FORSA",
+            "FORZA"
+          ]
+        },
+        {
+          "name": "Vitara",
+          "aliases": [
+            "VITARA"
+          ]
+        },
+        {
+          "name": "Grand Vitara",
+          "aliases": [
+            "GR VITARA",
+            "GRAN VITARA",
+            "GRAND VITARA"
+          ]
+        },
+        {
+          "name": "Swift",
+          "aliases": [
+            "SWIFT"
+          ]
+        },
+        {
+          "name": "Alto",
+          "aliases": [
+            "ALTO"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hyundai",
+      "aliases": [
+        "HYUNDAI",
+        "HYUNDA"
+      ],
+      "models": [
+        {
+          "name": "Accent",
+          "aliases": [
+            "ACCENT"
+          ]
+        },
+        {
+          "name": "Elantra",
+          "aliases": [
+            "ELANTRA"
+          ]
+        },
+        {
+          "name": "Tucson",
+          "aliases": [
+            "TUCSON"
+          ]
+        },
+        {
+          "name": "Santa Fe",
+          "aliases": [
+            "SANTA FE",
+            "SANTAFE"
+          ]
+        },
+        {
+          "name": "i10",
+          "aliases": [
+            "I10",
+            "GRAND I10"
+          ]
+        },
+        {
+          "name": "Getz",
+          "aliases": [
+            "GETZ"
+          ]
+        },
+        {
+          "name": "H1",
+          "aliases": [
+            "H1",
+            "H 1"
+          ]
+        },
+        {
+          "name": "H100",
+          "aliases": [
+            "H100",
+            "H 100",
+            "PORTER"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Kia",
+      "aliases": [
+        "KIA"
+      ],
+      "models": [
+        {
+          "name": "Rio",
+          "aliases": [
+            "RIO",
+            "RIO STYLUS",
+            "RIO XCITE"
+          ]
+        },
+        {
+          "name": "Picanto",
+          "aliases": [
+            "PICANTO"
+          ]
+        },
+        {
+          "name": "Sportage",
+          "aliases": [
+            "SPORTAGE"
+          ]
+        },
+        {
+          "name": "Cerato",
+          "aliases": [
+            "CERATO"
+          ]
+        },
+        {
+          "name": "Soluto",
+          "aliases": [
+            "SOLUTO"
+          ]
+        },
+        {
+          "name": "Sorento",
+          "aliases": [
+            "SORENTO"
+          ]
+        },
+        {
+          "name": "Pregio",
+          "aliases": [
+            "PREGIO"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Toyota",
+      "aliases": [
+        "TOYOTA"
+      ],
+      "models": [
+        {
+          "name": "Hilux",
+          "aliases": [
+            "HILUX",
+            "HI LUX"
+          ]
+        },
+        {
+          "name": "Corolla",
+          "aliases": [
+            "COROLLA"
+          ]
+        },
+        {
+          "name": "Yaris",
+          "aliases": [
+            "YARIS"
+          ]
+        },
+        {
+          "name": "Fortuner",
+          "aliases": [
+            "FORTUNER"
+          ]
+        },
+        {
+          "name": "Land Cruiser",
+          "aliases": [
+            "LAND CRUISER",
+            "LANDCRUISER"
+          ]
+        },
+        {
+          "name": "RAV4",
+          "aliases": [
+            "RAV4",
+            "RAV 4"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Nissan",
+      "aliases": [
+        "NISSAN"
+      ],
+      "models": [
+        {
+          "name": "Sentra",
+          "aliases": [
+            "SENTRA"
+          ]
+        },
+        {
+          "name": "Tiida",
+          "aliases": [
+            "TIIDA"
+          ]
+        },
+        {
+          "name": "Versa",
+          "aliases": [
+            "VERSA"
+          ]
+        },
+        {
+          "name": "Frontier",
+          "aliases": [
+            "FRONTIER",
+            "NAVARA"
+          ]
+        },
+        {
+          "name": "X-Trail",
+          "aliases": [
+            "X TRAIL",
+            "XTRAIL"
+          ]
+        },
+        {
+          "name": "March",
+          "aliases": [
+            "MARCH"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mazda",
+      "aliases": [
+        "MAZDA"
+      ],
+      "models": [
+        {
+          "name": "BT-50",
+          "aliases": [
+            "BT 50",
+            "BT50"
+          ]
+        },
+        {
+          "name": "Mazda 3",
+          "aliases": [
+            "MAZDA 3",
+            "MAZDA3"
+          ]
+        },
+        {
+          "name": "Allegro",
+          "aliases": [
+            "ALLEGRO"
+          ]
+        },
+        {
+          "name": "B2200",
+          "aliases": [
+            "B2200",
+            "B 2200"
+          ]
+        },
+        {
+          "name": "B2600",
+          "aliases": [
+            "B2600",
+            "B 2600"
+          ]
+        },
+        {
+          "name": "323",
+          "aliases": [
+            "323",
+            "MAZDA 323"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ford",
+      "aliases": [
+        "FORD"
+      ],
+      "models": [
+        {
+          "name": "Ranger",
+          "aliases": [
+            "RANGER"
+          ]
+        },
+        {
+          "name": "Explorer",
+          "aliases": [
+            "EXPLORER"
+          ]
+        },
+        {
+          "name": "Escape",
+          "aliases": [
+            "FORD ESCAPE"
+          ]
+        },
+        {
+          "name": "Fiesta",
+          "aliases": [
+            "FIESTA"
+          ]
+        },
+        {
+          "name": "F-150",
+          "aliases": [
+            "F150",
+            "F 150"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Renault",
+      "aliases": [
+        "RENAULT"
+      ],
+      "models": [
+        {
+          "name": "Logan",
+          "aliases": [
+            "LOGAN"
+          ]
+        },
+        {
+          "name": "Sandero",
+          "aliases": [
+            "SANDERO"
+          ]
+        },
+        {
+          "name": "Duster",
+          "aliases": [
+            "DUSTER"
+          ]
+        },
+        {
+          "name": "Kwid",
+          "aliases": [
+            "KWID"
+          ]
+        },
+        {
+          "name": "Megane",
+          "aliases": [
+            "MEGANE"
+          ]
+        },
+        {
+          "name": "Clio",
+          "aliases": [
+            "CLIO"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Volkswagen",
+      "aliases": [
+        "VOLKSWAGEN",
+        "VOLKWAGEN",
+        "VOLSWAGEN",
+        "VW",
+        "WOLKSWAGEN"
+      ],
+      "models": [
+        {
+          "name": "Gol",
+          "aliases": [
+            "GOL"
+          ]
+        },
+        {
+          "name": "Amarok",
+          "aliases": [
+            "AMAROK"
+          ]
+        },
+        {
+          "name": "Jetta",
+          "aliases": [
+            "JETTA"
+          ]
+        },
+        {
+          "name": "Passat",
+          "aliases": [
+            "PASSAT",
+            "PASSA"
+          ]
+        },
+        {
+          "name": "Golf",
+          "aliases": [
+            "GOLF"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mitsubishi",
+      "aliases": [
+        "MITSUBISHI"
+      ],
+      "models": [
+        {
+          "name": "L200",
+          "aliases": [
+            "L200",
+            "L 200"
+          ]
+        },
+        {
+          "name": "Montero",
+          "aliases": [
+            "MONTERO"
+          ]
+        },
+        {
+          "name": "Lancer",
+          "aliases": [
+            "LANCER"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Great Wall",
+      "aliases": [
+        "GREAT WALL",
+        "GREATWALL"
+      ],
+      "models": [
+        {
+          "name": "Wingle",
+          "aliases": [
+            "WINGLE"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chery",
+      "aliases": [
+        "CHERY"
+      ],
+      "models": [
+        {
+          "name": "QQ",
+          "aliases": [
+            "QQ"
+          ]
+        },
+        {
+          "name": "Tiggo",
+          "aliases": [
+            "TIGGO"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "JAC",
+      "aliases": [
+        "JAC"
+      ],
+      "models": []
+    },
+    {
+      "name": "Daewoo",
+      "aliases": [
+        "DAEWOO",
+        "DEAWOO",
+        "DAEWO",
+        "DAEWOOO",
+        "DW"
+      ],
+      "models": [
+        {
+          "name": "Lanos",
+          "aliases": [
+            "LANOS"
+          ]
+        },
+        {
+          "name": "Cielo",
+          "aliases": [
+            "CIELO"
+          ]
+        },
+        {
+          "name": "Racer",
+          "aliases": [
+            "RACER",
+            "RANCER"
+          ]
+        },
+        {
+          "name": "Matiz",
+          "aliases": [
+            "MATIZ"
+          ]
+        },
+        {
+          "name": "Tico",
+          "aliases": [
+            "TICO"
+          ]
+        },
+        {
+          "name": "Nubira",
+          "aliases": [
+            "NUBIRA"
+          ]
+        },
+        {
+          "name": "Espero",
+          "aliases": [
+            "ESPERO"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Daihatsu",
+      "aliases": [
+        "DAIHATSU",
+        "DAHIATSU",
+        "DAIATSU"
+      ],
+      "models": [
+        {
+          "name": "Terios",
+          "aliases": [
+            "TERIOS"
+          ]
+        },
+        {
+          "name": "Delta",
+          "aliases": [
+            "DAIHATSU DELTA",
+            "DAHIATSU DELTA"
+          ]
+        },
+        {
+          "name": "Charade",
+          "aliases": [
+            "CHARADE"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fiat",
+      "aliases": [
+        "FIAT"
+      ],
+      "models": [
+        {
+          "name": "Uno",
+          "aliases": [
+            "FIAT UNO",
+            "UNO MILLE"
+          ]
+        },
+        {
+          "name": "Premio",
+          "aliases": [
+            "PREMIO"
+          ]
+        },
+        {
+          "name": "Palio",
+          "aliases": [
+            "PALIO"
+          ]
+        },
+        {
+          "name": "Siena",
+          "aliases": [
+            "SIENA"
+          ]
+        },
+        {
+          "name": "Fiorino",
+          "aliases": [
+            "FIORINO"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Peugeot",
+      "aliases": [
+        "PEUGEOT",
+        "PEUGOT"
+      ],
+      "models": [
+        {
+          "name": "206",
+          "aliases": [
+            "206",
+            "PEUGEOT 206"
+          ]
+        },
+        {
+          "name": "307",
+          "aliases": [
+            "307",
+            "PEUGEOT 307"
+          ]
+        },
+        {
+          "name": "405",
+          "aliases": [
+            "405",
+            "PEUGEOT 405"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Citroen",
+      "aliases": [
+        "CITROEN"
+      ],
+      "models": [
+        {
+          "name": "C4",
+          "aliases": [
+            "C4"
+          ]
+        },
+        {
+          "name": "Picasso",
+          "aliases": [
+            "PICASSO",
+            "XSARA PICASSO"
+          ]
+        },
+        {
+          "name": "Xsara",
+          "aliases": [
+            "XSARA"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Skoda",
+      "aliases": [
+        "SKODA"
+      ],
+      "models": [
+        {
+          "name": "Fabia",
+          "aliases": [
+            "FABIA"
+          ]
+        },
+        {
+          "name": "Superb",
+          "aliases": [
+            "SUPERB"
+          ]
+        },
+        {
+          "name": "Felicia",
+          "aliases": [
+            "FELICIA"
+          ]
+        },
+        {
+          "name": "Favorit",
+          "aliases": [
+            "FAVORIT"
+          ]
+        },
+        {
+          "name": "Forman",
+          "aliases": [
+            "FORMAN"
+          ]
+        },
+        {
+          "name": "Octavia",
+          "aliases": [
+            "OCTAVIA"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Honda",
+      "aliases": [
+        "HONDA"
+      ],
+      "models": [
+        {
+          "name": "Civic",
+          "aliases": [
+            "CIVIC"
+          ]
+        },
+        {
+          "name": "Accord",
+          "aliases": [
+            "ACCORD"
+          ]
+        },
+        {
+          "name": "CR-V",
+          "aliases": [
+            "CR V",
+            "CRV"
+          ]
+        },
+        {
+          "name": "Fit",
+          "aliases": [
+            "HONDA FIT"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mercedes-Benz",
+      "aliases": [
+        "MERCEDES",
+        "MERCEDES BENZ",
+        "M BENZ",
+        "BENZ"
+      ],
+      "models": []
+    },
+    {
+      "name": "Datsun",
+      "aliases": [
+        "DATSUN"
+      ],
+      "models": []
+    },
+    {
+      "name": "Hino",
+      "aliases": [
+        "HINO"
+      ],
+      "models": []
+    }
+  ]
+}

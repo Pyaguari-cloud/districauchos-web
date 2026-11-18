@@ -1,0 +1,90 @@
+# Districauchos catálogo · proyecto y red propios, separados de CuadernoPOS (brief §10).
+# Desarrollo local:  docker compose up -d db search        (solo dependencias)
+# Todo el backend:   docker compose up -d --build
+# Con la web (semana 2+): docker compose --profile web up -d --build
+name: districauchos
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: districauchos
+      POSTGRES_USER: districauchos
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?define POSTGRES_PASSWORD en .env}
+    volumes:
+      - districauchos_pg:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    ports: ["127.0.0.1:5433:5432"]   # 5433 para no chocar con otro Postgres del VPS
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U districauchos -d districauchos"]
+      interval: 10s
+      retries: 5
+    restart: unless-stopped
+    networks: [districauchos_net]
+
+  search:
+    image: getmeili/meilisearch:v1.11
+    environment:
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:?define MEILI_MASTER_KEY en .env}
+      MEILI_ENV: production
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - districauchos_meili:/meili_data
+    ports: ["127.0.0.1:7700:7700"]
+    mem_limit: 512m
+    restart: unless-stopped
+    networks: [districauchos_net]
+
+  worker:
+    build: { context: ., dockerfile: src/Dockerfile, args: { PROJECT: Districauchos.Worker } }
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://districauchos:${POSTGRES_PASSWORD}@db:5432/districauchos
+      GOOGLE_SERVICE_ACCOUNT_JSON_PATH: /run/secrets/google-sa.json
+      VEHICLES_JSON_PATH: /app/data/vehicles.json
+    volumes:
+      - ./data:/app/data:ro
+      - ./media:/app/media
+    secrets: [google-sa.json]
+    depends_on: { db: { condition: service_healthy } }
+    mem_limit: 384m
+    restart: unless-stopped
+    networks: [districauchos_net]
+
+  api:
+    build: { context: ., dockerfile: src/Dockerfile, args: { PROJECT: Districauchos.Api } }
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://districauchos:${POSTGRES_PASSWORD}@db:5432/districauchos
+      ASPNETCORE_URLS: http://+:8080
+    volumes:
+      - ./media:/app/media:ro
+    ports: ["127.0.0.1:8080:8080"]
+    depends_on: { db: { condition: service_healthy } }
+    mem_limit: 384m
+    restart: unless-stopped
+    networks: [districauchos_net]
+
+  web:
+    profiles: [web]   # se activa en la semana 2 cuando exista web/Dockerfile
+    build: { context: ./web }
+    environment:
+      API_URL: http://api:8080
+    ports: ["127.0.0.1:3000:3000"]
+    depends_on: [api]
+    mem_limit: 512m
+    restart: unless-stopped
+    networks: [districauchos_net]
+
+secrets:
+  google-sa.json:
+    file: ./secrets/google-sa.json
+
+volumes:
+  districauchos_pg:
+  districauchos_meili:
+
+networks:
+  districauchos_net:
+    name: districauchos_net
