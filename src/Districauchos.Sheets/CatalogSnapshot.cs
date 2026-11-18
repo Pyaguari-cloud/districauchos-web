@@ -2,6 +2,7 @@ using Districauchos.Core;
 using Districauchos.Core.Catalog;
 using Districauchos.Core.Model;
 using Districauchos.Core.Pricing;
+using Districauchos.Core.Text;
 using Districauchos.Core.Vehicles;
 
 namespace Districauchos.Sheets;
@@ -22,7 +23,7 @@ public sealed record CatalogSnapshot(
         var categories = CategoryClassifier.Load(settings.CategoriesJsonPath);
 
         var sheets = await new SheetLoader(source, settings).LoadAsync(ct);
-        var catalog = new CatalogBuilder(pricing, extractor, categories: categories).Build(sheets.Master, sheets.Stock, overrides);
+        var catalog = new CatalogBuilder(pricing, extractor, categories: categories, titles: TitleCase.From(dict)).Build(sheets.Master, sheets.Stock, overrides);
         return new CatalogSnapshot(sheets, catalog, dict.Version, categories.Version);
     }
 }

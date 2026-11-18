@@ -51,7 +51,8 @@ public sealed class CatalogBuildResult
 /// Es una función pura: no lee ni escribe nada fuera de memoria.
 /// </summary>
 public sealed class CatalogBuilder(
-    PricingRules pricing, VehicleExtractor vehicles, CatalogBuildOptions? options = null, CategoryClassifier? categories = null)
+    PricingRules pricing, VehicleExtractor vehicles, CatalogBuildOptions? options = null,
+    CategoryClassifier? categories = null, TitleCase? titles = null)
 {
     private readonly CatalogBuildOptions _options = options ?? new();
 
@@ -87,7 +88,11 @@ public sealed class CatalogBuilder(
             var principalIdx = Math.Max(0, variants.FindIndex(v => v.Available));
             var principal = rows[principalIdx];
             var title = TextNorm.RepairEncoding(principal.Description!);
+            // Título legible para mostrar (propuesta 5); el slug sigue saliendo del texto original
+            // para que las URLs no cambien.
+            var displayTitle = titles?.Format(title) ?? title;
             var descriptions = rows.Select(r => TextNorm.RepairEncoding(r.Description!))
+                .Select(d => titles?.Format(d) ?? d)
                 .Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
             var slug = Slug.ForItem(oem, title);
@@ -113,7 +118,7 @@ public sealed class CatalogBuilder(
                 OemNorm: oem,
                 OemAliases: rows.SelectMany(r => r.Oems).Where(o => o != oem).Distinct().ToList(),
                 Slug: slug,
-                Title: title,
+                Title: displayTitle,
                 Description: string.Join(" | ", descriptions),
                 Category: category,
                 Subcategory: subcategory,
