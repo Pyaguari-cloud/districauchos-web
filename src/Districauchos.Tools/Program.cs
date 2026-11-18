@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 
 // Uso:
 //   dotnet run --project src/Districauchos.Tools -- vehicles-report [--out out/]
+//   dotnet run --project src/Districauchos.Tools -- import-prices --file "<excel>.xlsx" [--apply]
+//     (sin --apply solo genera el reporte; con --apply guarda en price_overrides y pide sincronizar)
 // Lee las hojas (o LOCAL_CSV_DIR) sin escribir nada y genera los CSV para que el cliente revise.
 
 var command = args.FirstOrDefault() ?? "help";
@@ -29,8 +31,10 @@ switch (command)
     case "headers":
         await PrintHeaders();
         return 0;
+    case "import-prices":
+        return await ImportPrices();
     default:
-        Console.WriteLine("Comandos: vehicles-report [--out <dir>] | headers");
+        Console.WriteLine("Comandos: vehicles-report [--out <dir>] | headers | import-prices --file <xlsx> [--apply]");
         return command == "help" ? 0 : 1;
 }
 
@@ -142,6 +146,69 @@ async Task PrintHeaders()
             if (!string.IsNullOrWhiteSpace(h.RawHeaders[i]))
                 Console.WriteLine($"  {ColumnLetter(i),-3} {h.RawHeaders[i]}");
     }
+}
+
+// Excel "costos y precios sugeridos" → price_overrides (respuesta del cliente 2026-11-18).
+// Solo se leen las columnas "ID Producto" y "precio x mayor sugerido": el costo nunca se lee ni se guarda.
+async Task<int> ImportPrices()
+{
+    const string Source = "excel-sugeridos";
+    var file = ArgValue("--file") ?? throw new ArgumentException("Falta --file <ruta del Excel>");
+    var apply = args.Contains("--apply");
+
+    static string Key(string v) => new(Districauchos.Core.Text.TextNorm.NormalizeHeader(v).Where(char.IsAsciiLetterOrDigit).ToArray());
+    // Solo la fila de encabezados se lee completa (para ubicar las columnas por nombre).
+    var all = Districauchos.Tools.XlsxReader.ReadFirstSheet(file).Take(20).ToList();
+    var header = all.FirstOrDefault(r => r.Cells.Values.Any(v => Key(v) == "idproducto"));
+    if (header.Cells is null) { Console.Error.WriteLine("No encontré la columna 'ID Producto'"); return 1; }
+    string? Col(string name) => header.Cells.FirstOrDefault(kv => Key(kv.Value).StartsWith(name)).Key;
+    var idCol = Col("idproducto");
+    var mayorCol = Col("precioxmayorsugerido");
+    if (mayorCol is null) { Console.Error.WriteLine("No encontré la columna 'precio x mayor sugerido'"); return 1; }
+
+    var rows = Districauchos.Tools.XlsxReader.ReadFirstSheet(file, c => c == idCol || c == mayorCol)
+        .Where(r => r.Row > header.Row && r.Cells.TryGetValue(idCol!, out var id) && !string.IsNullOrWhiteSpace(id))
+        .Select(r => new Districauchos.Core.Pricing.SuggestedPriceRow(r.Row, r.Cells[idCol!].Trim(), r.Cells.GetValueOrDefault(mayorCol)))
+        .ToList();
+
+    var db = Districauchos.Data.CatalogRepository.CreateDataSource(settings.DatabaseUrl ?? throw new InvalidOperationException("Falta DATABASE_URL"));
+    var repo = new Districauchos.Data.CatalogRepository(db);
+    var (byOem, byCode) = await repo.LoadPriceTargetsAsync(default);
+    var results = Districauchos.Core.Pricing.SuggestedPrices.Match(rows, byOem, byCode);
+
+    static string Label(Districauchos.Core.Pricing.SuggestedPriceStatus s) => s switch
+    {
+        Districauchos.Core.Pricing.SuggestedPriceStatus.Applied => "se aplica",
+        Districauchos.Core.Pricing.SuggestedPriceStatus.NoPrice => "sin precio por mayor en el Excel",
+        Districauchos.Core.Pricing.SuggestedPriceStatus.InvalidPrice => "precio inválido o fila repetida",
+        Districauchos.Core.Pricing.SuggestedPriceStatus.NotFound => "no está en el catálogo publicado",
+        Districauchos.Core.Pricing.SuggestedPriceStatus.NotVch => "no es Importadora VCH (no se aplica)",
+        _ => "precio por mayor >= precio público (no se aplica)",
+    };
+    string M(decimal? v) => v is null ? "" : v.Value.ToString("0.00", CultureInfo.InvariantCulture);
+
+    Directory.CreateDirectory(outDir);
+    var name = $"precios_excel_{DateTime.Now:yyyy-MM-dd}.csv";
+    WriteCsv(name, ["Fila Excel", "ID Producto", "OEM en catalogo", "Precio por mayor Excel", "Precio publico", "Por mayor 40%", "Resultado"],
+        results.Select(r => new[] { r.Row.ToString(), r.Id.ReplaceLineEndings(" "), r.Oem ?? "", M(r.PrecioMayor), M(r.Pvp),
+            M(r.Pvp is null ? null : Math.Round(r.Pvp.Value * (1 - settings.MayorDescuento), 2)), Label(r.Status) }));
+
+    Console.WriteLine($"Filas leídas: {rows.Count}");
+    foreach (var g in results.GroupBy(r => r.Status).OrderBy(g => g.Key))
+        Console.WriteLine($"  {Label(g.Key),-50} {g.Count(),4}");
+    Console.WriteLine($"Reporte: {Path.Combine(outDir, name)}");
+
+    var toApply = results.Where(r => r.Status == Districauchos.Core.Pricing.SuggestedPriceStatus.Applied)
+        .Select(r => (r.Oem!, r.PrecioMayor!.Value)).ToList();
+    if (!apply)
+    {
+        Console.WriteLine($"Vista previa: {toApply.Count} precios listos. Repite con --apply para guardarlos.");
+        return 0;
+    }
+    await repo.ReplacePriceOverridesAsync(Source, toApply, default);
+    await Districauchos.Data.SyncSignal.RequestAsync(db, default);
+    Console.WriteLine($"Guardados {toApply.Count} precios ({Source}). Pedida sincronización al Worker.");
+    return 0;
 }
 
 static string ColumnLetter(int index)

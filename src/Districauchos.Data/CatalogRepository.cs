@@ -1,3 +1,5 @@
+using Districauchos.Core.Text;
+using Districauchos.Core.Pricing;
 using System.Text.Json;
 using Districauchos.Core.Catalog;
 using Districauchos.Core.Model;
@@ -40,6 +42,48 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
             result[r.GetString(0)] = new PriceOverride(r.GetString(0),
                 r.IsDBNull(1) ? null : r.GetDecimal(1), r.IsDBNull(2) ? null : r.GetDecimal(2), r.GetString(3));
         return result;
+    }
+
+    /// <summary>Fichas publicadas y códigos → OEM, para emparejar el Excel de precios sugeridos.</summary>
+    public async Task<(Dictionary<string, SuggestedPriceTarget> ByOem, Dictionary<string, string> OemByCodeKey)> LoadPriceTargetsAsync(CancellationToken ct)
+    {
+        var byOem = new Dictionary<string, SuggestedPriceTarget>(StringComparer.Ordinal);
+        await using (var cmd = db.CreateCommand("SELECT oem_norm, is_vch, pvp_min FROM catalog_items"))
+        await using (var r = await cmd.ExecuteReaderAsync(ct))
+            while (await r.ReadAsync(ct))
+                byOem[r.GetString(0)] = new(r.GetString(0), r.GetBoolean(1), r.GetDecimal(2));
+
+        var byCode = new Dictionary<string, string>(StringComparer.Ordinal);
+        await using (var cmd = db.CreateCommand("SELECT code_norm, oem_norm FROM products_raw WHERE oem_norm IS NOT NULL"))
+        await using (var r = await cmd.ExecuteReaderAsync(ct))
+            while (await r.ReadAsync(ct))
+                if (TextNorm.CodeMatchKey(r.GetString(0)) is { } key) byCode.TryAdd(key, r.GetString(1));
+        return (byOem, byCode);
+    }
+
+    /// <summary>Reemplaza en una transacción los precios de un origen (p. ej. "excel-sugeridos").</summary>
+    public async Task<int> ReplacePriceOverridesAsync(string source, IReadOnlyCollection<(string Oem, decimal PrecioMayor)> prices, CancellationToken ct)
+    {
+        await using var conn = await db.OpenConnectionAsync(ct);
+        await using var tx = await conn.BeginTransactionAsync(ct);
+        await using (var del = new NpgsqlCommand("DELETE FROM price_overrides WHERE source = $1", conn, tx))
+        {
+            del.Parameters.Add(new() { Value = source });
+            await del.ExecuteNonQueryAsync(ct);
+        }
+        foreach (var (oem, mayor) in prices)
+        {
+            await using var ins = new NpgsqlCommand("""
+                INSERT INTO price_overrides (oem_norm, precio_mayor, precio_menor, source) VALUES ($1, $2, NULL, $3)
+                ON CONFLICT (oem_norm) DO UPDATE SET precio_mayor = EXCLUDED.precio_mayor, source = EXCLUDED.source
+                """, conn, tx);
+            ins.Parameters.Add(new() { Value = oem });
+            ins.Parameters.Add(new() { Value = mayor });
+            ins.Parameters.Add(new() { Value = source });
+            await ins.ExecuteNonQueryAsync(ct);
+        }
+        await tx.CommitAsync(ct);
+        return prices.Count;
     }
 
     public async Task<long> StartRunAsync(CancellationToken ct)

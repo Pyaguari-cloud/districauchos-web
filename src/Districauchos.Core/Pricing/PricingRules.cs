@@ -16,7 +16,8 @@ public sealed class PricingRules(decimal mayorDescuento = 0.40m, decimal mayorUm
     public decimal? PrecioMayor(decimal pvp, bool isVch, decimal? overrideMayor = null)
     {
         if (!isVch) return null;
-        if (overrideMayor is > 0) return overrideMayor;
+        // Defensa: un precio por mayor nunca puede ser igual o mayor al público (el Excel trae algunos así).
+        if (overrideMayor is > 0 && overrideMayor < pvp) return overrideMayor;
         return Math.Round(pvp * (1 - MayorDescuento), 2, MidpointRounding.AwayFromZero);
     }
 

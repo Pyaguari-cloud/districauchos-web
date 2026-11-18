@@ -40,7 +40,7 @@ public sealed class SyncBackgroundService(
 
     private void OnRequest()
     {
-        log.LogInformation("Sincronización pedida desde /api/admin/sync");
+        log.LogInformation("Aviso de sincronización recibido (/api/admin/sync o import-prices)");
         _requested = true;
         try { _wait?.Cancel(); } catch (ObjectDisposedException) { }
     }
