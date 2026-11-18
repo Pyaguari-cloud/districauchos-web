@@ -13,6 +13,8 @@ public sealed class CatalogBuildOptions
 
 public sealed record ProductWithoutVehicle(string OemNorm, string Code, string Description);
 
+public sealed record CategoryAssignment(string OemNorm, string Title, string? SheetCategory, string Category, CategorySource Source, string? Rule);
+
 public sealed class CatalogBuildStats
 {
     public int MasterRows { get; set; }
@@ -39,6 +41,7 @@ public sealed class CatalogBuildResult
     public List<ProductVehicle> Vehicles { get; } = [];
     public List<ProductWithoutVehicle> WithoutVehicle { get; } = [];
     public Dictionary<string, int> AmbiguousModels { get; } = new(StringComparer.Ordinal);
+    public List<CategoryAssignment> CategoryAssignments { get; } = [];
     public List<SyncWarning> Warnings { get; } = [];
     public CatalogBuildStats Stats { get; } = new();
 }
@@ -47,7 +50,8 @@ public sealed class CatalogBuildResult
 /// Convierte las filas leídas de las hojas en el catálogo publicable (brief §6.1–6.5).
 /// Es una función pura: no lee ni escribe nada fuera de memoria.
 /// </summary>
-public sealed class CatalogBuilder(PricingRules pricing, VehicleExtractor vehicles, CatalogBuildOptions? options = null)
+public sealed class CatalogBuilder(
+    PricingRules pricing, VehicleExtractor vehicles, CatalogBuildOptions? options = null, CategoryClassifier? categories = null)
 {
     private readonly CatalogBuildOptions _options = options ?? new();
 
@@ -89,6 +93,18 @@ public sealed class CatalogBuilder(PricingRules pricing, VehicleExtractor vehicl
             var slug = Slug.ForItem(oem, title);
             for (var n = 2; !usedSlugs.Add(slug); n++) slug = $"{Slug.ForItem(oem, title)}-{n}";
 
+            var sheetCategory = rows.Select(r => r.Category).FirstOrDefault(c => c is not null);
+            var sheetSubcategory = rows.Select(r => r.Subcategory).FirstOrDefault(c => c is not null);
+            var (category, subcategory) = (sheetCategory, sheetSubcategory);
+            if (categories is not null)
+            {
+                var cr = categories.Classify(principal.Description, sheetCategory);
+                var sheetMapped = categories.Classify(null, sheetCategory).Category;
+                // La subcategoría de la hoja solo tiene sentido si la hoja ya decía la misma categoría.
+                (category, subcategory) = (cr.Category, sheetMapped == cr.Category ? sheetSubcategory : null);
+                result.CategoryAssignments.Add(new(oem, title, sheetCategory, cr.Category, cr.Source, cr.Rule));
+            }
+
             var mayor = variants.Where(v => v.PrecioMayor is not null).Select(v => v.PrecioMayor!.Value).ToList();
             var abc = rows.Select(r => abcByCode.GetValueOrDefault(TextNorm.CodeMatchKey(r.CodeNorm)!))
                 .Where(a => a is not null).OrderBy(a => a, StringComparer.Ordinal).FirstOrDefault();
@@ -99,8 +115,8 @@ public sealed class CatalogBuilder(PricingRules pricing, VehicleExtractor vehicl
                 Slug: slug,
                 Title: title,
                 Description: string.Join(" | ", descriptions),
-                Category: rows.Select(r => r.Category).FirstOrDefault(c => c is not null),
-                Subcategory: rows.Select(r => r.Subcategory).FirstOrDefault(c => c is not null),
+                Category: category,
+                Subcategory: subcategory,
                 IsVch: variants.Any(v => v.IsVch),
                 PvpMin: variants.Min(v => v.Pvp),
                 PvpMax: variants.Max(v => v.Pvp),

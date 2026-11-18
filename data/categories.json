@@ -1,0 +1,322 @@
+{
+  "_notas": [
+    "Categorias del catalogo (propuesta de mejora 2). Se asignan por como EMPIEZA la descripcion (se saltan codigos iniciales).",
+    "Gana el prefijo mas largo: 'BASE AMORTIGUADOR' antes que 'BASE'. Comparacion sin tildes, mayusculas, puntos/guiones = espacio.",
+    "Si ningun prefijo coincide, se usa la categoria de la hoja segun 'from_sheet'; si tampoco, 'default'.",
+    "Solo cambia como se muestra en la pagina: la hoja del cliente no se modifica. Subir version en cada cambio."
+  ],
+  "version": "2026-11-18.3",
+  "default": "Otros",
+  "categories": [
+    {
+      "name": "Mangueras",
+      "prefixes": [
+        "MANGUERA",
+        "MANGUERAS",
+        "MANGUIERA",
+        "MAGUERA",
+        "MANGERA",
+        "MANG"
+      ]
+    },
+    {
+      "name": "Bases de motor y caja",
+      "prefixes": [
+        "BASE MOTOR",
+        "BASE DE MOTOR",
+        "BASE DEL MOTOR",
+        "BASES MOTOR",
+        "SOPORTE MOTOR",
+        "SOPORTE DE MOTOR",
+        "BASE CAJA",
+        "BASE DE CAJA",
+        "BASE C CAMBIO",
+        "BASE C CAMBIOS",
+        "SOPORTE CAJA",
+        "SOPORTE DE CAJA",
+        "BASE TRANSMISION",
+        "SOPORTE TRANSMISION"
+      ]
+    },
+    {
+      "name": "Bases y topes de amortiguador",
+      "prefixes": [
+        "CAUCHO BASE AMORTIGUADOR",
+        "BASE DE AMORTIGUADOR",
+        "BASE AMORTIGUADORES",
+        "BASE AMORTIGUADOR",
+        "BASE AMORIGUADOR",
+        "ALZA ESPIRAL",
+        "BASE ESPIRAL",
+        "BASE PLATO",
+        "PLATO",
+        "TOPES",
+        "ALZA",
+        "TOPE"
+      ]
+    },
+    {
+      "name": "Soportes de cardán y cabina",
+      "prefixes": [
+        "SOPORTE DE CABINA",
+        "SOPORTE DE CARDAN",
+        "BASE DE CABINA",
+        "BASE DE CARDAN",
+        "SOPORTE CABINA",
+        "SOPORTE CARDAN",
+        "SOP DE CARDAN",
+        "BASE CABINA",
+        "BASE CARDAN",
+        "SOP CABINA",
+        "SOP CARDAN"
+      ]
+    },
+    {
+      "name": "Bases y soportes",
+      "prefixes": [
+        "SOPOPRTE",
+        "SOPORTES",
+        "MONTAJE",
+        "SOPORTE",
+        "SOPRTE",
+        "SPORTE",
+        "BASES",
+        "BASE",
+        "SOP"
+      ]
+    },
+    {
+      "name": "Bujes y bocines",
+      "prefixes": [
+        "BUJE",
+        "BUJES",
+        "BOCIN",
+        "BOCINES"
+      ]
+    },
+    {
+      "name": "Guardapolvos",
+      "prefixes": [
+        "GUARDAPOLVO",
+        "GUARDAPOLVOS",
+        "GUARDA POLVO",
+        "FUELLE"
+      ]
+    },
+    {
+      "name": "Cauchos",
+      "prefixes": [
+        "CAUCHO",
+        "CAUCHOS",
+        "ZAPATILLA",
+        "REGATON",
+        "MUNECO"
+      ]
+    },
+    {
+      "name": "Bandas",
+      "prefixes": [
+        "TEMPLADOR",
+        "BANDAS",
+        "BANDA",
+        "TEMPL"
+      ]
+    },
+    {
+      "name": "Filtros",
+      "prefixes": [
+        "FILTRO",
+        "FILTROS",
+        "PREFILTRO"
+      ]
+    },
+    {
+      "name": "Frenos",
+      "prefixes": [
+        "PASTILLA",
+        "PASTILLAS",
+        "ZAPATA",
+        "ZAPATAS"
+      ]
+    },
+    {
+      "name": "Kits de reparación",
+      "prefixes": [
+        "PAQUETE",
+        "JUEGO",
+        "KIT",
+        "KT"
+      ]
+    },
+    {
+      "name": "Tubos y enfriamiento",
+      "prefixes": [
+        "TAPA RADIADOR",
+        "TOMA DE AGUA",
+        "RESERVORIOS",
+        "RESER AGUA",
+        "RESERVORIO",
+        "RESEV AGUA",
+        "TERMOSTATO",
+        "BAYONETA",
+        "DEPOSITO",
+        "ACOPLE",
+        "RESER",
+        "RESEV",
+        "TUBOS",
+        "TOMA",
+        "TUBO"
+      ]
+    },
+    {
+      "name": "Empaques, capuchones y tapas",
+      "prefixes": [
+        "EMPAQUE",
+        "EMPAQUES",
+        "CAPUCHON",
+        "CAPUCHONES",
+        "TAPA",
+        "TAPAS"
+      ]
+    },
+    {
+      "name": "Tornillería y abrazaderas",
+      "prefixes": [
+        "ABRAZADERA",
+        "ABRAZADERAS",
+        "PERNO",
+        "PERNOS",
+        "TORNILLO",
+        "ARANDELA",
+        "RODELA",
+        "TUERCA",
+        "GRAPA"
+      ]
+    },
+    {
+      "name": "Lubricantes y químicos",
+      "prefixes": [
+        "ACEITE",
+        "LIMPIADOR",
+        "ADITIVO",
+        "GRASA",
+        "REFRIGERANTE",
+        "SILICON",
+        "LUBRICANTE"
+      ]
+    },
+    {
+      "name": "Perfiles y burletes",
+      "prefixes": [
+        "PERFIL",
+        "PERFILES",
+        "BURLETE",
+        "RUDON",
+        "LAMEVIDRIO",
+        "CAUCHO PUERTA"
+      ]
+    },
+    {
+      "name": "Válvulas",
+      "prefixes": [
+        "VALVULA"
+      ]
+    },
+    {
+      "name": "Rodamientos",
+      "prefixes": [
+        "RULIMAN",
+        "RODAMIENTO",
+        "RULIMANES"
+      ]
+    },
+    {
+      "name": "Suspensión y dirección",
+      "prefixes": [
+        "MESA",
+        "BARRA",
+        "BARRA ESTABILIZADORA",
+        "BARRA ESTAB",
+        "BALANCIN",
+        "ROTULA",
+        "TERMINAL",
+        "BRAZO",
+        "VARILLA",
+        "TEMPLETE"
+      ]
+    },
+    {
+      "name": "Cables, pedales y palancas",
+      "prefixes": [
+        "CABLE ACELERADOR",
+        "CABLE EMBRAGUE",
+        "CABLE FRENO",
+        "CABLES",
+        "PEDAL",
+        "PALANCA"
+      ]
+    },
+    {
+      "name": "Eléctricos e iluminación",
+      "prefixes": [
+        "JUEGO DE CABLES DE BUJIA",
+        "JUEGO CABLES BUJIA",
+        "CABLES DE BUJIA",
+        "CABLE DE BUJIA",
+        "CABLES BUJIA",
+        "CABLE BUJIA",
+        "BUJIAS",
+        "SWITCH",
+        "BUJIA",
+        "CABLE",
+        "FOCOS",
+        "FOCO"
+      ]
+    }
+  ],
+  "from_sheet": {
+    "MANGUERAS": "Mangueras",
+    "BUJES": "Bujes y bocines",
+    "BUJE": "Bujes y bocines",
+    "BOCINES": "Bujes y bocines",
+    "BOCIN PLATO SUSPENSION": "Bujes y bocines",
+    "GUARDA POLVO": "Guardapolvos",
+    "GUARDAPOLVO GUARDAFANGO": "Guardapolvos",
+    "CAUCHOS": "Cauchos",
+    "CAUCHOS DE BARRA": "Cauchos",
+    "ZAPATILLAS-CAUCHOS-ALZAS-REGATONES": "Cauchos",
+    "BASES PI": "Bases y soportes",
+    "BASES": "Bases y soportes",
+    "SOPORTES": "Bases y soportes",
+    "BASE DE MOTOR": "Bases de motor y caja",
+    "BASE AMORTIGUADOR": "Bases y topes de amortiguador",
+    "TOPES": "Bases y topes de amortiguador",
+    "SOPORTE CABINA": "Soportes de cardán y cabina",
+    "SOPORTE DE CARDAN": "Soportes de cardán y cabina",
+    "LUBRICANTES": "Lubricantes y químicos",
+    "ACEITES Y ADITIVOS": "Lubricantes y químicos",
+    "BANDAS": "Bandas",
+    "FILTRO AIRE O A/C": "Filtros",
+    "FILTROS": "Filtros",
+    "FILTRO COMBUSTIBLE": "Filtros",
+    "TUBOS": "Tubos y enfriamiento",
+    "TUBOS PLASTICOS": "Tubos y enfriamiento",
+    "TUBOS DE AGUA": "Tubos y enfriamiento",
+    "TOMAS DE AGUA": "Tubos y enfriamiento",
+    "RESERVORIOS DE AGUA": "Tubos y enfriamiento",
+    "RESERVORIOS": "Tubos y enfriamiento",
+    "TAPAS": "Empaques, capuchones y tapas",
+    "CAPUCHONES": "Empaques, capuchones y tapas",
+    "PERNOS,TORNILLOS,ABRAZADERAS,ECT": "Tornillería y abrazaderas",
+    "ABRAZADERAS": "Tornillería y abrazaderas",
+    "METALICOS": "Tornillería y abrazaderas",
+    "KT PERNO DE MORDAZA": "Kits de reparación",
+    "KIT REPARACION MORDAZA": "Kits de reparación",
+    "KIT BARRA ESTABILIZADORA": "Kits de reparación",
+    "PERFILES": "Perfiles y burletes",
+    "LAMEVIDRIO": "Perfiles y burletes",
+    "VALVULA": "Válvulas",
+    "RODAMIENTOS": "Rodamientos",
+    "FOCOS": "Eléctricos e iluminación"
+  }
+}

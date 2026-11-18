@@ -7,7 +7,8 @@ using Districauchos.Core.Vehicles;
 namespace Districauchos.Sheets;
 
 /// <summary>Lectura de hojas + construcción del catálogo. Lo usan el Worker y la herramienta de reportes.</summary>
-public sealed record CatalogSnapshot(SheetLoadResult Sheets, CatalogBuildResult Catalog, string VehicleDictionaryVersion)
+public sealed record CatalogSnapshot(
+    SheetLoadResult Sheets, CatalogBuildResult Catalog, string VehicleDictionaryVersion, string CategoriesVersion)
 {
     public IEnumerable<SyncWarning> AllWarnings => Sheets.Warnings.Concat(Catalog.Warnings);
 
@@ -18,9 +19,10 @@ public sealed record CatalogSnapshot(SheetLoadResult Sheets, CatalogBuildResult 
         var dict = VehicleDictionary.Load(settings.VehiclesJsonPath);
         var extractor = new VehicleExtractor(dict);
         var pricing = new PricingRules(settings.MayorDescuento, settings.MayorUmbral);
+        var categories = CategoryClassifier.Load(settings.CategoriesJsonPath);
 
         var sheets = await new SheetLoader(source, settings).LoadAsync(ct);
-        var catalog = new CatalogBuilder(pricing, extractor).Build(sheets.Master, sheets.Stock, overrides);
-        return new CatalogSnapshot(sheets, catalog, dict.Version);
+        var catalog = new CatalogBuilder(pricing, extractor, categories: categories).Build(sheets.Master, sheets.Stock, overrides);
+        return new CatalogSnapshot(sheets, catalog, dict.Version, categories.Version);
     }
 }

@@ -7,6 +7,7 @@ El detalle está en `BRIEF-districauchos-etapa1.md` (privado, no se versiona).
 
 ```
 data/vehicles.json          Diccionario marca → modelo → alias (versionado; revisar con el cliente)
+data/categories.json        Reglas de categorías por inicio de descripción (versionado)
 db/init/001_schema.sql      Esquema PostgreSQL (se aplica al crear el contenedor db)
 src/
   Districauchos.Core        Reglas puras: limpieza, OEM, stock, precios, vehículos, CatalogBuilder
@@ -40,6 +41,7 @@ Genera en `out/` (con `;` y UTF-8 con BOM para Excel en español):
 - `vehiculos_detectados_<fecha>.csv` — marca, modelo, cuántas fichas (OEM) tiene cada uno
 - `sin_vehiculo_<fecha>.csv` — fichas sin vehículo detectado (para completar el diccionario o la descripción)
 - `detalle_vehiculos_<fecha>.csv` — cada ficha con su vehículo (para encontrar falsos positivos)
+- `categorias_propuestas_<fecha>.csv` — categoría de la hoja vs. categoría propuesta, para que el cliente revise
 - `modelos_multimarca_<fecha>.csv` — modelos sin marca en la descripción asignados a todas sus marcas (Vitara, Forza)
 - `resumen_<fecha>.txt` — conteos de limpieza, exclusiones y advertencias
 
@@ -65,6 +67,7 @@ dotnet run --project src/Districauchos.Worker
 | Códigos con ceros a la izquierda | Se guarda el original; stock se empata ignorando ceros iniciales | `TextNorm.CodeMatchKey` |
 | Código repetido en el maestro | Se usa la primera fila y se registra advertencia | `CatalogBuilder` |
 | Vitara, Grand Vitara, Forza (Chevrolet = Suzuki) | **Resuelto 2026-11-18:** son el mismo vehículo; siempre se asignan a ambas marcas | `equivalents` en `data/vehicles.json` |
+| Categorías (propuesta de mejora 2) | Se asignan por cómo empieza la descripción; si no hay regla, desde la hoja; si no, "Otros". Solo presentación | `data/categories.json`, `CategoryClassifier` |
 
 ## Reglas que no se negocian
 

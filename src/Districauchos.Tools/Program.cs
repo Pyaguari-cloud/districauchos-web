@@ -18,6 +18,8 @@ var config = new ConfigurationBuilder()
 var settings = AppSettings.From(config);
 if (!File.Exists(settings.VehiclesJsonPath) && FindUp(settings.VehiclesJsonPath) is { } found)
     settings = settings with { VehiclesJsonPath = found };
+if (!File.Exists(settings.CategoriesJsonPath) && FindUp(settings.CategoriesJsonPath) is { } foundCat)
+    settings = settings with { CategoriesJsonPath = foundCat };
 
 switch (command)
 {
@@ -63,6 +65,17 @@ async Task VehiclesReport()
         cat.AmbiguousModels.OrderByDescending(kv => kv.Value)
             .Select(kv => new[] { kv.Key, kv.Value.ToString(CultureInfo.InvariantCulture) }));
 
+    // 3b) Categorías propuestas (propuesta de mejora 2): hoja vs. propuesta, para que el cliente revise
+    static string SourceLabel(Districauchos.Core.Catalog.CategorySource s) => s switch
+    {
+        Districauchos.Core.Catalog.CategorySource.Description => "por descripción",
+        Districauchos.Core.Catalog.CategorySource.Sheet => "de la hoja",
+        _ => "sin regla",
+    };
+    WriteCsv($"categorias_propuestas_{stamp}.csv", ["OEM", "Descripcion", "Categoria en la hoja", "Categoria propuesta", "Como se asigno"],
+        cat.CategoryAssignments.OrderBy(a => a.Category).ThenBy(a => a.Title)
+            .Select(a => new[] { a.OemNorm, a.Title, a.SheetCategory ?? "", a.Category, SourceLabel(a.Source) }));
+
     // 4) Resumen
     var s = cat.Stats;
     var summary = new StringBuilder()
@@ -90,6 +103,10 @@ async Task VehiclesReport()
         .AppendLine($"Filas de stock negativas:         {s.NegativeStockRows}")
         .AppendLine($"Filas de stock con código que no existe en el maestro: {s.StockRowsUnmatched}")
         .AppendLine()
+        .AppendLine($"Categorías (reglas v{snap.CategoriesVersion}):");
+    foreach (var g in cat.CategoryAssignments.GroupBy(a => a.Category).OrderByDescending(g => g.Count()))
+        summary.AppendLine($"  {g.Key,-32} {g.Count(),5}   (por descripción {g.Count(a => a.Source == Districauchos.Core.Catalog.CategorySource.Description)}, de la hoja {g.Count(a => a.Source == Districauchos.Core.Catalog.CategorySource.Sheet)})");
+    summary.AppendLine()
         .AppendLine("Advertencias (agrupadas):");
     foreach (var g in snap.AllWarnings.GroupBy(w => w.Code))
     {

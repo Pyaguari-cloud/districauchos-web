@@ -19,8 +19,11 @@ export function displayTitle(title: string) {
     .trim();
 }
 
-/** Categorías que en la hoja no son categorías reales (se ocultan del menú). */
-const PSEUDO_CATEGORIES = new Set(["PRODUCTO IMPORTADO", "PRODUCTO NACIONAL"]);
+/**
+ * No se muestran como categoría destacada. Desde las categorías automáticas (data/categories.json)
+ * las de la hoja ya no llegan, pero se dejan por si se desactiva el clasificador.
+ */
+const PSEUDO_CATEGORIES = new Set(["PRODUCTO IMPORTADO", "PRODUCTO NACIONAL", "OTROS"]);
 export const isRealCategory = (name: string) => !PSEUDO_CATEGORIES.has(name.trim().toUpperCase());
 
 /** "MANGUERAS CODO" → "Mangueras codo" (para menús y migas de pan). */
