@@ -14,6 +14,7 @@ public sealed record ModelCount(string Name, int Count);
 public sealed record BrandDto(string Brand, int Count, IReadOnlyList<ModelCount> Models);
 public sealed record SubcategoryCount(string Name, int Count);
 public sealed record CategoryDto(string Name, int Count, IReadOnlyList<SubcategoryCount> Subcategories);
+public sealed record SlugDto(string Slug, DateTimeOffset UpdatedAt);
 public sealed record SyncStatusDto(DateTimeOffset StartedAt, DateTimeOffset? FinishedAt, string Status, int? Published);
 
 /// <summary>Consultas de solo lectura para la API pública.</summary>
@@ -108,6 +109,17 @@ public sealed class CatalogQueries(NpgsqlDataSource db)
                 g.Where(x => x.Sub != "").Select(x => new SubcategoryCount(x.Sub, x.Count)).ToList()))
             .OrderByDescending(c => c.Count)
             .ToList();
+    }
+
+    /// <summary>Todas las fichas para el sitemap.xml.</summary>
+    public async Task<IReadOnlyList<SlugDto>> GetSlugsAsync(CancellationToken ct)
+    {
+        await using var cmd = db.CreateCommand("SELECT slug, updated_at FROM catalog_items ORDER BY slug");
+        var list = new List<SlugDto>(4000);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+            list.Add(new(r.GetString(0), r.GetFieldValue<DateTimeOffset>(1)));
+        return list;
     }
 
     public async Task<SyncStatusDto?> GetLastSyncAsync(CancellationToken ct)

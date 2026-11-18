@@ -77,10 +77,12 @@ services:
     networks: [districauchos_net]
 
   web:
-    profiles: [web]   # se activa en la semana 2 cuando exista web/Dockerfile
+    profiles: [web]
     build: { context: ./web }
     environment:
       API_URL: http://api:8080
+      WHATSAPP_NUMBER: ${WHATSAPP_NUMBER:-}
+      SITE_URL: ${SITE_URL:-https://districauchosvch.com}
     ports: ["127.0.0.1:3000:3000"]
     depends_on: [api]
     mem_limit: 512m

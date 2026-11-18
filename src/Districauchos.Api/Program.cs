@@ -53,6 +53,10 @@ app.MapGet("/api/catalog", async (
     });
 });
 
+// Debe ir antes de /{slug} para que "slugs" no se interprete como una ficha.
+app.MapGet("/api/catalog/slugs", async (CatalogQueries queries, CancellationToken ct) =>
+    Results.Ok(await queries.GetSlugsAsync(ct)));
+
 app.MapGet("/api/catalog/{slug}", async (string slug, CatalogQueries queries, CancellationToken ct) =>
     await queries.GetBySlugAsync(slug, ct) is { } item ? Results.Ok(item) : Results.NotFound());
 

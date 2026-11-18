@@ -13,11 +13,12 @@ src/
   Districauchos.Sheets      Lectura de solo lectura: Google Sheets API (spreadsheets.readonly) o CSV locales
   Districauchos.Data        PostgreSQL: snapshot transaccional (TRUNCATE + COPY), sync_runs, price_overrides
   Districauchos.Worker      BackgroundService: sincroniza cada SYNC_INTERVAL_MINUTES
-  Districauchos.Api         API minimal (semana 1: /api/health)
+  Districauchos.Search      Índice Meilisearch "products" (carga atómica con índice temporal)
+  Districauchos.Api         API pública: /api/catalog, /api/catalog/{slug}, /api/vehicles, /api/categories, /api/health
   Districauchos.Tools       CLI: reporte de vehículos para el cliente
   Dockerfile                Imagen de api/worker (build arg PROJECT)
 tests/Districauchos.Core.Tests
-web/                        Next.js (semana 2)
+web/                        Next.js 16: catálogo público (ver web/README.md)
 docker-compose.yml          db, search, worker, api (+ web con --profile web), red districauchos_net
 ```
 

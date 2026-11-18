@@ -54,6 +54,13 @@ public class TextNormTests
         Assert.Equal(Sheets.HeaderTable.Key("Código de producto"), Sheets.HeaderTable.Key("CODIGO DE PRODUCTO"));
     }
 
+    [Theory]
+    [InlineData("BASE MOTOR Chevrolet CORSA (IMPORTADORA VCH)")]
+    [InlineData("BASE MOTOR Chevrolet CORSA (MPORTADORA VCH)")]
+    [InlineData("BASE MOTOR Chevrolet CORSA (IMPORTADORAVCH)")]
+    public void Slug_drops_supplier_tag(string title) =>
+        Assert.Equal("0682561-base-motor-chevrolet-corsa", Slug.ForItem("0682561", title));
+
     [Fact]
     public void Slug_is_url_safe_with_odd_oem_chars() =>
         Assert.Equal("48609-87402-base-amortiguador", Slug.ForItem("48609'87402", "BASE AMORTIGUADOR"));

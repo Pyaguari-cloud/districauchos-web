@@ -7,7 +7,9 @@ public static partial class Slug
     /// <summary>Slug de ficha: {oem}-{titulo-corto} (máx. 6 palabras del título).</summary>
     public static string ForItem(string oemNorm, string title, int maxWords = 6)
     {
-        var words = TextNorm.NormalizeForMatch(title)
+        // Sin la marca del proveedor en la URL ("(IMPORTADORA VCH)" está en 262 títulos, a veces mal escrita).
+        var clean = SupplierTag().Replace(TextNorm.NormalizeForMatch(title), " ");
+        var words = clean
             .ToLowerInvariant()
             .Split(' ', StringSplitOptions.RemoveEmptyEntries)
             .Take(maxWords);
@@ -19,4 +21,5 @@ public static partial class Slug
 
     [GeneratedRegex("-{2,}")] private static partial Regex Dashes();
     [GeneratedRegex("[^a-z0-9]+")] private static partial Regex NonSlug();
+    [GeneratedRegex(@"\bI?MPORTADORA ?VCH\b")] private static partial Regex SupplierTag();
 }
