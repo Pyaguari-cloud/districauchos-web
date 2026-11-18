@@ -66,6 +66,17 @@ public class SheetLoaderTests
     }
 
     [Fact]
+    public void Abc_column_is_found_with_explanation_in_header()
+    {
+        var rows = WithPreamble(
+            ["Codigo Producto", "Stock actual", "CLASIFICACION ABC (A= ALTA ROTACION - B = REGULAR ROTACION C= BAJA ROTACION)"],
+            ["C1", "1", "a"], ["C2", "1", "C - BAJA"], ["C3", "1", "ALTA"]);
+        var res = new SheetLoadResult();
+        SheetLoader.LoadStore(rows, "InventarioTabiazo", StockLocation.Tabiazo, res, stockOccurrence: 1);
+        Assert.Equal(["A", "C", null], res.Stock.Select(s => s.AbcClass));
+    }
+
+    [Fact]
     public void Bodega_uses_stock_actual_and_finds_header_row()
     {
         var rows = new List<IReadOnlyList<string>>

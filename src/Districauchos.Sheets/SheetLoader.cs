@@ -101,7 +101,8 @@ public sealed class SheetLoader(ISheetSource source, AppSettings settings)
     {
         var h = HeaderTable.Locate(rows, "Codigo Producto");
         var cCode = h.Find("Codigo Producto");
-        var cAbc = h.Find("CLASIFICACION ABC");
+        // Por prefijo: el encabezado real es "CLASIFICACION ABC (A= ALTA ROTACION - B = ...)".
+        var cAbc = h.FindByPrefix("CLASIFICACION ABC") is [var abcCol, ..] ? abcCol : (int?)null;
 
         // Pregunta 12.4 (respondida 2026-11-18): la correcta es la columna J = la primera "Stock actual…".
         // Por prefijo porque en Cusubamba la J se llama "STOCK ACTUAL 1".
@@ -128,7 +129,7 @@ public sealed class SheetLoader(ISheetSource source, AppSettings settings)
             var stock = TextNorm.ParseDecimal(HeaderTable.Cell(row, cStock)) ?? 0m;
             if (cOther is not null && (TextNorm.ParseDecimal(HeaderTable.Cell(row, cOther)) ?? 0m) != stock) differ++;
 
-            result.Stock.Add(new StockRow(codeNorm, loc, stock, TextNorm.Clean(HeaderTable.Cell(row, cAbc)), i + 1));
+            result.Stock.Add(new StockRow(codeNorm, loc, stock, ParseAbc(HeaderTable.Cell(row, cAbc)), i + 1));
         }
         result.RowsRead[tab] = read;
 
@@ -156,6 +157,13 @@ public sealed class SheetLoader(ISheetSource source, AppSettings settings)
             result.Stock.Add(new StockRow(codeNorm, StockLocation.Bodega, stock, null, i + 1));
         }
         result.RowsRead[TabBodega] = read;
+    }
+
+    /// <summary>"A", " b ", "A - ALTA" → "A"/"B"/"C"; cualquier otra cosa → null.</summary>
+    internal static string? ParseAbc(string? cell)
+    {
+        var c = TextNorm.Clean(cell)?.ToUpperInvariant();
+        return c is { Length: > 0 } && c[0] is 'A' or 'B' or 'C' && (c.Length == 1 || !char.IsLetter(c[1])) ? c[..1] : null;
     }
 
     private static void MissingColumns(SheetLoadResult result, string tab, params (string Name, int? Col)[] cols)

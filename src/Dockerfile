@@ -9,6 +9,8 @@ RUN dotnet publish src/${PROJECT}/${PROJECT}.csproj -c Release -o /app --no-self
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 ARG PROJECT
+# Npgsql intenta cargar GSSAPI al conectar; sin esta librería imprime un error inofensivo.
+RUN apt-get update && apt-get install -y --no-install-recommends libgssapi-krb5-2 && rm -rf /var/lib/apt/lists/*
 ENV DOTNET_ENTRY=${PROJECT}.dll
 WORKDIR /app
 COPY --from=build /app ./
