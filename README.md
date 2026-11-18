@@ -83,3 +83,12 @@ curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" https://<dominio>/api/admin
 ```
 La API avisa al Worker por PostgreSQL (`LISTEN/NOTIFY`, canal `districauchos_sync`); si llega durante una
 sincronización, se hace otra al terminar. Resultado en `/api/health`.
+
+## Precios por mayor del Excel de sugeridos
+
+```bash
+dotnet run --project src/Districauchos.Tools -- import-prices --file "out/costos y precios sugeridos.xlsx"          # vista previa + reporte
+dotnet run --project src/Districauchos.Tools -- import-prices --file "out/costos y precios sugeridos.xlsx" --apply  # guarda y sincroniza
+```
+Solo lee "ID Producto" y "precio x mayor sugerido" (el costo nunca se lee). Los precios quedan en `price_overrides`
+(base de datos, no en la hoja): **volver a correrlo al montar el servidor** o cuando el cliente actualice el Excel.

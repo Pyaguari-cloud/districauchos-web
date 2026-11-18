@@ -10,6 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const slugs = await getSlugs();
   return [
     { url: `${SITE_URL}/`, changeFrequency: "daily", priority: 1 },
+    ...["/locales", "/como-comprar", "/nosotros"].map((p) => ({ url: `${SITE_URL}${p}`, changeFrequency: "monthly" as const, priority: 0.6 })),
     ...slugs.map((s) => ({
       url: `${SITE_URL}/repuesto/${s.slug}`,
       lastModified: s.updatedAt,

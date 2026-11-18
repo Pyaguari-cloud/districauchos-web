@@ -27,7 +27,8 @@ npm run lint && npx tsc --noEmit
 | `/repuesto/[slug]` | Ficha: precio público y por mayor, vehículos, opciones, cotizar por WhatsApp. JSON-LD `Product` **sin precio** (pendiente 12.5) | indexada |
 | `/carrito` | Carrito (localStorage) + barra "te faltan $X para por mayor" + enviar cotización por WhatsApp | `noindex` |
 | `POST /api/cotizar` | Puente a `POST /api/quote/preview` de la API .NET; agrega el enlace `wa.me`. El navegador solo manda OEM, variante y cantidad | — |
-| `/sitemap.xml`, `/robots.txt` | 3.900 fichas | — |
+| `/locales`, `/como-comprar`, `/nosotros` | Páginas del negocio. Datos en `src/content/negocio.ts` (un solo archivo; "PENDIENTE" = confirmar con el cliente). `/locales` publica la ficha `AutoPartsStore` de cada local para Google | indexadas |
+| `/sitemap.xml`, `/robots.txt` | Fichas + páginas del negocio | — |
 
 ## Marca
 
@@ -42,8 +43,14 @@ con contrastes verificados. El logo es para fondo oscuro: va siempre sobre la ba
 
 ## Vehículo y carrito (semana 3)
 
-- "Mi vehículo" (barra bajo el encabezado) se guarda en `localStorage` (`dc.vehicle.v1`). Filtra cada búsqueda nueva
+- "Mi garaje" (barra bajo el encabezado): hasta 5 vehículos y uno activo, en `localStorage` (`dc.garage.v1`).
+  El activo filtra cada búsqueda nueva
   (campos ocultos en el buscador) y en la ficha muestra si el repuesto le sirve.
 - Carrito en `localStorage` (`dc.cart.v1`), máximo 50 líneas y 999 unidades. Los precios guardados son solo para
   mostrar mientras carga: **los precios y el mayor los calcula siempre la API** (`QuoteCalculator`).
 - Si el navegador bloquea el almacenamiento (modo privado), carrito y vehículo funcionan en memoria.
+
+## Direcciones de la página anterior
+
+`next.config.ts` redirige (308) las URL de WordPress/WooCommerce: `/contactos` → `/locales`, `/tienda` → `/buscar`,
+`/producto/<slug>` → `/buscar?q=<slug>`, `/mi-cuenta` y `/finalizar-compra` → `/carrito`.

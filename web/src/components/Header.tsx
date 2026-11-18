@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { getVehicles } from "@/lib/api";
 import { CartLink } from "./CartLink";
@@ -7,7 +8,16 @@ import { SearchBox } from "./SearchBox";
 import { VehicleBar, type VehicleOption } from "./VehicleBar";
 
 /** Barra superior negra con el logo (el logo está diseñado para fondo oscuro). */
+const nav = [
+  { href: "/buscar", label: "Repuestos" },
+  { href: "/como-comprar", label: "Cómo comprar" },
+  { href: "/locales", label: "Locales" },
+  { href: "/nosotros", label: "Nosotros" },
+];
+
 export async function Header() {
+  // Siempre al pedir la página (nunca en el build): así "Mi garaje" tiene las marcas aunque la página sea estática.
+  await connection();
   // Si la API no responde, la página sigue funcionando sin el selector.
   const options: VehicleOption[] = await getVehicles()
     .then((brands) => brands.map((b) => ({ brand: b.brand, models: b.models.map((m) => m.name) })))
@@ -29,6 +39,17 @@ export async function Header() {
           <CartLink />
         </div>
       </div>
+      <nav aria-label="Principal" className="border-t border-white/10">
+        <ul className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-2 sm:px-4">
+          {nav.map((n) => (
+            <li key={n.href} className="shrink-0">
+              <Link href={n.href} className="inline-flex min-h-11 items-center px-3 font-display text-sm font-bold uppercase tracking-wide text-white/85 hover:text-brand-yellow">
+                {n.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
       {options.length > 0 && (
         <Suspense>
           <VehicleBar options={options} />

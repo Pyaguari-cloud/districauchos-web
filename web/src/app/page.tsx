@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { connection } from "next/server";
+import { HowItWorks } from "@/components/HowItWorks";
 import { ProductGrid } from "@/components/ProductCard";
+import { StoreCard } from "@/components/StoreCard";
+import { negocio } from "@/content/negocio";
 import { SearchBox } from "@/components/SearchBox";
 import { getCategories, getVehicles, searchCatalog } from "@/lib/api";
 import { isRealCategory, sentenceCase } from "@/lib/format";
+import { jsonLd, organizationJsonLd } from "@/lib/structured-data";
 
 export default async function HomePage() {
   // Se renderiza al pedirla (no en el build): los datos vienen de la API y se cachean 5 min.
@@ -25,6 +29,15 @@ export default async function HomePage() {
           <SearchBox size="lg" />
         </div>
       </section>
+
+      <ul className="grid grid-cols-3 gap-2 text-center sm:gap-4" aria-label="Districauchos en números">
+        {negocio.highlights.map((h) => (
+          <li key={h.label} className="rounded-xl border border-line bg-white px-2 py-3">
+            <p className="font-display text-2xl font-bold text-brand-red sm:text-3xl">{h.value}</p>
+            <p className="text-xs text-muted sm:text-sm">{h.label}</p>
+          </li>
+        ))}
+      </ul>
 
       <section aria-labelledby="marcas">
         <h2 id="marcas" className="mb-3 font-display text-2xl font-bold uppercase tracking-wide">Busca por marca</h2>
@@ -66,6 +79,20 @@ export default async function HomePage() {
         </div>
         <ProductGrid items={topSellers.items} />
       </section>
+
+      <HowItWorks />
+
+      <section aria-labelledby="locales">
+        <div className="mb-3 flex items-baseline justify-between gap-4">
+          <h2 id="locales" className="font-display text-2xl font-bold uppercase tracking-wide">Visítanos en {negocio.city}</h2>
+          <Link href="/locales" className="font-semibold underline underline-offset-4">Horarios</Link>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          {negocio.stores.map((s) => <StoreCard key={s.id} store={s} compact />)}
+        </div>
+      </section>
+
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(organizationJsonLd())} />
     </div>
   );
 }
