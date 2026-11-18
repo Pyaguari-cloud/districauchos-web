@@ -1,3 +1,4 @@
+using Districauchos.Core.Pricing;
 using Npgsql;
 
 namespace Districauchos.Data;
@@ -45,7 +46,7 @@ public sealed class CatalogQueries(NpgsqlDataSource db)
         var variants = new List<VariantDto>();
         await using (var cmd = new NpgsqlCommand("""
             SELECT code, is_vch, pvp, precio_mayor, available FROM catalog_variants
-            WHERE oem_norm = $1 ORDER BY available DESC, pvp
+            WHERE oem_norm = $1 ORDER BY available DESC, pvp, code
             """, conn))
         {
             cmd.Parameters.Add(new() { Value = oem });
@@ -120,6 +121,29 @@ public sealed class CatalogQueries(NpgsqlDataSource db)
         while (await r.ReadAsync(ct))
             list.Add(new(r.GetString(0), r.GetFieldValue<DateTimeOffset>(1)));
         return list;
+    }
+
+    /// <summary>Variantes publicadas para cotizar (la principal primero, igual que la ficha).</summary>
+    public async Task<IReadOnlyDictionary<string, IReadOnlyList<QuoteVariant>>> GetQuoteVariantsAsync(
+        IReadOnlyCollection<string> oems, CancellationToken ct)
+    {
+        var result = new Dictionary<string, IReadOnlyList<QuoteVariant>>(StringComparer.Ordinal);
+        if (oems.Count == 0) return result;
+        await using var cmd = db.CreateCommand("""
+            SELECT v.oem_norm, i.title, v.code, v.pvp, v.precio_mayor, v.available,
+                   count(*) OVER (PARTITION BY v.oem_norm)
+            FROM catalog_variants v JOIN catalog_items i USING (oem_norm)
+            WHERE v.oem_norm = ANY($1)
+            ORDER BY v.oem_norm, v.available DESC, v.pvp, v.code
+            """);
+        cmd.Parameters.Add(new() { Value = oems.ToArray() });
+        var rows = new List<QuoteVariant>();
+        await using (var r = await cmd.ExecuteReaderAsync(ct))
+            while (await r.ReadAsync(ct))
+                rows.Add(new(r.GetString(0), r.GetString(1), r.GetString(2), r.GetDecimal(3),
+                    r.IsDBNull(4) ? null : r.GetDecimal(4), r.GetBoolean(5), (int)r.GetInt64(6)));
+        foreach (var g in rows.GroupBy(x => x.Oem)) result[g.Key] = g.ToList();
+        return result;
     }
 
     public async Task<SyncStatusDto?> GetLastSyncAsync(CancellationToken ct)

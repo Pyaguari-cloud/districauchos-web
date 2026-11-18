@@ -15,7 +15,8 @@ src/
   Districauchos.Data        PostgreSQL: snapshot transaccional (TRUNCATE + COPY), sync_runs, price_overrides
   Districauchos.Worker      BackgroundService: sincroniza cada SYNC_INTERVAL_MINUTES
   Districauchos.Search      Índice Meilisearch "products" (carga atómica con índice temporal)
-  Districauchos.Api         API pública: /api/catalog, /api/catalog/{slug}, /api/vehicles, /api/categories, /api/health
+  Districauchos.Api         API pública: /api/catalog, /api/catalog/{slug}, /api/vehicles, /api/categories, /api/health,
+                            POST /api/quote/preview, POST /api/admin/sync (Bearer ADMIN_TOKEN)
   Districauchos.Tools       CLI: reporte de vehículos para el cliente
   Dockerfile                Imagen de api/worker (build arg PROJECT)
 tests/Districauchos.Core.Tests
@@ -74,3 +75,11 @@ dotnet run --project src/Districauchos.Worker
 - Nada en el código escribe en Google: solo `values.get` con scope `spreadsheets.readonly`.
 - `precio de COSTO` no se lee ni se guarda.
 - Cantidades y ubicaciones de stock solo en `stock_raw` (interna). La API solo expone `available`.
+
+## Forzar sincronización
+
+```bash
+curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" https://<dominio>/api/admin/sync   # 202; máx. 1 por minuto
+```
+La API avisa al Worker por PostgreSQL (`LISTEN/NOTIFY`, canal `districauchos_sync`); si llega durante una
+sincronización, se hace otra al terminar. Resultado en `/api/health`.

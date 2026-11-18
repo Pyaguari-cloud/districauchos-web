@@ -1,3 +1,5 @@
+import { VehicleFields } from "./VehicleFields";
+
 /**
  * Formulario GET a /buscar: funciona sin JavaScript y el resultado se puede compartir por enlace.
  */
@@ -8,6 +10,7 @@ export function SearchBox({ defaultValue, size = "lg" }: { defaultValue?: string
       <label htmlFor={`q-${size}`} className="sr-only">
         Buscar repuesto por nombre, vehículo o código OEM
       </label>
+      <VehicleFields />
       <input
         id={`q-${size}`}
         name="q"

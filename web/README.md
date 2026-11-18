@@ -25,6 +25,8 @@ npm run lint && npx tsc --noEmit
 | `/` | Inicio: buscador, marcas, categorías, más pedidos (clase A) | indexada |
 | `/buscar?q=&marca=&modelo=&categoria=&disponible=1&pagina=` | Resultados con filtros | `noindex` (evita duplicados) |
 | `/repuesto/[slug]` | Ficha: precio público y por mayor, vehículos, opciones, cotizar por WhatsApp. JSON-LD `Product` **sin precio** (pendiente 12.5) | indexada |
+| `/carrito` | Carrito (localStorage) + barra "te faltan $X para por mayor" + enviar cotización por WhatsApp | `noindex` |
+| `POST /api/cotizar` | Puente a `POST /api/quote/preview` de la API .NET; agrega el enlace `wa.me`. El navegador solo manda OEM, variante y cantidad | — |
 | `/sitemap.xml`, `/robots.txt` | 3.900 fichas | — |
 
 ## Marca
@@ -37,3 +39,11 @@ con contrastes verificados. El logo es para fondo oscuro: va siempre sobre la ba
 - `displayTitle` quita "(IMPORTADORA VCH)" de los títulos; el slug tampoco lo incluye.
 - "Producto Importado" / "Producto Nacional" no se muestran como categorías.
 - Precios con punto decimal ($7.00), igual que el mensaje de WhatsApp.
+
+## Vehículo y carrito (semana 3)
+
+- "Mi vehículo" (barra bajo el encabezado) se guarda en `localStorage` (`dc.vehicle.v1`). Filtra cada búsqueda nueva
+  (campos ocultos en el buscador) y en la ficha muestra si el repuesto le sirve.
+- Carrito en `localStorage` (`dc.cart.v1`), máximo 50 líneas y 999 unidades. Los precios guardados son solo para
+  mostrar mientras carga: **los precios y el mayor los calcula siempre la API** (`QuoteCalculator`).
+- Si el navegador bloquea el almacenamiento (modo privado), carrito y vehículo funcionan en memoria.

@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
+import { AddToCart } from "@/components/AddToCart";
 import { Availability } from "@/components/Availability";
 import { PartImage } from "@/components/PartImage";
+import { VehicleFit } from "@/components/VehicleFit";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { getItem, type Vehicle } from "@/lib/api";
 import { displayTitle, money, priceRange, sentenceCase, vehicleLabel } from "@/lib/format";
@@ -36,7 +38,9 @@ export default async function ItemPage({ params }: Props) {
 
   const title = displayTitle(item.title);
   const vehicles = groupVehicles(item.vehicles);
-  const wa = quoteOneLink({ oem: item.oem, title, price: item.pvpMin });
+  // La principal es la primera variante (disponible y más barata), la misma que usa la cotización.
+  const main = item.variants[0];
+  const wa = quoteOneLink({ oem: item.oem, title, price: main?.pvp ?? item.pvpMin });
   const otherNames = item.description
     .split(" | ")
     .map(displayTitle)
@@ -86,6 +90,7 @@ export default async function ItemPage({ params }: Props) {
           </div>
 
           <Availability available={item.available} />
+          <VehicleFit vehicles={item.vehicles} />
 
           <div className="rounded-xl border border-line bg-white p-4">
             <p className="text-sm font-semibold uppercase tracking-wide text-muted">Precio público</p>
@@ -99,7 +104,8 @@ export default async function ItemPage({ params }: Props) {
             )}
           </div>
 
-          {wa && <WhatsAppButton href={wa} label="Cotizar por WhatsApp" full />}
+          {main && <AddToCart oem={item.oem} code={main.code} slug={item.slug} title={title} price={main.pvp} />}
+          {wa && <WhatsAppButton href={wa} label="Cotizar solo este por WhatsApp" full />}
 
           {vehicles.length > 0 && (
             <section aria-labelledby="compatibles">
@@ -124,14 +130,15 @@ export default async function ItemPage({ params }: Props) {
           <h2 id="opciones" className="mb-1 font-display text-xl font-bold uppercase tracking-wide">
             {item.variants.length} opciones para este repuesto
           </h2>
-          <p className="mb-3 text-sm text-muted">Mismo código OEM, distinto fabricante. Pregunta por la que prefieras al cotizar.</p>
+          <p className="mb-3 text-sm text-muted">Mismo código OEM, distinto fabricante. Agrega al carrito la que prefieras.</p>
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[22rem] text-left">
+            <table className="w-full min-w-[26rem] text-left">
               <thead className="text-sm text-muted">
                 <tr>
                   <th scope="col" className="py-2 pr-3 font-semibold">Código</th>
                   <th scope="col" className="py-2 pr-3 font-semibold">Precio</th>
-                  <th scope="col" className="py-2 font-semibold">Disponibilidad</th>
+                  <th scope="col" className="py-2 pr-3 font-semibold">Disponibilidad</th>
+                  <th scope="col" className="py-2 font-semibold"><span className="sr-only">Agregar</span></th>
                 </tr>
               </thead>
               <tbody>
@@ -142,7 +149,10 @@ export default async function ItemPage({ params }: Props) {
                       {money(v.pvp)}
                       {v.precioMayor !== null && <span className="block text-sm text-brand-red">Por mayor {money(v.precioMayor)}</span>}
                     </td>
-                    <td className="py-2"><Availability available={v.available} /></td>
+                    <td className="py-2 pr-3"><Availability available={v.available} /></td>
+                    <td className="py-2 text-right">
+                      <AddToCart compact oem={item.oem} code={v.code} slug={item.slug} title={title} price={v.pvp} />
+                    </td>
                   </tr>
                 ))}
               </tbody>
