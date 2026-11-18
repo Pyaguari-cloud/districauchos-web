@@ -5,6 +5,6 @@ export type QuoteLine = {
 };
 export type QuoteResponse = {
   lines: QuoteLine[]; missing: string[]; subtotalPvp: number; total: number; hasVch: boolean;
-  mayorApplied: boolean; faltaParaMayor: number; ahorro: number; umbral: number; message: string;
+  mayorApplied: boolean; faltaParaMayor: number; ahorro: number; umbral: number; baseMayor: number; message: string;
   whatsappUrl: string | null;
 };

@@ -95,11 +95,12 @@ export default async function ItemPage({ params }: Props) {
           <div className="rounded-xl border border-line bg-white p-4">
             <p className="text-sm font-semibold uppercase tracking-wide text-muted">Precio público</p>
             <p className="font-display text-4xl font-bold">{priceRange(item.pvpMin, item.pvpMax)}</p>
+            <p className="text-sm text-muted">IVA incluido</p>
             {item.mayorMin !== null && (
               <p className="mt-2 flex flex-wrap items-center gap-2">
                 <span className="rounded bg-brand-red px-2 py-0.5 text-sm font-bold uppercase text-white">Por mayor</span>
                 <span className="font-display text-2xl font-bold">desde {money(item.mayorMin)}</span>
-                <span className="text-sm text-muted">en compras desde $200</span>
+                <span className="text-sm text-muted">al llevar $200 o más en productos Importadora VCH</span>
               </p>
             )}
           </div>

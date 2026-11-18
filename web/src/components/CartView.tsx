@@ -109,6 +109,7 @@ export function CartView() {
           <span className="font-display text-lg font-bold uppercase tracking-wide">Subtotal</span>
           <span className="font-display text-3xl font-bold">{q ? money(q.total) : "…"}</span>
         </div>
+        <p className="-mt-3 text-right text-sm text-muted">IVA incluido</p>
         {q && q.ahorro > 0 && <p className="-mt-3 text-right text-sm font-semibold text-brand-red">Ahorras {money(q.ahorro)}</p>}
         {vehicle && <p className="text-sm text-muted">Vehículo: <span className="font-semibold text-brand-ink">{vehicleText(vehicle)}</span> (va en el mensaje)</p>}
         {q?.whatsappUrl ? (
@@ -127,23 +128,29 @@ export function CartView() {
   );
 }
 
-/** Barra "Te faltan $X para precio al por mayor" (brief §6.4). Solo si hay productos VCH. */
+/**
+ * Barra "Te faltan $X para precio al por mayor" (brief §6.4). Solo si hay productos VCH.
+ * Regla del cliente: cuentan solo los productos Importadora VCH, sumados a precio por mayor.
+ */
 function MayorProgress({ quote }: { quote: QuoteResponse }) {
   if (!quote.hasVch) return null;
-  const pct = Math.min(100, Math.round((quote.subtotalPvp / quote.umbral) * 100));
+  const pct = Math.min(100, Math.round((quote.baseMayor / quote.umbral) * 100));
   return (
     <div>
       {quote.mayorApplied ? (
         <p className="font-semibold text-ok">✓ Precio al por mayor aplicado en productos Importadora VCH</p>
       ) : (
         <p>
-          Te faltan <strong>{money(quote.faltaParaMayor)}</strong> para el precio al por mayor en productos Importadora VCH
-          (compras desde {money(quote.umbral)}).
+          Te faltan <strong>{money(quote.faltaParaMayor)}</strong> en productos Importadora VCH para el precio al por mayor.
         </p>
       )}
       <div className="mt-2 h-3 overflow-hidden rounded-full bg-surface" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct} aria-label="Avance hacia el precio al por mayor">
         <div className={`h-full rounded-full ${quote.mayorApplied ? "bg-ok" : "bg-brand-yellow"}`} style={{ width: `${pct}%` }} />
       </div>
+      <p className="mt-1 text-sm text-muted">
+        Llevas {money(quote.baseMayor)} de {money(quote.umbral)}. Se cuentan los productos Importadora VCH a precio por mayor;
+        los demás se cobran a precio público.
+      </p>
     </div>
   );
 }

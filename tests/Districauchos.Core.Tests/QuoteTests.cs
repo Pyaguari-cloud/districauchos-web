@@ -24,22 +24,32 @@ public class QuoteTests
         Assert.Equal(47.00m, r.SubtotalPvp);
         Assert.Equal(47.00m, r.Total);
         Assert.False(r.MayorApplied);
-        Assert.Equal(153.00m, r.FaltaParaMayor);
+        Assert.Equal(18.00m, r.BaseMayor);          // solo VCH, a precio por mayor: 3 × 6
+        Assert.Equal(182.00m, r.FaltaParaMayor);
         Assert.Contains("Subtotal: $47.00 (precio al por mayor no aplicado)", r.Message);
+    }
+
+    [Fact]
+    public void Threshold_counts_only_vch_at_mayor_price()
+    {
+        // $204 a precio público en VCH = $122.40 a precio por mayor → NO llega (respuesta del cliente)
+        var r = _q.Calculate([new("96180071", null, 20), new("0682561", null, 20)], Catalog); // VCH 200 PVP / 120 mayor + otros 340
+        Assert.False(r.MayorApplied);
+        Assert.Equal(80.00m, r.FaltaParaMayor);
     }
 
     [Fact]
     public void At_threshold_only_vch_lines_get_mayor_price()
     {
-        var r = _q.Calculate([new("96180071", null, 10), new("0682561", null, 6)], Catalog); // 100 + 102 = 202
+        var r = _q.Calculate([new("96180071", null, 34), new("0682561", null, 2)], Catalog); // VCH 34 × 6 = 204
         Assert.True(r.MayorApplied);
         Assert.Equal(0m, r.FaltaParaMayor);
         var vch = r.Lines.Single(l => l.Oem == "96180071");
-        Assert.Equal((6.00m, 60.00m, true), (vch.UnitPrice, vch.LineTotal, vch.MayorApplied));
+        Assert.Equal((6.00m, 204.00m, true), (vch.UnitPrice, vch.LineTotal, vch.MayorApplied));
         var other = r.Lines.Single(l => l.Oem == "0682561");
         Assert.Equal((17.00m, false), (other.UnitPrice, other.MayorApplied));
-        Assert.Equal(162.00m, r.Total);
-        Assert.Equal(40.00m, r.Ahorro);
+        Assert.Equal(238.00m, r.Total);
+        Assert.Equal(136.00m, r.Ahorro);
     }
 
     [Fact]
@@ -61,6 +71,7 @@ public class QuoteTests
             2) 0682561 (cód. B2) – Base motor Chevrolet Corsa – Cant: 1 – $21.50 c/u
             Subtotal: $41.50 (precio al por mayor no aplicado)
             Vehículo: Chevrolet Aveo
+            Precios con IVA incluido
             Enviado desde districauchosvch.com
             """.ReplaceLineEndings("\n"), r.Message);
     }

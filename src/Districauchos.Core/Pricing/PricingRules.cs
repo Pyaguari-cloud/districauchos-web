@@ -21,10 +21,11 @@ public sealed class PricingRules(decimal mayorDescuento = 0.40m, decimal mayorUm
     }
 
     /// <summary>
-    /// ¿Aplica el precio al por mayor? Supuesto actual (pregunta abierta 12.1):
-    /// el umbral se mide sobre el subtotal de todo el carrito a PVP.
+    /// ¿Aplica el precio al por mayor? Confirmado por el cliente (2026-11-18): se cuentan SOLO los productos
+    /// con precio por mayor (Importadora VCH), sumados YA a precio por mayor, y ese total debe ser ≥ umbral.
+    /// Los demás productos van siempre a precio público y no suman.
     /// </summary>
-    public bool AppliesMayor(decimal subtotalPvp) => subtotalPvp >= MayorUmbral;
+    public bool AppliesMayor(decimal subtotalMayor) => subtotalMayor >= MayorUmbral;
 
-    public decimal FaltaParaMayor(decimal subtotalPvp) => Math.Max(0, MayorUmbral - subtotalPvp);
+    public decimal FaltaParaMayor(decimal subtotalMayor) => Math.Max(0, MayorUmbral - subtotalMayor);
 }

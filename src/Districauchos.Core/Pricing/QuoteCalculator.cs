@@ -16,7 +16,7 @@ public sealed record QuoteLine(
 public sealed record Quote(
     IReadOnlyList<QuoteLine> Lines, IReadOnlyList<string> Missing,
     decimal SubtotalPvp, decimal Total, bool HasVch, bool MayorApplied, decimal FaltaParaMayor, decimal Ahorro,
-    decimal Umbral, string Message);
+    decimal Umbral, decimal BaseMayor, string Message);
 
 /// <summary>
 /// Cotización del carrito (brief §6.4 y §6.7). La calcula siempre el servidor con los precios publicados:
@@ -53,9 +53,10 @@ public sealed class QuoteCalculator(PricingRules pricing, string site = "distric
             chosen.Add((v, (int)qty));
         }
 
-        // Supuesto pendiente 12.1: el umbral se mide sobre todo el carrito a precio público.
+        // Umbral (confirmado por el cliente): solo productos con precio por mayor, sumados a precio por mayor.
         var subtotalPvp = chosen.Sum(c => c.V.Pvp * c.Qty);
-        var applies = pricing.AppliesMayor(subtotalPvp);
+        var baseMayor = chosen.Where(c => c.V.PrecioMayor is not null).Sum(c => c.V.PrecioMayor!.Value * c.Qty);
+        var applies = pricing.AppliesMayor(baseMayor);
         var lines = chosen.Select(c =>
         {
             var mayor = applies && c.V.PrecioMayor is not null;
@@ -65,11 +66,11 @@ public sealed class QuoteCalculator(PricingRules pricing, string site = "distric
 
         var total = lines.Sum(l => l.LineTotal);
         var hasVch = chosen.Any(c => c.V.PrecioMayor is not null);
-        var falta = hasVch ? pricing.FaltaParaMayor(subtotalPvp) : 0m;
+        var falta = hasVch ? pricing.FaltaParaMayor(baseMayor) : 0m;
         var mayorApplied = lines.Any(l => l.MayorApplied);
 
         return new Quote(lines, missing, subtotalPvp, total, hasVch, mayorApplied, falta, subtotalPvp - total,
-            pricing.MayorUmbral, BuildMessage(lines, total, hasVch, mayorApplied, vehicle));
+            pricing.MayorUmbral, baseMayor, BuildMessage(lines, total, hasVch, mayorApplied, vehicle));
     }
 
     /// <summary>Formato del brief §6.7.</summary>
@@ -88,6 +89,7 @@ public sealed class QuoteCalculator(PricingRules pricing, string site = "distric
         if (hasVch) sb.Append(mayorApplied ? " (precio al por mayor aplicado)" : " (precio al por mayor no aplicado)");
         sb.Append('\n');
         if (!string.IsNullOrWhiteSpace(vehicle)) sb.Append($"Vehículo: {vehicle.Trim()}\n");
+        sb.Append("Precios con IVA incluido\n"); // confirmado por el cliente: el PVP de la hoja ya incluye IVA
         sb.Append($"Enviado desde {site}");
         return sb.ToString();
     }
