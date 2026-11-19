@@ -1,0 +1,25 @@
+# Caddy: recibe las visitas en 80/443, saca y renueva solo el certificado HTTPS y las pasa a la web.
+# SITE_ADDRESS (en .env del servidor):
+#   ":80"                                         → pruebas por IP, sin HTTPS (antes de cambiar el dominio)
+#   "districauchosvch.com, www.districauchosvch.com" → producción con HTTPS automático
+{
+	admin off
+}
+
+{$SITE_ADDRESS::80} {
+	encode zstd gzip
+
+	# www → dominio principal (una sola dirección para Google)
+	@www host www.districauchosvch.com
+	redir @www https://districauchosvch.com{uri} permanent
+
+	header {
+		-Server
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		X-Frame-Options SAMEORIGIN
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	}
+
+	reverse_proxy web:3000
+}

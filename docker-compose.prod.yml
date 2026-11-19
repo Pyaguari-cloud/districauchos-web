@@ -1,0 +1,22 @@
+# Producción (VPS). Se suma a docker-compose.yml; en el servidor el .env define
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.prod.yml  y  COMPOSE_PROFILES=web
+# así que basta con `docker compose up -d`.
+# Caddy es lo único expuesto a internet (80/443). El resto escucha solo en 127.0.0.1 o en la red interna.
+services:
+  caddy:
+    image: caddy:2.10-alpine
+    ports: ["80:80", "443:443", "443:443/udp"]
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data        # certificados HTTPS: no borrar
+      - caddy_config:/config
+    depends_on: [web]
+    mem_limit: 128m
+    restart: unless-stopped
+    networks: [districauchos_net]
+
+volumes:
+  caddy_data:
+  caddy_config:
