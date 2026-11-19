@@ -142,6 +142,16 @@ Probar con el simulador:
   - swap de 2 GB (swappiness 10);
   - Docker 29 + Compose, con registros limitados a 3×10 MB.
 - **Ojo:** Docker publica sus puertos saltándose ufw. En producción, todo puerto de contenedor va en `127.0.0.1:` salvo el proxy web (80/443).
+- **Página instalada (2026-11-19):**
+  - responde en `http://23.159.52.27`, todavía sin dominio;
+  - primera sincronización: 3.902 fichas (2.899 disponibles);
+  - 65 precios por mayor del Excel cargados por túnel SSH;
+  - pagos `off`;
+  - los puertos internos (8080, 3000, 5433 y 7700) están cerrados desde internet.
+- **Publicar cambios:** `./deploy.sh` (construye aquí, sube solo las imágenes que cambiaron y reinicia). Solo configuración: `./deploy.sh --files`. Exige que todo esté en commit.
+- **`.env` del servidor:** copia del local con contraseñas **nuevas** (Postgres, Meilisearch y ADMIN_TOKEN, generadas en el servidor) más `COMPOSE_FILE`, `COMPOSE_PROFILES=web` y `SITE_ADDRESS=:80`. Para cambiar a HTTPS: `SITE_ADDRESS=districauchosvch.com, www.districauchosvch.com` y `docker compose up -d caddy`.
+- **Faltan en el `.env` del servidor los `SMTP_*`** (correo de aviso de pedidos). Se necesitan antes de `PAYMENTS_MODE=payphone`.
+- Chrome fuerza HTTPS, así que por IP no se ve en el navegador (curl sí). Se verá al cambiar el dominio.
 - Plan acordado: publicar **directo en districauchosvch.com** (sin subdominio de borrador). El cliente revisa en vivo y la página de WordPress.com queda un mes de respaldo.
 
 **Repositorio**
@@ -159,11 +169,11 @@ Probar con el simulador:
 
 **Nuestros: Semana 4**
 - [x] Servidor preparado: seguridad, swap y Docker (2026-11-19).
-- [ ] Instalar la página en el VPS **ffxf Nano** (1 vCPU, 2 GB, 20 GB; Montreal) + 2 GB de swap; las imágenes se construyen fuera del servidor, Docker, `.env` de producción y `secrets/google-sa.json`.
+- [x] Página instalada en el VPS (2026-11-19). Era: VPS **ffxf Nano** (1 vCPU, 2 GB, 20 GB; Montreal) + 2 GB de swap; las imágenes se construyen fuera del servidor, Docker, `.env` de producción y `secrets/google-sa.json`.
 - [ ] Dominio: sigue registrado en WordPress.com; en su panel se cambian los nameservers a Cloudflare (gratis). Hoy el DNS solo tiene registros de WordPress, sin correo.
 - [ ] Cloudflare: DNS, HTTPS y proxy hacia la web. La API **no se expone**: solo escucha en 127.0.0.1.
 - [ ] SMTP para los avisos de pedidos.
-- [ ] En el servidor, volver a correr `import-prices` con el Excel de sugeridos (ver README).
+- [x] `import-prices` corrido contra la base del servidor (65 precios, 2026-11-19).
 - [ ] `PAYMENTS_MODE=payphone` y una compra real de $1, que luego se anula desde PayPhone Business.
 - [ ] Desactivar la aplicación PayPhone vieja cuando la nueva esté en producción.
 - [ ] Revisar en el celular real antes del lanzamiento.
