@@ -48,7 +48,7 @@ Reemplaza la tienda WordPress/WooCommerce actual en `districauchosvch.com`.
 | Página del negocio | ✅ | Inicio, /locales, /como-comprar (FAQ), /nosotros, pie de página, datos estructurados para Google |
 | Importación directa VCH | ✅ | Productos VCH primero en el buscador, sección en el inicio, filtro `/buscar?importado=1` y etiqueta |
 | Envíos | ✅ | Retiro, Quito gratis, provincia +$5 por cooperativa (`ENVIO_NACIONAL`) |
-| Pago en línea PayPhone | 🟡 Programado y probado con el simulador | **Falta un Token válido** (ver §6) |
+| Pago en línea PayPhone | 🟢 Conexión con PayPhone OK (token Web) | Falta el cobro real de $1 en el servidor (ver §6) |
 | Semana 4: servidor y lanzamiento | ⏳ Pendiente | VPS, Cloudflare, DNS, `.env` de producción, prueba real de $1 |
 
 Pruebas: 139 en `tests/` (`dotnet test`). Lint de la web: `cd web && npx tsc --noEmit && npx eslint .`
@@ -114,16 +114,15 @@ Probar con el simulador:
 
 ## 6. Dónde nos quedamos (2026-11-19)
 
-**PayPhone**
-- El Token y el Store ID que dio el cliente están en `.env`.
-- La prueba de conexión (pedir un enlace de $1, sin cobrar) dio **401: "Su aplicación no está autorizada…"**.
-- El Token está bien copiado. El problema es la aplicación de donde salió: probablemente no es de **tipo Web**, se copió otro campo, o es la aplicación vieja del programador anterior.
-- **Solución:** crear en developer.payphone.app una **aplicación nueva tipo Web** con:
+**PayPhone: conexión OK**
+- Causa del 401: la aplicación vieja era de **tipo API**, que no puede usar el Botón de Pagos. No se tocó.
+- Con la cuenta de desarrollador que prestó el cliente se creó una **aplicación nueva tipo Web**:
+  - plataforma .NET;
   - dominio `https://districauchosvch.com`;
-  - URL de respuesta `https://districauchosvch.com/pago/respuesta`.
-  Después se copia su Token al `.env` y se repite la prueba.
-- El cliente invitó al desarrollador como "developer", pero la invitación **no deja entrar**: no llega correo de recuperación y la cuenta parece no estar activada.
-- **Plan B:** una videollamada en la que el cliente crea la aplicación desde su cuenta.
+  - respuesta `/pago/respuesta`.
+  Su Token está en `.env` y **funciona**: la API crea el pedido y PayPhone devuelve el `payUrl`.
+- **Store ID:** el que está en `.env` da "La tienda asociada no existe". **Dejar `PAYPHONE_STORE_ID` vacío**, con lo que PayPhone usa la tienda principal y funciona, o copiar el correcto desde la aplicación o PayPhone Business.
+- Abrir el `payUrl` fuera del dominio real (con curl desde local) muestra "No autorizado". Es lo esperado: PayPhone exige que el pago venga de `districauchosvch.com`. **La página de pago y el cobro de $1 se prueban en el servidor** (Semana 4).
 
 **Cómo repetir la prueba de conexión** (no cobra nada):
 1. `SITE_URL=https://districauchosvch.com PAYMENTS_MODE=payphone docker compose up -d api`
@@ -138,7 +137,8 @@ Probar con el simulador:
 ## 7. Pendientes
 
 **Del cliente**
-- [ ] Token de una aplicación **Web** en PayPhone Developer, o activar la invitación de desarrollador.
+- [x] Token de una aplicación **Web** en PayPhone Developer (2026-11-19).
+- [ ] Store ID correcto, o dejarlo vacío.
 - [ ] Captura de cómo les llega hoy el aviso de venta al WhatsApp: ¿lo manda su tienda o la app PayPhone?
 - [ ] Confirmar "bajo pedido ~4 días".
 - [ ] Correo para los avisos de pedidos. Por defecto: districauchosich@hotmail.com.
