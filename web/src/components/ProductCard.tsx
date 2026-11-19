@@ -8,10 +8,10 @@ export function ProductCard({ item }: { item: CatalogHit }) {
   const title = displayTitle(item.title);
   const vehicles = [...item.models.slice(0, 3)];
   return (
-    <li className="h-full">
+    <li className="h-full min-w-0">
       <Link
         href={`/repuesto/${item.slug}`}
-        className="flex h-full flex-col gap-3 rounded-xl border border-line bg-white p-3 transition hover:border-gray-400 hover:shadow-md"
+        className="flex h-full min-w-0 flex-col gap-3 rounded-xl border border-line bg-white p-3 transition hover:border-gray-400 hover:shadow-md"
       >
         <div className="relative">
           <PartImage image={item.image} category={item.category} title={title} />
@@ -21,9 +21,11 @@ export function ProductCard({ item }: { item: CatalogHit }) {
             </span>
           )}
         </div>
-        <div className="flex flex-1 flex-col gap-1.5">
-          <h3 className="line-clamp-3 font-semibold leading-snug">{title}</h3>
-          <p className="text-sm text-muted">
+        {/* Códigos OEM y títulos de la hoja pueden traer "palabras" larguísimas (210470M0000200XS1997CR):
+            se cortan al borde para que nunca ensanchen la página en celular. */}
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <h3 className="line-clamp-3 font-semibold leading-snug [overflow-wrap:anywhere]">{title}</h3>
+          <p className="text-sm text-muted [overflow-wrap:anywhere]">
             OEM <span className="font-mono">{item.oem}</span>
           </p>
           {vehicles.length > 0 && (

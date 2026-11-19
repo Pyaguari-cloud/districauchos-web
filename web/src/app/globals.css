@@ -32,6 +32,13 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* Red de seguridad: si algún dato de la hoja fuera más ancho que la pantalla, se recorta en vez de
+   ensanchar la página (en celular eso se ve como "zoom" y una franja blanca). clip no rompe sticky. */
+html,
+body {
+  overflow-x: clip;
+}
+
 body {
   background: var(--color-surface);
   color: var(--color-brand-ink);
