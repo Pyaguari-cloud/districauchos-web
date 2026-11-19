@@ -150,7 +150,6 @@ Probar con el simulador:
   - los puertos internos (8080, 3000, 5433 y 7700) están cerrados desde internet.
 - **Publicar cambios:** `./deploy.sh` (construye aquí, sube solo las imágenes que cambiaron y reinicia). Solo configuración: `./deploy.sh --files`. Exige que todo esté en commit.
 - **`.env` del servidor:** copia del local con contraseñas **nuevas** (Postgres, Meilisearch y ADMIN_TOKEN, generadas en el servidor) más `COMPOSE_FILE`, `COMPOSE_PROFILES=web` y `SITE_ADDRESS=:80`. Para cambiar a HTTPS: `SITE_ADDRESS=districauchosvch.com, www.districauchosvch.com` y `docker compose up -d caddy`.
-- **Faltan en el `.env` del servidor los `SMTP_*`** (correo de aviso de pedidos). Se necesitan antes de `PAYMENTS_MODE=payphone`.
 - Chrome fuerza HTTPS, así que por IP no se ve en el navegador (curl sí). Se verá al cambiar el dominio.
 - Plan acordado: publicar **directo en districauchosvch.com** (sin subdominio de borrador). El cliente revisa en vivo y la página de WordPress.com queda un mes de respaldo.
 
@@ -161,6 +160,14 @@ Probar con el simulador:
   1. en Cloudflare cambiar los `A` a `23.159.52.27` y `www` a CNAME del dominio, con el **proxy activado**;
   2. SSL/TLS en **Full (strict)**;
   3. en el servidor, `SITE_ADDRESS=districauchosvch.com, www.districauchosvch.com` y `docker compose up -d caddy`.
+
+**Correo de avisos de pedidos (2026-11-19)**
+- **Brevo**, cuenta del cliente, plan Free (300 correos al día). Dominio `districauchosvch.com` **autenticado**, con los registros brevo-code, DKIM `brevo1`/`brevo2` y DMARC con `rua` de Brevo en Cloudflare.
+- Remitente `Districauchos VCH - Pedidos web <pedidos@districauchosvch.com>`, una dirección que solo envía (no tiene buzón). Las respuestas van al comprador por Reply-To.
+- Destino: `ORDERS_EMAIL_TO=districauchosich@hotmail.com`.
+- `SMTP_*` cargados en el `.env` del servidor (`smtp-relay.brevo.com:587`). La clave la generó el usuario y pasó al servidor sin mostrarse.
+- Correo de prueba enviado OK el 2026-11-19. **Falta que el cliente confirme que llegó a la bandeja de entrada y no a spam.**
+- No se usó la conexión automática Brevo↔Cloudflare, para no dar permisos sobre el DNS.
 
 **Repositorio**
 - GitHub **privado**: `https://github.com/Pyaguari-cloud/districauchos-web`, rama `main`.
@@ -181,7 +188,8 @@ Probar con el simulador:
 - [x] Nameservers del dominio pasados a Cloudflare (2026-11-19). El dominio sigue registrado en WordPress.com.
 - [ ] Lanzamiento: apuntar el DNS en Cloudflare al servidor (ver §6).
 - [ ] Cloudflare: DNS, HTTPS y proxy hacia la web. La API **no se expone**: solo escucha en 127.0.0.1.
-- [ ] SMTP para los avisos de pedidos.
+- [x] SMTP para los avisos de pedidos (Brevo, 2026-11-19).
+- [ ] Confirmar con el cliente que el correo de prueba llegó a la bandeja de entrada del Hotmail.
 - [x] `import-prices` corrido contra la base del servidor (65 precios, 2026-11-19).
 - [ ] `PAYMENTS_MODE=payphone` y una compra real de $1, que luego se anula desde PayPhone Business.
 - [ ] Desactivar la aplicación PayPhone vieja cuando la nueva esté en producción.
