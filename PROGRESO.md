@@ -131,6 +131,12 @@ Probar con el simulador:
 3. Abrir el `payUrl`: debe decir "Pagar a Districauchos $1.00". **No pagar.**
 4. Volver a la normalidad: `docker compose up -d api`. Borrar el pedido de prueba de la tabla `orders`.
 
+**Servidor (creado 2026-11-19)**
+- ffxf, **cuenta propia del cliente** (pagada por él). `districauchos-1`: Nano, Montreal, Ubuntu 24.04, IPv4 `23.159.52.27`. Renueva el 19 de cada mes.
+- Acceso: `ssh -i ~/.ssh/districauchos_ed25519 ubuntu@23.159.52.27` (usuario `ubuntu` con sudo; root no entra). La clave `districauchos_ed25519` es solo para este cliente y está solo en la computadora del desarrollador.
+- Se creó con "solo clave": **no hay contraseña de consola VNC**. Hay que crearla si hace falta una entrada de emergencia.
+- Plan acordado: publicar **directo en districauchosvch.com** (sin subdominio de borrador). El cliente revisa en vivo y la página de WordPress.com queda un mes de respaldo.
+
 **Repositorio**
 - GitHub **privado**: `https://github.com/Pyaguari-cloud/districauchos-web`, rama `main`.
 - Subido el 2026-11-19. El `git push` lo hace el usuario con `! git push`.
@@ -140,7 +146,6 @@ Probar con el simulador:
 **Del cliente**
 - [x] Token de una aplicación **Web** en PayPhone Developer (2026-11-19).
 - [ ] Carpeta de fotos de Drive (el cliente ya la está preparando).
-- [ ] Visto bueno y pago del servidor (ffxf Nano, ~$6 USD/mes).
 - [ ] Tarjeta vigente en WordPress.com: el dominio se renueva el **10-dic-2026** ($13/año). **No cancelar** el plan Personal ($9/mes) hasta el lanzamiento.
 - [ ] Los 18 productos del PDF de importación que en la hoja no figuran como VCH.
 - [ ] Los 8 productos del Excel que no son VCH, y el precio de 9023781 ($13 por mayor contra $5 público).
