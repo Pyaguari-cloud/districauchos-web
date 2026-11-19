@@ -48,8 +48,8 @@ Reemplaza la tienda WordPress/WooCommerce actual en `districauchosvch.com`.
 | Página del negocio | ✅ | Inicio, /locales, /como-comprar (FAQ), /nosotros, pie de página, datos estructurados para Google |
 | Importación directa VCH | ✅ | Productos VCH primero en el buscador, sección en el inicio, filtro `/buscar?importado=1` y etiqueta |
 | Envíos | ✅ | Retiro, Quito gratis, provincia +$5 por cooperativa (`ENVIO_NACIONAL`) |
-| Pago en línea PayPhone | 🟢 Conexión con PayPhone OK (token Web) | Falta el cobro real de $1 en el servidor (ver §6) |
-| Semana 4: servidor y lanzamiento | ⏳ Pendiente | VPS, Cloudflare, DNS, `.env` de producción, prueba real de $1 |
+| Pago en línea PayPhone | 🟢 **Activo en producción** (`PAYMENTS_MODE=payphone`) | Falta la compra real de $1 y anularla |
+| Semana 4: servidor y lanzamiento | ✅ **En vivo desde el 2026-11-19** | VPS ffxf, Caddy, Cloudflare (proxy + Full strict), Brevo y PayPhone activo. Falta la compra real de $1 |
 
 Pruebas: 139 en `tests/` (`dotnet test`). Lint de la web: `cd web && npx tsc --noEmit && npx eslint .`
 
@@ -169,6 +169,13 @@ Probar con el simulador:
 - Correo de prueba enviado OK el 2026-11-19. **El cliente confirmó que llegó a su Hotmail.**
 - No se usó la conexión automática Brevo↔Cloudflare, para no dar permisos sobre el DNS.
 
+**LANZAMIENTO (2026-11-19)**
+- Cloudflare: `A @ → 23.159.52.27` **proxied**; se borró el `A` viejo de WordPress (192.0.78.184); `www` CNAME **proxied**. SSL/TLS en **Full (strict)**.
+- Caddy con certificados Let's Encrypt para `districauchosvch.com` y `www` (vencen en feb-2027; se renuevan solos por HTTP-01 a través de Cloudflare). `www` → raíz (301), http → https.
+- `PAYMENTS_MODE=payphone` en el servidor.
+- **Volver a la página vieja** (emergencia): en Cloudflare, `A @ → 192.0.78.184` (y .236), DNS only. El plan WordPress.com sigue pagado hasta el 9-dic-2026.
+- Producto de $1.00 para la prueba real: `/repuesto/4881722010-caucho-perno-estabilizador-toyota-celica-82`.
+
 **Repositorio**
 - GitHub **privado**: `https://github.com/Pyaguari-cloud/districauchos-web`, rama `main`.
 - Subido el 2026-11-19. El `git push` lo hace el usuario con `! git push`.
@@ -186,13 +193,14 @@ Probar con el simulador:
 - [x] Servidor preparado: seguridad, swap y Docker (2026-11-19).
 - [x] Página instalada en el VPS (2026-11-19). Era: VPS **ffxf Nano** (1 vCPU, 2 GB, 20 GB; Montreal) + 2 GB de swap; las imágenes se construyen fuera del servidor, Docker, `.env` de producción y `secrets/google-sa.json`.
 - [x] Nameservers del dominio pasados a Cloudflare (2026-11-19). El dominio sigue registrado en WordPress.com.
-- [ ] Lanzamiento: apuntar el DNS en Cloudflare al servidor (ver §6).
-- [ ] Cloudflare: DNS, HTTPS y proxy hacia la web. La API **no se expone**: solo escucha en 127.0.0.1.
+- [x] Lanzamiento: DNS en Cloudflare apuntando al servidor, con proxy y Full (strict) (2026-11-19).
+- [x] Cloudflare: DNS, HTTPS y proxy hacia la web (2026-11-19). La API no se expone.
 - [x] SMTP para los avisos de pedidos (Brevo, 2026-11-19).
 - [x] El cliente confirmó que recibe el correo de prueba en su Hotmail.
 - [x] `import-prices` corrido contra la base del servidor (65 precios, 2026-11-19).
 - [ ] `PAYMENTS_MODE=payphone` y una compra real de $1, que luego se anula desde PayPhone Business.
-- [ ] Desactivar la aplicación PayPhone vieja cuando la nueva esté en producción.
+- [ ] Desactivar la aplicación PayPhone vieja (tipo API) después de la compra de prueba.
+- [ ] Cancelar el plan WordPress.com Personal ($9/mes) **antes del 9-dic-2026**, sin tocar el dominio (que se renueva el 10-dic).
 - [ ] Revisar en el celular real antes del lanzamiento.
 
 **Ideas para después**
