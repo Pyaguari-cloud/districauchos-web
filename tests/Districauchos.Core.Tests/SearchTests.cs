@@ -66,4 +66,11 @@ public class SearchTests
         Assert.Contains("aveo", s["chevytaxi"]);
         Assert.Equal(["chev", "gm"], s["chevrolet"]);
     }
+
+    [Fact]
+    public void Drop_one_word_tries_every_word()
+    {
+        // Caso real del cliente: "alza" no aparece en las fichas DMAX; la variante sin "alza" debe probarse.
+        Assert.Equal(["cabina dmax", "alza dmax", "alza cabina"], ProductIndex.DropOneWord(["alza", "cabina", "dmax"]));
+    }
 }

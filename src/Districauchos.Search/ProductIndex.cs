@@ -137,17 +137,34 @@ public sealed class ProductIndex(MeiliClient meili)
 
     /// <summary>
     /// Exige todas las palabras ("manguera aveo" = mangueras de Aveo, no todo lo que diga "aveo").
-    /// Si así no hay resultados, reintenta permitiendo que falten palabras.
+    /// Si así no hay resultados, prueba quitando UNA palabra cada vez y se queda con la variante que más
+    /// encuentra: así una palabra que el catálogo no usa ("alza cabina dmax" → "cabina dmax") no hunde la
+    /// búsqueda. Si tampoco hay nada, deja que Meilisearch quite palabras desde el final.
     /// </summary>
     public async Task<JsonNode> SearchAsync(Query query, CancellationToken ct)
     {
         var strict = await SearchAsync(query, "all", ct);
-        var multiWord = NormalizeQuery(query.Q).Contains(' ');
-        if (!multiWord || (strict["totalHits"]?.GetValue<int>() ?? 0) > 0) return strict;
-        var relaxed = await SearchAsync(query, "last", ct);
-        relaxed["relaxed"] = true;
-        return relaxed;
+        var words = NormalizeQuery(query.Q).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (words.Length < 2 || Hits(strict) > 0) return strict;
+
+        JsonNode? best = null;
+        if (words.Length <= MaxWordsForDropOne)
+        {
+            var tries = await Task.WhenAll(DropOneWord(words).Select(q => SearchAsync(query with { Q = q }, "all", ct)));
+            best = tries.Where(r => Hits(r) > 0).OrderByDescending(Hits).FirstOrDefault();
+        }
+        best ??= await SearchAsync(query, "last", ct);
+        best["relaxed"] = true;
+        return best;
     }
+
+    private const int MaxWordsForDropOne = 6;
+
+    private static int Hits(JsonNode r) => r["totalHits"]?.GetValue<int>() ?? 0;
+
+    /// <summary>"a b c" → "b c", "a c", "a b" (en ese orden).</summary>
+    internal static IEnumerable<string> DropOneWord(string[] words) =>
+        Enumerable.Range(0, words.Length).Select(skip => string.Join(' ', words.Where((_, i) => i != skip)));
 
     private Task<JsonNode> SearchAsync(Query query, string matchingStrategy, CancellationToken ct)
     {

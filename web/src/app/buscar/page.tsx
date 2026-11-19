@@ -29,16 +29,19 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     pagina: Math.max(1, Number(one(raw.pagina)) || 1),
   };
 
-  const result = await searchCatalog({
+  const base = {
     q: p.q,
-    brand: p.marca,
-    model: p.marca ? p.modelo : undefined,
     category: p.categoria,
     available: p.disponible ? true : undefined,
     vch: p.importado ? true : undefined,
     page: p.pagina,
     pageSize: 24,
-  });
+  };
+  const forVehicle = await searchCatalog({ ...base, brand: p.marca, model: p.marca ? p.modelo : undefined });
+  // "Mi garaje" no debe esconder repuestos: si con el vehículo no hay nada, se muestran los de todos los
+  // vehículos y se avisa (caso real: buscaron "alza cabina dmax" con un Aveo guardado y salía vacío).
+  const vehicleFallback = forVehicle.total === 0 && !!p.marca && !!p.q;
+  const result = vehicleFallback ? await searchCatalog(base) : forVehicle;
 
   const href = (changes: Partial<Record<keyof typeof p, string | undefined>>) => {
     const next = new URLSearchParams();
@@ -63,9 +66,15 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         <h1 className="font-display text-3xl font-bold uppercase tracking-wide">{heading}</h1>
         <p className="text-muted" aria-live="polite">
           {result.total === 0 ? "Sin resultados" : `${result.total.toLocaleString("es-EC")} repuesto${result.total === 1 ? "" : "s"}`}
-          {vehicle && p.q ? ` para ${vehicle}` : ""}
+          {vehicle && p.q && !vehicleFallback ? ` para ${vehicle}` : ""}
         </p>
-        {result.relaxed && (
+        {vehicleFallback && result.total > 0 && (
+          <p className="mt-2 rounded-lg bg-ask-bg px-3 py-2 text-ask">
+            No encontramos esto marcado para tu <strong>{vehicle}</strong>. Te mostramos los de todos los vehículos: revisa
+            en cada repuesto para qué carro es, o pregúntanos por WhatsApp.
+          </p>
+        )}
+        {result.relaxed && result.total > 0 && (
           <p className="mt-2 rounded-lg bg-ask-bg px-3 py-2 text-ask">
             No encontramos repuestos con todas esas palabras. Te mostramos resultados parecidos.
           </p>
@@ -82,7 +91,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
       {(p.marca || p.categoria || p.disponible || p.importado) && (
         <ul className="flex flex-wrap gap-2" aria-label="Filtros activos">
-          {p.marca && <Chip label={vehicle!} href={href({ marca: undefined, modelo: undefined })} />}
+          {p.marca && !vehicleFallback && <Chip label={vehicle!} href={href({ marca: undefined, modelo: undefined })} />}
           {p.categoria && <Chip label={sentenceCase(p.categoria)} href={href({ categoria: undefined })} />}
           {p.disponible && <Chip label="Solo disponibles" href={href({ disponible: undefined })} />}
           {p.importado && <Chip label="Importación directa" href={href({ importado: undefined })} />}
