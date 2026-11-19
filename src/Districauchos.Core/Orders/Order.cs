@@ -30,7 +30,7 @@ public static class OrderText
 {
     private static readonly Dictionary<DocType, string> DocNames = new()
     {
-        [DocType.ConsumidorFinal] = "Consumidor final", [DocType.Cedula] = "Cédula", [DocType.Ruc] = "RUC", [DocType.Pasaporte] = "Pasaporte",
+        [DocType.Cedula] = "Cédula", [DocType.Ruc] = "RUC", [DocType.Pasaporte] = "Pasaporte",
     };
 
     public static string DeliveryText(Delivery d, string? city) => d switch
@@ -66,7 +66,7 @@ public static class OrderText
         if (!string.IsNullOrWhiteSpace(o.Vehicle)) sb.Append($"Vehículo: {o.Vehicle}\n");
         sb.Append("\nFACTURAR A\n");
         sb.Append($"Nombre: {c.Name}\n");
-        sb.Append($"{DocNames[c.DocType]}{(c.DocNumber is null ? "" : $": {c.DocNumber}")}\n");
+        sb.Append($"{DocNames[c.DocType]}: {c.DocNumber}\n");
         sb.Append($"Celular: {c.Phone}\nCorreo: {c.Email}\n");
         if (c.Notes is not null) sb.Append($"\nNota del cliente: {c.Notes}\n");
         return sb.ToString();

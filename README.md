@@ -98,7 +98,7 @@ Solo lee "ID Producto" y "precio x mayor sugerido" (el costo nunca se lee). Los 
 Decisión del cliente (2026-11-18): el comprador paga directo en la página, como invitado (sin cuenta).
 Flujo (Botón de Pagos por redirección, docs.payphone.app):
 
-1. Carrito → `/pagar`: datos de contacto, factura (cédula, RUC, pasaporte o consumidor final) y entrega.
+1. Carrito → `/pagar`: datos de contacto, factura (cédula, RUC o pasaporte, siempre: sin consumidor final) y entrega.
 2. `POST /api/orders` (API): recalcula precios, envío y stock, valida los datos, guarda el pedido
    (`orders`, estado `Pending`) y pide a PayPhone el enlace de pago (`api/button/Prepare`).
 3. El comprador paga en la página de PayPhone (tarjeta o app) y vuelve a `/pago/respuesta`.
@@ -120,5 +120,4 @@ Flujo (Botón de Pagos por redirección, docs.payphone.app):
 2. En `.env`: `PAYMENTS_MODE=payphone`, `PAYPHONE_TOKEN`, `PAYPHONE_STORE_ID`, `SITE_URL` real y `SMTP_*`.
 3. Hacer un pago real pequeño y anularlo desde PayPhone Business.
 
-Pendiente del cliente: confirmar "bajo pedido ~4 días", el límite de consumidor final con su contador
-(`CONSUMIDOR_FINAL_MAX`, por defecto $50) y cómo les llega hoy el aviso de venta al WhatsApp.
+Pendiente del cliente: confirmar "bajo pedido ~4 días" y cómo les llega hoy el aviso de venta al WhatsApp.

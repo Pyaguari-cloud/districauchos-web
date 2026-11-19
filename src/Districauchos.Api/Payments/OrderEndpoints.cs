@@ -44,7 +44,6 @@ public static class OrderEndpoints
             enabled = Enabled(s),
             mode = s.PaymentsMode,
             backorderDays = s.BackorderDays,
-            consumidorFinalMax = s.ConsumidorFinalMax,
         }));
         if (!Enabled(s)) return;
 
@@ -72,8 +71,7 @@ public static class OrderEndpoints
             if (s.BackorderDays == 0 && quote.Lines.Any(l => !l.Available))
                 return Problem("Hay repuestos sin stock en el carrito. Quítalos o cotízalos por WhatsApp.");
 
-            var (customer, errors) = CustomerValidator.Validate(req.Customer ?? new(null, null, null, null, null, null, null, null),
-                delivery, quote.GrandTotal, s.ConsumidorFinalMax);
+            var (customer, errors) = CustomerValidator.Validate(req.Customer ?? new(null, null, null, null, null, null, null, null), delivery);
             if (customer is null) return Results.Json(new { error = "Revisa los datos marcados.", fields = errors }, statusCode: 400);
 
             var orderLines = quote.Lines.Select(l => new OrderLine(

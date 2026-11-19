@@ -34,8 +34,6 @@ public sealed record AppSettings
     public decimal IvaRate { get; init; } = 0.15m;
     /// <summary>Días de entrega de lo que no está en stock. 0 = no se puede pagar lo que no hay.</summary>
     public int BackorderDays { get; init; } = 4;
-    /// <summary>Monto máximo para facturar a "Consumidor final" (por encima se pide cédula/RUC). 0 = sin límite.</summary>
-    public decimal ConsumidorFinalMax { get; init; } = 50m;
 
     // ---- Aviso de pedidos por correo ----
     public string? SmtpHost { get; init; }
@@ -79,7 +77,6 @@ public sealed record AppSettings
         SiteUrl = (c["SITE_URL"] ?? "https://districauchosvch.com").TrimEnd('/'),
         IvaRate = Dec(c["IVA_RATE"], 0.15m),
         BackorderDays = int.TryParse(c["BACKORDER_DAYS"], out var bd) && bd >= 0 ? bd : 4,
-        ConsumidorFinalMax = Dec(c["CONSUMIDOR_FINAL_MAX"], 50m),
         SmtpHost = c["SMTP_HOST"],
         SmtpPort = int.TryParse(c["SMTP_PORT"], out var sp) ? sp : 587,
         SmtpUser = c["SMTP_USER"],

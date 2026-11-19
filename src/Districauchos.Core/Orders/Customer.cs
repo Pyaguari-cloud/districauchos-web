@@ -4,8 +4,11 @@ using Districauchos.Core.Text;
 
 namespace Districauchos.Core.Orders;
 
-/// <summary>Tipo de documento para la factura (la factura la emite el local en su POS).</summary>
-public enum DocType { ConsumidorFinal, Cedula, Ruc, Pasaporte }
+/// <summary>
+/// Tipo de documento para la factura (la factura la emite el local en su POS). Decisión del cliente:
+/// siempre con datos, sin "consumidor final", sea cual sea el monto.
+/// </summary>
+public enum DocType { Cedula, Ruc, Pasaporte }
 
 /// <summary>Lo que escribe el comprador en el formulario (sin validar).</summary>
 public sealed record CustomerInput(
@@ -13,27 +16,27 @@ public sealed record CustomerInput(
 
 /// <summary>Datos del comprador ya validados y normalizados. Dato personal: nunca se publica.</summary>
 public sealed record Customer(
-    string Name, DocType DocType, string? DocNumber, string Phone, string Email, string? Address, string? City, string? Notes);
+    string Name, DocType DocType, string DocNumber, string Phone, string Email, string? Address, string? City, string? Notes);
 
 public static partial class CustomerValidator
 {
     /// <summary>Valida y normaliza. Errores por campo, en español, listos para mostrar.</summary>
     public static (Customer? Customer, Dictionary<string, string> Errors) Validate(
-        CustomerInput input, Delivery delivery, decimal total, decimal consumidorFinalMax)
+        CustomerInput input, Delivery delivery)
     {
         var errors = new Dictionary<string, string>();
 
         var name = Clean(input.Name, 100);
         if (name.Length < 3 || !name.Any(char.IsLetter)) errors["name"] = "Escribe tu nombre y apellido.";
 
-        var docType = (input.DocType ?? "").Trim().ToLowerInvariant() switch
+        DocType? docType = (input.DocType ?? "").Trim().ToLowerInvariant() switch
         {
             "cedula" => DocType.Cedula,
             "ruc" => DocType.Ruc,
             "pasaporte" => DocType.Pasaporte,
-            _ => DocType.ConsumidorFinal,
+            _ => null,
         };
-        string? docNumber = null;
+        var docNumber = "";
         var rawDoc = Clean(input.DocNumber, 20).Replace(" ", "").Replace("-", "");
         switch (docType)
         {
@@ -50,8 +53,7 @@ public static partial class CustomerValidator
                 docNumber = rawDoc.ToUpperInvariant();
                 break;
             default:
-                if (consumidorFinalMax > 0 && total > consumidorFinalMax)
-                    errors["docType"] = $"Para compras de más de {QuoteCalculator.Money(consumidorFinalMax)} la factura necesita cédula o RUC.";
+                errors["docType"] = "Elige el tipo de documento para la factura.";
                 break;
         }
 
@@ -76,7 +78,7 @@ public static partial class CustomerValidator
 
         var notes = Clean(input.Notes, 300);
         if (errors.Count > 0) return (null, errors);
-        return (new Customer(name, docType, docNumber, phone!, email, address, city, notes.Length > 0 ? notes : null), errors);
+        return (new Customer(name, docType!.Value, docNumber, phone!, email, address, city, notes.Length > 0 ? notes : null), errors);
     }
 
     /// <summary>Cédula ecuatoriana: provincia 01–24 o 30, tercer dígito &lt; 6 y dígito verificador (módulo 10).</summary>

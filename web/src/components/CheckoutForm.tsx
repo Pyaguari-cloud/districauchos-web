@@ -15,14 +15,13 @@ const DOC_TYPES = [
   { value: "cedula", label: "Cédula" },
   { value: "ruc", label: "RUC" },
   { value: "pasaporte", label: "Pasaporte" },
-  { value: "consumidor_final", label: "Consumidor final (sin datos)" },
 ];
 
 /**
  * Datos de entrega y facturación, y paso a PayPhone. Los precios los recalcula el servidor:
  * lo que se muestra aquí es solo el resumen.
  */
-export function CheckoutForm({ backorderDays, consumidorFinalMax }: { backorderDays: number; consumidorFinalMax: number }) {
+export function CheckoutForm({ backorderDays }: { backorderDays: number }) {
   const items = useCart();
   const delivery = deliveryStore.use();
   const vehicle = useMyVehicle();
@@ -63,7 +62,6 @@ export function CheckoutForm({ backorderDays, consumidorFinalMax }: { backorderD
 
   const hasBackorder = !!quote?.lines.some((l) => !l.available);
   const needsAddress = delivery === "quito" || delivery === "national";
-  const consumidorBlocked = consumidorFinalMax > 0 && (quote?.grandTotal ?? 0) > consumidorFinalMax;
   const deliveryLabel = DELIVERY_OPTIONS.find((o) => o.value === delivery)?.label;
 
   const set = (k: keyof Fields) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
@@ -84,7 +82,7 @@ export function CheckoutForm({ backorderDays, consumidorFinalMax }: { backorderD
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           items: payloadItems, delivery, vehicle: vehicleText(vehicle) || null,
-          customer: { ...f, docNumber: f.docType === "consumidor_final" ? "" : f.docNumber },
+          customer: f,
         }),
       });
       const data = (await res.json().catch(() => ({}))) as { payUrl?: string; error?: string; fields?: Record<string, string> };
@@ -136,19 +134,16 @@ export function CheckoutForm({ backorderDays, consumidorFinalMax }: { backorderD
                 className={`min-h-12 rounded-lg border bg-white px-3 text-base ${errors.docType ? "border-brand-red" : "border-line"}`}
               >
                 {DOC_TYPES.map((d) => (
-                  <option key={d.value} value={d.value} disabled={d.value === "consumidor_final" && consumidorBlocked}>{d.label}</option>
+                  <option key={d.value} value={d.value}>{d.label}</option>
                 ))}
               </select>
               {errors.docType && <p id="e-docType" className="text-sm text-brand-red">{errors.docType}</p>}
             </div>
-            {f.docType !== "consumidor_final" &&
-              field("docNumber", f.docType === "ruc" ? "Número de RUC" : f.docType === "pasaporte" ? "Número de pasaporte" : "Número de cédula", {
+            {field("docNumber", f.docType === "ruc" ? "Número de RUC" : f.docType === "pasaporte" ? "Número de pasaporte" : "Número de cédula", {
                 inputMode: f.docType === "pasaporte" ? "text" : "numeric", autoComplete: "off", required: true,
               })}
           </div>
-          {consumidorBlocked && (
-            <p className="text-sm text-muted">Para compras de más de {money(consumidorFinalMax)} la factura necesita cédula o RUC.</p>
-          )}
+          <p className="text-sm text-muted">Te enviamos la factura electrónica a tu correo.</p>
         </fieldset>
 
         <fieldset className="flex flex-col gap-4 rounded-xl border border-line bg-white p-4">

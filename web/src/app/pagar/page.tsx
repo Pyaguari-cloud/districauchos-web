@@ -11,7 +11,7 @@ export default async function PayPage() {
   return (
     <div className="flex flex-col gap-5">
       <h1 className="font-display text-3xl font-bold uppercase tracking-wide">Pagar pedido</h1>
-      <CheckoutForm backorderDays={config.backorderDays} consumidorFinalMax={config.consumidorFinalMax} />
+      <CheckoutForm backorderDays={config.backorderDays} />
     </div>
   );
 }

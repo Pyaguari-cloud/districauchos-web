@@ -3,7 +3,7 @@ import "server-only";
 /** Pagos en línea (PayPhone). La API decide si están activos (PAYMENTS_MODE). */
 const API_URL = process.env.API_URL ?? "http://localhost:8080";
 
-export type OrdersConfig = { enabled: boolean; mode: "off" | "payphone" | "fake"; backorderDays: number; consumidorFinalMax: number };
+export type OrdersConfig = { enabled: boolean; mode: "off" | "payphone" | "fake"; backorderDays: number };
 
 export type OrderSummary = {
   number: number;
@@ -14,7 +14,7 @@ export type OrderSummary = {
   name: string; email: string; whatsappText: string;
 };
 
-const OFF: OrdersConfig = { enabled: false, mode: "off", backorderDays: 0, consumidorFinalMax: 0 };
+const OFF: OrdersConfig = { enabled: false, mode: "off", backorderDays: 0 };
 
 export async function getOrdersConfig(): Promise<OrdersConfig> {
   try {

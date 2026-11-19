@@ -35,7 +35,7 @@ public class OrderTests
     [Fact]
     public void Valid_customer_is_normalized()
     {
-        var (c, errors) = CustomerValidator.Validate(Input(), Delivery.Quito, 30m, 50m);
+        var (c, errors) = CustomerValidator.Validate(Input(), Delivery.Quito);
         Assert.Empty(errors);
         Assert.Equal(("juan@correo.com", "+593987654321", "Quito", DocType.Cedula), (c!.Email, c.Phone, c.City, c.DocType));
     }
@@ -43,7 +43,7 @@ public class OrderTests
     [Fact]
     public void National_needs_address_and_city()
     {
-        var (_, errors) = CustomerValidator.Validate(Input(address: "", city: ""), Delivery.National, 30m, 50m);
+        var (_, errors) = CustomerValidator.Validate(Input(address: "", city: ""), Delivery.National);
         Assert.Contains("address", errors.Keys);
         Assert.Contains("city", errors.Keys);
     }
@@ -51,18 +51,16 @@ public class OrderTests
     [Fact]
     public void Pickup_does_not_need_address()
     {
-        var (c, errors) = CustomerValidator.Validate(Input(address: null), Delivery.Pickup, 30m, 50m);
+        var (c, errors) = CustomerValidator.Validate(Input(address: null), Delivery.Pickup);
         Assert.Empty(errors);
         Assert.Null(c!.Address);
     }
 
-    [Fact]
-    public void Consumidor_final_only_up_to_limit()
-    {
-        Assert.Empty(CustomerValidator.Validate(Input("consumidor_final", null), Delivery.Pickup, 50m, 50m).Errors);
-        Assert.Contains("docType", CustomerValidator.Validate(Input("consumidor_final", null), Delivery.Pickup, 50.01m, 50m).Errors.Keys);
-        Assert.Empty(CustomerValidator.Validate(Input("consumidor_final", null), Delivery.Pickup, 900m, 0m).Errors); // 0 = sin límite
-    }
+    [Theory]
+    [InlineData("consumidor_final")]
+    [InlineData("")]
+    public void Document_is_always_required(string docType) =>
+        Assert.Contains("docType", CustomerValidator.Validate(Input(docType, null), Delivery.Pickup).Errors.Keys);
 
     [Theory]
     [InlineData(10.20, 1020, 887, 133)]
@@ -78,7 +76,7 @@ public class OrderTests
     [Fact]
     public void Store_message_has_invoice_data_and_backorder()
     {
-        var (c, _) = CustomerValidator.Validate(Input(), Delivery.Quito, 30m, 50m);
+        var (c, _) = CustomerValidator.Validate(Input(), Delivery.Quito);
         var o = new Order(1001, "tok", OrderStatus.Paid, DateTimeOffset.UnixEpoch,
             c! with { City = "Ambato", Address = "Calle 1" }, Delivery.National,
             [new("0682561", "A1", "Base motor Chevrolet Corsa", 2, 17m, 34m, false, Backorder: true, false)],
