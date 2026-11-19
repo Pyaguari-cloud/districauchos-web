@@ -1,7 +1,50 @@
-# Districauchos · Catálogo web (Etapa 1)
+# Districauchos VCH · Página web y catálogo
+
+Sitio web de **Districauchos VCH** (Quito, Ecuador), distribuidora e importadora directa de cauchos automotrices:
+mangueras, bujes, bases de motor, bandas y más, con 3 locales y bodega.
+
+> **¿Retomas el trabajo?** Lee primero [`PROGRESO.md`](PROGRESO.md): estado, decisiones del cliente y pendientes.
+
+## Qué hace
+
+- **Catálogo automático:** se alimenta solo de las hojas de Google del cliente, que **solo se leen y nunca se modifican**. Se sincroniza cada hora.
+- **Buscador:** por nombre, vehículo o código OEM, tolerante a errores de escritura. Las categorías se asignan solas.
+- **Mi garaje:** el comprador guarda hasta 5 vehículos y el catálogo se filtra por el activo.
+- **Importación directa VCH:** estos productos aparecen primero, con su sección y su etiqueta.
+- **Carrito:** el precio por mayor se aplica solo desde $200 en productos VCH. Envío: retiro, Quito gratis o provincia +$5.
+- **Cotización por WhatsApp:** el mensaje sale listo, calculado por el servidor.
+- **Pago en línea con PayPhone:** el comprador paga como invitado, con los datos de factura. El pago se verifica en el servidor.
+- **Páginas del negocio:** locales con mapas y horarios, cómo comprar (FAQ), nosotros, datos estructurados para Google y redirecciones desde la tienda WordPress anterior.
+- **Privacidad:** nunca se muestran costos, cantidades de stock ni ubicación de la mercadería.
+
+## Tecnología
+
+| Parte | Tecnología |
+|---|---|
+| Web | Next.js 16 (React, Tailwind), renderizada en el servidor |
+| API y sincronización | .NET 8 (Minimal API y Worker) |
+| Datos | PostgreSQL 16 |
+| Búsqueda | Meilisearch |
+| Pagos | PayPhone (Botón de Pagos por redirección) |
+| Despliegue | Docker Compose; Cloudflare delante (Semana 4) |
+
+## Inicio rápido
+
+```bash
+cp .env.example .env          # completar; los secretos nunca se versionan
+docker compose --profile web up -d --build
+# Web: http://localhost:3000 · API: http://localhost:8080/api/health
+dotnet test                   # pruebas del núcleo
+```
+
+Necesita además `secrets/google-sa.json`, una cuenta de servicio de **solo lectura** con acceso a las hojas.
+Los IDs de las hojas y el encargo original están en `BRIEF-districauchos-etapa1.md`, que es privado y no se versiona.
+
+---
+
+## Detalle técnico
 
 Catálogo de repuestos que **solo lee** las hojas de Google del cliente y las copia a PostgreSQL para servir la web.
-El detalle está en `BRIEF-districauchos-etapa1.md` (privado, no se versiona).
 
 ## Estructura
 
