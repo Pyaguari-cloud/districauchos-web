@@ -22,13 +22,14 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col gap-10">
-      <section className="-mx-4 -mt-6 bg-brand-ink px-4 py-10 text-white sm:rounded-b-2xl">
+      <section className="-mx-4 -mt-6 bg-brand-ink px-4 py-8 text-white sm:mx-0 sm:mt-0 sm:rounded-2xl sm:py-12">
         <div className="mx-auto flex max-w-3xl flex-col gap-4">
           <h1 className="font-display text-3xl font-bold uppercase leading-tight tracking-wide sm:text-4xl">
             Encuentra el repuesto <span className="text-brand-yellow">para tu vehículo</span>
           </h1>
           <p className="text-gray-300">Busca por nombre, por vehículo o por código OEM. Cotiza al instante por WhatsApp.</p>
-          <SearchBox size="lg" />
+          {/* En celular ya está el buscador del encabezado justo arriba: no se repite. */}
+          <div className="hidden sm:block"><SearchBox size="lg" /></div>
         </div>
       </section>
 

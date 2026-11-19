@@ -21,6 +21,12 @@ export type Store = {
 
 const WEEKDAYS: Day[] = ["Mo", "Tu", "We", "Th", "Fr"];
 
+// Confirmado por el cliente (2026-11-18): todos L–V 8–18 y sábado 8–15; solo Cusubamba abre domingo 8–15.
+const WEEK: Hours[] = [
+  { days: WEEKDAYS, label: "Lunes a viernes", opens: "08:00", closes: "18:00" },
+  { days: ["Sa"], label: "Sábado", opens: "08:00", closes: "15:00" },
+];
+
 export const negocio = {
   name: "Districauchos",
   tagline: "Todo en cauchos automotrices",
@@ -63,11 +69,7 @@ export const negocio = {
       postalCode: "170606",
       phone: "593986151793",
       mapsUrl: "https://maps.app.goo.gl/zg47QN4bQJ8vh9fP8",
-      // PENDIENTE: su página muestra dos horarios distintos para la matriz (sábado 8:30–13:00 y 8:00–15:00).
-      hours: [
-        { days: WEEKDAYS, label: "Lunes a viernes", opens: "09:00", closes: "18:00" },
-        { days: ["Sa"], label: "Sábado", opens: "08:30", closes: "13:00" },
-      ],
+      hours: WEEK,
     },
     {
       id: "cusubamba",
@@ -77,10 +79,7 @@ export const negocio = {
       postalCode: "170606",
       phone: "593985595439",
       mapsUrl: "https://maps.app.goo.gl/yFZzpAPsMmkUTU5R6",
-      hours: [
-        { days: WEEKDAYS, label: "Lunes a viernes", opens: "08:00", closes: "18:00" },
-        { days: ["Sa", "Su"], label: "Sábado y domingo", opens: "08:00", closes: "15:00" },
-      ],
+      hours: [...WEEK, { days: ["Su"], label: "Domingo", opens: "08:00", closes: "15:00" }],
     },
     {
       id: "maldonado",
@@ -90,10 +89,7 @@ export const negocio = {
       postalCode: "170146",
       phone: "593999541922",
       mapsUrl: "https://maps.app.goo.gl/FgnGkScW5f6F85Jd6",
-      hours: [
-        { days: WEEKDAYS, label: "Lunes a viernes", opens: "08:00", closes: "18:00" },
-        { days: ["Sa", "Su"], label: "Sábado y domingo", opens: "08:00", closes: "15:00" },
-      ],
+      hours: WEEK,
     },
   ] satisfies Store[],
 } as const;
@@ -106,10 +102,7 @@ export const storeWhatsApp = (s: Store) =>
   `https://wa.me/${s.phone}?text=${encodeURIComponent(`Hola, les escribo desde la página web (local ${s.name}).`)}`;
 
 /*
- * RESPONDIDO (2026-11-18): mapas de los 3 locales, cotizaciones al WhatsApp de Cusubamba, envíos,
- * formas de pago (PayPhone + transferencia) e historia para "Quiénes somos".
- * PENDIENTE:
- * 1. Horarios reales de cada local (la página actual se contradice).
- * 2. ¿Mantener el enlace "Compra y Facturación" (formulario de Google)?
- * 3. PayPhone en la página: ver decisión en el README (enlace de pago vs. pago en el carrito).
+ * Todo confirmado por el cliente (2026-11-18): mapas, horarios, WhatsApp de cotizaciones (Cusubamba), envíos,
+ * formas de pago e historia. "Compra y Facturación" no va (lleva a su POS interno).
+ * PENDIENTE: PayPhone en la página (ver README).
  */

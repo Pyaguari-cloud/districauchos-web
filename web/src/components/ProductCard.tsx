@@ -16,7 +16,7 @@ export function ProductCard({ item }: { item: CatalogHit }) {
         <div className="relative">
           <PartImage image={item.image} category={item.category} title={title} />
           {item.isVch && (
-            <span className="absolute left-2 top-2 rounded bg-brand-red px-2 py-0.5 text-xs font-bold uppercase tracking-wide text-white">
+            <span className="absolute left-2 top-2 whitespace-nowrap rounded bg-brand-red px-1.5 py-0.5 text-[10px] font-bold sm:px-2 sm:text-xs uppercase tracking-wide text-white">
               Importación directa
             </span>
           )}
@@ -29,7 +29,7 @@ export function ProductCard({ item }: { item: CatalogHit }) {
           {vehicles.length > 0 && (
             <p className="line-clamp-1 text-sm text-muted">Para: {vehicles.join(", ")}{item.models.length > 3 ? "…" : ""}</p>
           )}
-          <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-2">
+          <div className="mt-auto flex flex-col items-start gap-0.5 pt-2 lg:flex-row lg:flex-wrap lg:items-center lg:justify-between lg:gap-2">
             <span className="font-display text-xl font-bold">{priceRange(item.pvpMin, item.pvpMax)}</span>
             {item.mayorMin !== null && (
               <span className="text-sm font-semibold text-brand-red">Por mayor {money(item.mayorMin)}</span>
