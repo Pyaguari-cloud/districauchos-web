@@ -3,8 +3,6 @@
 Sitio web de **Districauchos VCH** (Quito, Ecuador), distribuidora e importadora directa de cauchos automotrices:
 mangueras, bujes, bases de motor, bandas y más, con 3 locales y bodega.
 
-> **¿Retomas el trabajo?** Lee primero [`PROGRESO.md`](PROGRESO.md): estado, decisiones del cliente y pendientes.
-
 ## Qué hace
 
 - **Catálogo automático:** se alimenta solo de las hojas de Google del cliente, que **solo se leen y nunca se modifican**. Se sincroniza cada hora.
@@ -162,5 +160,3 @@ Flujo (Botón de Pagos por redirección, docs.payphone.app):
 1. En developer.payphone.app (cuenta Business del cliente) crear la aplicación web y copiar Token y Store ID.
 2. En `.env`: `PAYMENTS_MODE=payphone`, `PAYPHONE_TOKEN`, `PAYPHONE_STORE_ID`, `SITE_URL` real y `SMTP_*`.
 3. Hacer un pago real pequeño y anularlo desde PayPhone Business.
-
-Pendiente del cliente: confirmar "bajo pedido ~4 días" y cómo les llega hoy el aviso de venta al WhatsApp.
