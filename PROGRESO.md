@@ -132,7 +132,8 @@ Probar con el simulador:
 4. Volver a la normalidad: `docker compose up -d api`. Borrar el pedido de prueba de la tabla `orders`.
 
 **Repositorio**
-- Se está subiendo a GitHub, en un repositorio **privado**.
+- GitHub **privado**: `https://github.com/Pyaguari-cloud/districauchos-web`, rama `main`.
+- Subido el 2026-11-19. El `git push` lo hace el usuario con `! git push`.
 
 ## 7. Pendientes
 
