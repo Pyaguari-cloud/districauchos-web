@@ -176,6 +176,10 @@ Probar con el simulador:
 - **Volver a la página vieja** (emergencia): en Cloudflare, `A @ → 192.0.78.184` (y .236), DNS only. El plan WordPress.com sigue pagado hasta el 9-dic-2026.
 - Producto de $1.00 para la prueba real: `/repuesto/4881722010-caucho-perno-estabilizador-toyota-celica-82`.
 
+**Arreglos post-lanzamiento (2026-11-19)**
+- Celular: el inicio se ensanchaba (efecto "zoom" + franja blanca) por códigos OEM y títulos largos sin espacios. Tarjetas con `min-w-0` + corte de palabras largas, categorías con el número debajo en celular, y `overflow-x: clip` en html/body. Verificado a 320, 360 y 390 px.
+- Ícono de pestaña: era el de Next. Ahora `favicon.ico`, `icon.svg` y `apple-icon.png` con el auto "VCH" del logo.
+
 **Repositorio**
 - GitHub **privado**: `https://github.com/Pyaguari-cloud/districauchos-web`, rama `main`.
 - Subido el 2026-11-19. El `git push` lo hace el usuario con `! git push`.
