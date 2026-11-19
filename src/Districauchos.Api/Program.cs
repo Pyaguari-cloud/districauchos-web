@@ -16,8 +16,13 @@ builder.Services.AddSingleton(_ => CatalogRepository.CreateDataSource(
 builder.Services.AddSingleton<CatalogQueries>();
 builder.Services.AddSingleton(_ => MeiliClient.Create(settings));
 builder.Services.AddSingleton<ProductIndex>();
-builder.Services.AddSingleton(new QuoteCalculator(new PricingRules(settings.MayorDescuento, settings.MayorUmbral)));
-builder.Services.ConfigureHttpJsonOptions(o => o.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase);
+builder.Services.AddSingleton(new QuoteCalculator(
+    new PricingRules(settings.MayorDescuento, settings.MayorUmbral), nationalShipping: settings.EnvioNacional));
+builder.Services.ConfigureHttpJsonOptions(o =>
+{
+    o.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    o.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+});
 
 var app = builder.Build();
 
@@ -36,10 +41,10 @@ app.Use(async (ctx, next) =>
 app.MapGet("/api/catalog", async (
     ProductIndex index, CancellationToken ct,
     string? q, string? brand, string? model, string? category, string? subcategory,
-    bool? available, int? page, int? pageSize) =>
+    bool? available, bool? vch, int? page, int? pageSize) =>
 {
     var res = await index.SearchAsync(new ProductIndex.Query(
-        q, brand, model, category, subcategory, available, page ?? 1, pageSize ?? 24), ct);
+        q, brand, model, category, subcategory, available, page ?? 1, pageSize ?? 24, vch), ct);
 
     return Results.Ok(new
     {
@@ -90,7 +95,8 @@ app.MapPost("/api/quote/preview", async (QuoteRequest req, QuoteCalculator calc,
 
     var variants = await queries.GetQuoteVariantsAsync(lines.Select(l => l.Oem).Distinct().ToList(), ct);
     var vehicle = req.Vehicle is { Length: > 0 and <= 80 } v ? v : null;
-    return Results.Ok(calc.Calculate(lines, variants, vehicle));
+    var delivery = Enum.TryParse<Delivery>(req.Delivery, ignoreCase: true, out var d) && Enum.IsDefined(d) ? d : Delivery.None;
+    return Results.Ok(calc.Calculate(lines, variants, vehicle, delivery));
 });
 
 // Forzar sincronización (brief §8). Protegido por ADMIN_TOKEN; el Worker recibe el aviso por PostgreSQL.
@@ -130,5 +136,5 @@ static JsonNode? ToCamel(JsonNode? node)
     return result;
 }
 
-record QuoteRequest(List<QuoteRequestItem>? Items, string? Vehicle);
+record QuoteRequest(List<QuoteRequestItem>? Items, string? Vehicle, string? Delivery);
 record QuoteRequestItem(string? Oem, string? Code, int Qty);

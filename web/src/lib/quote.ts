@@ -5,6 +5,9 @@ export type QuoteLine = {
 };
 export type QuoteResponse = {
   lines: QuoteLine[]; missing: string[]; subtotalPvp: number; total: number; hasVch: boolean;
-  mayorApplied: boolean; faltaParaMayor: number; ahorro: number; umbral: number; baseMayor: number; message: string;
+  mayorApplied: boolean; faltaParaMayor: number; ahorro: number; umbral: number; baseMayor: number;
+  delivery: Delivery; shipping: number; grandTotal: number; message: string;
   whatsappUrl: string | null;
 };
+
+export type Delivery = "none" | "pickup" | "quito" | "national";

@@ -19,6 +19,7 @@ public sealed record AppSettings
     public string? AdminToken { get; init; }
     public string VehiclesJsonPath { get; init; } = "data/vehicles.json";
     public string CategoriesJsonPath { get; init; } = "data/categories.json";
+    public decimal EnvioNacional { get; init; } = 5m;
     public string MeiliUrl { get; init; } = "http://localhost:7700";
     public string? MeiliMasterKey { get; init; }
 
@@ -41,6 +42,7 @@ public sealed record AppSettings
         WhatsappNumber = c["WHATSAPP_NUMBER"],
         MayorDescuento = Dec(c["MAYOR_DESCUENTO"], 0.40m),
         MayorUmbral = Dec(c["MAYOR_UMBRAL"], 200m),
+        EnvioNacional = Dec(c["ENVIO_NACIONAL"], 5m),
         SyncIntervalMinutes = int.TryParse(c["SYNC_INTERVAL_MINUTES"], out var m) ? m : 60,
         DatabaseUrl = c["DATABASE_URL"],
         AdminToken = c["ADMIN_TOKEN"],

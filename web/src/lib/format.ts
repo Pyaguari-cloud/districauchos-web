@@ -13,7 +13,7 @@ export function priceRange(min: number, max: number) {
  */
 export function displayTitle(title: string) {
   return title
-    .replace(/\(?\s*(?:IMPORTADORA|MPORTADORA)\s*VCH\s*\)?/gi, "")
+    .replace(/\(?\s*\b[A-Z]*MP[A-Z]*\s*VCH\b\s*\)?/gi, "")
     .replace(/\s{2,}/g, " ")
     .replace(/[\s,\-–/]+$/, "")
     .trim();

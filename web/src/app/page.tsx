@@ -12,8 +12,10 @@ import { jsonLd, organizationJsonLd } from "@/lib/structured-data";
 export default async function HomePage() {
   // Se renderiza al pedirla (no en el build): los datos vienen de la API y se cachean 5 min.
   await connection();
-  const [topSellers, categories, brands] = await Promise.all([
-    searchCatalog({ available: true, pageSize: 8 }), // sin texto: ordena clase A primero
+  // Pedido del cliente: primero lo que importan directamente (Importadora VCH), luego el resto.
+  const [imported, topSellers, categories, brands] = await Promise.all([
+    searchCatalog({ available: true, vch: true, pageSize: 8 }),
+    searchCatalog({ available: true, vch: false, pageSize: 8 }), // sin texto: clase A primero
     getCategories(),
     getVehicles(),
   ]);
@@ -30,7 +32,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <ul className="grid grid-cols-3 gap-2 text-center sm:gap-4" aria-label="Districauchos en números">
+      <ul className="grid grid-cols-2 gap-2 text-center sm:grid-cols-4 sm:gap-4" aria-label="Districauchos en números">
         {negocio.highlights.map((h) => (
           <li key={h.label} className="rounded-xl border border-line bg-white px-2 py-3">
             <p className="font-display text-2xl font-bold text-brand-red sm:text-3xl">{h.value}</p>
@@ -38,6 +40,17 @@ export default async function HomePage() {
           </li>
         ))}
       </ul>
+
+      <section aria-labelledby="importacion" className="rounded-2xl border-2 border-brand-red/20 bg-white p-4 sm:p-6">
+        <div className="mb-1 flex items-baseline justify-between gap-4">
+          <h2 id="importacion" className="font-display text-2xl font-bold uppercase tracking-wide">
+            <span className="text-brand-red">Importación directa</span> VCH
+          </h2>
+          <Link href="/buscar?importado=1" className="shrink-0 font-semibold underline underline-offset-4">Ver todos</Link>
+        </div>
+        <p className="mb-4 text-muted">Importamos directamente desde Corea, Japón y Tailandia. Precio al por mayor desde $200.</p>
+        <ProductGrid items={imported.items} />
+      </section>
 
       <section aria-labelledby="marcas">
         <h2 id="marcas" className="mb-3 font-display text-2xl font-bold uppercase tracking-wide">Busca por marca</h2>
@@ -74,7 +87,7 @@ export default async function HomePage() {
 
       <section aria-labelledby="mas-vendidos">
         <div className="mb-3 flex items-baseline justify-between gap-4">
-          <h2 id="mas-vendidos" className="font-display text-2xl font-bold uppercase tracking-wide">Los más pedidos</h2>
+          <h2 id="mas-vendidos" className="font-display text-2xl font-bold uppercase tracking-wide">Más repuestos</h2>
           <Link href="/buscar" className="font-semibold underline underline-offset-4">Ver todo</Link>
         </div>
         <ProductGrid items={topSellers.items} />

@@ -5,11 +5,12 @@ import { negocio } from "@/content/negocio";
 
 export const metadata: Metadata = {
   title: "Cómo comprar y preguntas frecuentes",
-  description: "Cómo cotizar repuestos por WhatsApp en Districauchos, precio al por mayor, IVA y disponibilidad.",
+  description: "Cómo cotizar por WhatsApp, envíos gratis en Quito y a todo el Ecuador, formas de pago, precio al por mayor e IVA.",
   alternates: { canonical: "/como-comprar" },
 };
 
-// Solo respuestas confirmadas. Envíos y formas de pago: pendientes (ver content/negocio.ts).
+// Solo respuestas confirmadas por el cliente (ver content/negocio.ts).
+const { shipping, payments } = negocio;
 const faq: { q: string; a: React.ReactNode }[] = [
   {
     q: "¿Cómo cotizo?",
@@ -32,6 +33,25 @@ const faq: { q: string; a: React.ReactNode }[] = [
   },
   { q: "¿Los precios incluyen IVA?", a: "Sí. Todos los precios de la página incluyen IVA." },
   {
+    q: "¿Hacen envíos?",
+    a: (
+      <ul className="list-disc space-y-1 pl-5">
+        <li><strong>{shipping.quito}.</strong></li>
+        <li>{shipping.national.text}.</li>
+        <li>{shipping.international}.</li>
+      </ul>
+    ),
+  },
+  {
+    q: "¿Cómo puedo pagar?",
+    a: (
+      <>
+        Cuando confirmamos tu cotización puedes pagar con <strong>{payments.payphone}</strong> o por{" "}
+        <strong>transferencia</strong> a nuestra cuenta (ver abajo). También puedes pagar en cualquiera de nuestros locales.
+      </>
+    ),
+  },
+  {
     q: "¿Cómo sé si un repuesto le sirve a mi vehículo?",
     a: (
       <>
@@ -48,7 +68,7 @@ const faq: { q: string; a: React.ReactNode }[] = [
     q: "¿Puedo comprar directamente en la página?",
     a: (
       <>
-        La página es para cotizar: la compra se cierra por WhatsApp o en nuestros{" "}
+        La página es para cotizar: confirmamos disponibilidad y la compra se cierra por WhatsApp o en nuestros{" "}
         <Link href="/locales" className="font-semibold underline underline-offset-2">locales</Link>. No se cobra nada en la página.
       </>
     ),
@@ -76,6 +96,17 @@ export default function HowToBuyPage() {
           ))}
         </div>
       </section>
+      <section aria-labelledby="pago" className="max-w-3xl rounded-xl border border-line bg-white p-4">
+        <h2 id="pago" className="mb-2 font-display text-2xl font-bold uppercase tracking-wide">Datos para transferencia</h2>
+        <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
+          <dt className="font-semibold">Banco</dt><dd>{payments.transfer.bank}</dd>
+          <dt className="font-semibold">Tipo</dt><dd>{payments.transfer.accountType}</dd>
+          <dt className="font-semibold">Número</dt><dd className="font-mono text-lg">{payments.transfer.number}</dd>
+          <dt className="font-semibold">A nombre de</dt><dd>{payments.transfer.holder}</dd>
+        </dl>
+        <p className="mt-3 text-sm text-muted">Envíanos el comprobante por WhatsApp para despachar tu pedido.</p>
+      </section>
+
       <p className="text-muted">¿Otra pregunta? Escríbenos a {negocio.email} o por WhatsApp.</p>
     </div>
   );

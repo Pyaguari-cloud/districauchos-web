@@ -6,6 +6,9 @@ namespace Districauchos.Core.Pricing;
 /// <summary>Línea pedida por el cliente (carrito). <c>Code</c> = variante elegida; null = la principal.</summary>
 public sealed record QuoteRequestLine(string Oem, string? Code, int Qty);
 
+/// <summary>Cómo recibe el pedido (respuesta del cliente 2026-11-18: Quito gratis, nacional +$5 por cooperativa).</summary>
+public enum Delivery { None, Pickup, Quito, National }
+
 /// <summary>Datos de catálogo de una variante, tal como están publicados.</summary>
 public sealed record QuoteVariant(string Oem, string Title, string Code, decimal Pvp, decimal? PrecioMayor, bool Available, int VariantCount);
 
@@ -16,13 +19,13 @@ public sealed record QuoteLine(
 public sealed record Quote(
     IReadOnlyList<QuoteLine> Lines, IReadOnlyList<string> Missing,
     decimal SubtotalPvp, decimal Total, bool HasVch, bool MayorApplied, decimal FaltaParaMayor, decimal Ahorro,
-    decimal Umbral, decimal BaseMayor, string Message);
+    decimal Umbral, decimal BaseMayor, Delivery Delivery, decimal Shipping, decimal GrandTotal, string Message);
 
 /// <summary>
 /// Cotización del carrito (brief §6.4 y §6.7). La calcula siempre el servidor con los precios publicados:
 /// el navegador solo manda OEM, variante y cantidad.
 /// </summary>
-public sealed class QuoteCalculator(PricingRules pricing, string site = "districauchosvch.com")
+public sealed class QuoteCalculator(PricingRules pricing, string site = "districauchosvch.com", decimal nationalShipping = 5m)
 {
     public const int MaxLines = 50;
     public const int MaxQty = 999;
@@ -33,7 +36,7 @@ public sealed class QuoteCalculator(PricingRules pricing, string site = "distric
     /// <param name="variantsByOem">Variantes publicadas por OEM, la principal primero.</param>
     public Quote Calculate(
         IEnumerable<QuoteRequestLine> request, IReadOnlyDictionary<string, IReadOnlyList<QuoteVariant>> variantsByOem,
-        string? vehicle = null)
+        string? vehicle = null, Delivery delivery = Delivery.None)
     {
         // Misma ficha y variante pedida dos veces → una sola línea con la suma.
         var merged = request
@@ -68,13 +71,17 @@ public sealed class QuoteCalculator(PricingRules pricing, string site = "distric
         var hasVch = chosen.Any(c => c.V.PrecioMayor is not null);
         var falta = hasVch ? pricing.FaltaParaMayor(baseMayor) : 0m;
         var mayorApplied = lines.Any(l => l.MayorApplied);
+        // El envío no cuenta para el umbral del por mayor.
+        var shipping = delivery == Delivery.National && lines.Count > 0 ? nationalShipping : 0m;
 
         return new Quote(lines, missing, subtotalPvp, total, hasVch, mayorApplied, falta, subtotalPvp - total,
-            pricing.MayorUmbral, baseMayor, BuildMessage(lines, total, hasVch, mayorApplied, vehicle));
+            pricing.MayorUmbral, baseMayor, delivery, shipping, total + shipping,
+            BuildMessage(lines, total, hasVch, mayorApplied, vehicle, delivery, shipping));
     }
 
     /// <summary>Formato del brief §6.7.</summary>
-    private string BuildMessage(IReadOnlyList<QuoteLine> lines, decimal total, bool hasVch, bool mayorApplied, string? vehicle)
+    private string BuildMessage(
+        IReadOnlyList<QuoteLine> lines, decimal total, bool hasVch, bool mayorApplied, string? vehicle, Delivery delivery, decimal shipping)
     {
         var sb = new StringBuilder("Hola, quiero cotizar:\n");
         for (var i = 0; i < lines.Count; i++)
@@ -88,6 +95,15 @@ public sealed class QuoteCalculator(PricingRules pricing, string site = "distric
         sb.Append($"Subtotal: {Money(total)}");
         if (hasVch) sb.Append(mayorApplied ? " (precio al por mayor aplicado)" : " (precio al por mayor no aplicado)");
         sb.Append('\n');
+        switch (delivery)
+        {
+            case Delivery.Pickup: sb.Append("Entrega: retiro en local\n"); break;
+            case Delivery.Quito: sb.Append("Entrega: envío dentro de Quito (sin costo)\n"); break;
+            case Delivery.National:
+                sb.Append($"Entrega: envío nacional por cooperativa (+{Money(shipping)})\n");
+                sb.Append($"Total con envío: {Money(total + shipping)}\n");
+                break;
+        }
         if (!string.IsNullOrWhiteSpace(vehicle)) sb.Append($"Vehículo: {vehicle.Trim()}\n");
         sb.Append("Precios con IVA incluido\n"); // confirmado por el cliente: el PVP de la hoja ya incluye IVA
         sb.Append($"Enviado desde {site}");

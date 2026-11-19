@@ -12,6 +12,7 @@ export function Footer() {
         <div className="flex flex-col gap-3">
           <p className="font-display text-xl font-bold uppercase tracking-wide text-brand-yellow">{negocio.name}</p>
           <p className="text-sm text-gray-300">{negocio.tagline} · {negocio.city}, Ecuador</p>
+          <p className="text-sm text-gray-300">{negocio.shipping.quito} · envíos a todo el Ecuador</p>
           {wa && <WhatsAppButton href={wa} label="WhatsApp" />}
         </div>
 

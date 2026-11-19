@@ -68,6 +68,8 @@ export type CatalogQuery = {
   category?: string;
   subcategory?: string;
   available?: boolean;
+  /** true = solo importación directa (Importadora VCH); false = solo los demás. */
+  vch?: boolean;
   page?: number;
   pageSize?: number;
 };

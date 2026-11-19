@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { CatalogHit } from "@/lib/api";
-import { displayTitle, priceRange } from "@/lib/format";
+import { displayTitle, money, priceRange } from "@/lib/format";
 import { Availability } from "./Availability";
 import { PartImage } from "./PartImage";
 
@@ -13,7 +13,14 @@ export function ProductCard({ item }: { item: CatalogHit }) {
         href={`/repuesto/${item.slug}`}
         className="flex h-full flex-col gap-3 rounded-xl border border-line bg-white p-3 transition hover:border-gray-400 hover:shadow-md"
       >
-        <PartImage image={item.image} category={item.category} title={title} />
+        <div className="relative">
+          <PartImage image={item.image} category={item.category} title={title} />
+          {item.isVch && (
+            <span className="absolute left-2 top-2 rounded bg-brand-red px-2 py-0.5 text-xs font-bold uppercase tracking-wide text-white">
+              Importación directa
+            </span>
+          )}
+        </div>
         <div className="flex flex-1 flex-col gap-1.5">
           <h3 className="line-clamp-3 font-semibold leading-snug">{title}</h3>
           <p className="text-sm text-muted">
@@ -24,8 +31,8 @@ export function ProductCard({ item }: { item: CatalogHit }) {
           )}
           <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-2">
             <span className="font-display text-xl font-bold">{priceRange(item.pvpMin, item.pvpMax)}</span>
-            {item.isVch && (
-              <span className="rounded bg-brand-red px-2 py-0.5 text-xs font-bold uppercase tracking-wide text-white">Precio por mayor</span>
+            {item.mayorMin !== null && (
+              <span className="text-sm font-semibold text-brand-red">Por mayor {money(item.mayorMin)}</span>
             )}
           </div>
           <Availability available={item.available} />

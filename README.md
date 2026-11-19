@@ -92,3 +92,11 @@ dotnet run --project src/Districauchos.Tools -- import-prices --file "out/costos
 ```
 Solo lee "ID Producto" y "precio x mayor sugerido" (el costo nunca se lee). Los precios quedan en `price_overrides`
 (base de datos, no en la hoja): **volver a correrlo al montar el servidor** o cuando el cliente actualice el Excel.
+
+## PayPhone (decisión pendiente)
+
+La página anterior cobraba con PayPhone. Opciones:
+- **A. Enlace de pago (recomendado para el lanzamiento):** se cotiza por WhatsApp, el local confirma stock y envía un
+  enlace de pago de PayPhone desde su panel. Sin desarrollo y sin cobrar repuestos que no hay.
+- **B. Pago en el carrito:** botón de PayPhone en /carrito con confirmación en el servidor, registro de pedidos y
+  avisos. Necesita token y Store ID de PayPhone Developer (van en `.env`, nunca en el código).

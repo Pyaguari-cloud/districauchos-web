@@ -4,10 +4,23 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { QuoteResponse } from "@/lib/quote";
 import { cart, useCart, type CartItem } from "@/lib/cart";
+import { createLocalStore } from "@/lib/local-store";
+import type { Delivery } from "@/lib/quote";
+import { negocio } from "@/content/negocio";
 import { money } from "@/lib/format";
 import { useMyVehicle, vehicleText } from "@/lib/vehicle";
 import { QtyStepper } from "./AddToCart";
 import { WhatsAppButton } from "./WhatsAppButton";
+
+const deliveryStore = createLocalStore<Delivery>("dc.delivery.v1", "none", (v) =>
+  v === "pickup" || v === "quito" || v === "national" ? v : "none",
+);
+
+const DELIVERY_OPTIONS: { value: Exclude<Delivery, "none">; label: string; note: string }[] = [
+  { value: "pickup", label: "Retiro en local", note: "Sin costo" },
+  { value: "quito", label: "Envío dentro de Quito", note: "Gratis" },
+  { value: "national", label: "Envío a provincia", note: `Por cooperativa, +$${negocio.shipping.national.fee}` },
+];
 
 type State = { status: "idle" | "loading" | "ok" | "error"; quote?: QuoteResponse; forPayload?: string };
 
@@ -15,11 +28,13 @@ type State = { status: "idle" | "loading" | "ok" | "error"; quote?: QuoteRespons
 export function CartView() {
   const items = useCart();
   const vehicle = useMyVehicle();
+  const delivery = deliveryStore.use();
   const [state, setState] = useState<State>({ status: "idle" });
 
   const payload = JSON.stringify({
     items: items.map(({ oem, code, qty }) => ({ oem, code, qty })),
     vehicle: vehicleText(vehicle) || null,
+    delivery: delivery === "none" ? null : delivery,
   });
 
   useEffect(() => {
@@ -111,6 +126,27 @@ export function CartView() {
         </div>
         <p className="-mt-3 text-right text-sm text-muted">IVA incluido</p>
         {q && q.ahorro > 0 && <p className="-mt-3 text-right text-sm font-semibold text-brand-red">Ahorras {money(q.ahorro)}</p>}
+        <fieldset className="flex flex-col gap-2">
+          <legend className="mb-1 font-display text-lg font-bold uppercase tracking-wide">¿Cómo lo recibes?</legend>
+          {DELIVERY_OPTIONS.map((o) => (
+            <label key={o.value} className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-line px-3 has-[:checked]:border-brand-black has-[:checked]:bg-surface">
+              <input type="radio" name="entrega" value={o.value} checked={delivery === o.value} onChange={() => deliveryStore.set(o.value)} className="h-5 w-5 accent-brand-black" />
+              <span className="flex-1">{o.label}</span>
+              <span className="text-sm text-muted">{o.note}</span>
+            </label>
+          ))}
+        </fieldset>
+        {q && q.shipping > 0 && (
+          <div className="flex items-baseline justify-between border-t border-line pt-3">
+            <span>Envío nacional</span><span>{money(q.shipping)}</span>
+          </div>
+        )}
+        {q && q.shipping > 0 && (
+          <div className="flex items-baseline justify-between">
+            <span className="font-display text-lg font-bold uppercase tracking-wide">Total con envío</span>
+            <span className="font-display text-2xl font-bold">{money(q.grandTotal)}</span>
+          </div>
+        )}
         {vehicle && <p className="text-sm text-muted">Vehículo: <span className="font-semibold text-brand-ink">{vehicleText(vehicle)}</span> (va en el mensaje)</p>}
         {q?.whatsappUrl ? (
           <WhatsAppButton href={q.whatsappUrl} label="Enviar cotización por WhatsApp" full />

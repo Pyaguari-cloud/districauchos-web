@@ -23,6 +23,7 @@ public sealed record SearchDocument(
     bool Available,
     int AvailableRank,
     bool IsVch,
+    int VchRank,
     string? AbcClass,
     int AbcRank,
     decimal PvpMin,
@@ -59,6 +60,7 @@ public sealed class ProductIndex(MeiliClient meili)
                 Available: i.Available,
                 AvailableRank: i.Available ? 1 : 0,
                 IsVch: i.IsVch,
+                VchRank: i.IsVch ? 1 : 0,
                 AbcClass: i.AbcClass,
                 AbcRank: i.AbcClass switch { "A" => 1, "B" => 2, "C" => 3, _ => 4 },
                 PvpMin: i.PvpMin,
@@ -75,9 +77,9 @@ public sealed class ProductIndex(MeiliClient meili)
             "title", "oem", "oem_aliases", "codes", "alt_codes", "models", "brands", "category", "subcategory", "description",
         },
         filterableAttributes = new[] { "brands", "models", "vehicles", "category", "subcategory", "available", "is_vch", "abc_class" },
-        sortableAttributes = new[] { "pvp_min", "abc_rank", "title" },
+        sortableAttributes = new[] { "pvp_min", "abc_rank", "vch_rank", "title" },
         // Relevancia primero; luego clase A > B > C; luego disponibles primero (brief §6.6).
-        rankingRules = new[] { "words", "typo", "proximity", "attribute", "sort", "exactness", "abc_rank:asc", "available_rank:desc" },
+        rankingRules = new[] { "words", "typo", "proximity", "attribute", "sort", "exactness", "vch_rank:desc", "abc_rank:asc", "available_rank:desc" },
         // Códigos y OEM deben coincidir exacto: un error de tipeo ahí devolvería otra pieza.
         typoTolerance = new { disableOnAttributes = new[] { "oem", "oem_aliases", "codes", "alt_codes" } },
         synonyms = Synonyms,
@@ -131,7 +133,7 @@ public sealed class ProductIndex(MeiliClient meili)
 
     public sealed record Query(
         string? Q, string? Brand, string? Model, string? Category, string? Subcategory,
-        bool? Available, int Page = 1, int PageSize = 24);
+        bool? Available, int Page = 1, int PageSize = 24, bool? IsVch = null);
 
     /// <summary>
     /// Exige todas las palabras ("manguera aveo" = mangueras de Aveo, no todo lo que diga "aveo").
@@ -156,6 +158,7 @@ public sealed class ProductIndex(MeiliClient meili)
         if (!string.IsNullOrWhiteSpace(query.Category)) filters.Add($"category = {Quote(query.Category)}");
         if (!string.IsNullOrWhiteSpace(query.Subcategory)) filters.Add($"subcategory = {Quote(query.Subcategory)}");
         if (query.Available is { } a) filters.Add($"available = {(a ? "true" : "false")}");
+        if (query.IsVch is { } v) filters.Add($"is_vch = {(v ? "true" : "false")}");
 
         var body = new Dictionary<string, object?>
         {
@@ -171,8 +174,8 @@ public sealed class ProductIndex(MeiliClient meili)
                 "available", "is_vch", "abc_class", "pvp_min", "pvp_max", "mayor_min", "image",
             },
         };
-        // Sin texto de búsqueda: mostrar primero clase A y disponibles.
-        if (string.IsNullOrWhiteSpace(query.Q)) body["sort"] = new[] { "abc_rank:asc" };
+        // Sin texto de búsqueda: primero importación directa (pedido del cliente), luego clase A.
+        if (string.IsNullOrWhiteSpace(query.Q)) body["sort"] = new[] { "vch_rank:desc", "abc_rank:asc" };
 
         return meili.PostAsync($"indexes/{Uid}/search", body, ct);
     }

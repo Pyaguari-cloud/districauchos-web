@@ -23,6 +23,8 @@ public class TitleCaseTests
     [InlineData("44133-60A00 guardapolvo EJE VITARA", "44133-60A00 guardapolvo eje Vitara")]
     [InlineData("BASE CAJA CLIO III- KANGO II", "Base caja clio III- kango II")]
     [InlineData("MANGUERA .MULT.ADM.CHEVROLET AVEO", "Manguera .mult.adm.Chevrolet Aveo")]
+    [InlineData("BUJE MESA BT-50 (importacion vch)", "Buje mesa BT-50")]
+    [InlineData("TOPE (imprtadora vch)", "Tope")]
     [InlineData("caucho  puerta  ,", "Caucho puerta")]
     [InlineData("PIÑON CAÑERIA MAZDA BT-50", "Piñon cañeria mazda BT-50")]
     public void Formats_titles(string input, string expected) => Assert.Equal(expected, _t.Format(input));

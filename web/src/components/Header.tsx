@@ -9,6 +9,7 @@ import { VehicleBar, type VehicleOption } from "./VehicleBar";
 
 /** Barra superior negra con el logo (el logo está diseñado para fondo oscuro). */
 const nav = [
+  { href: "/buscar?importado=1", label: "Importación directa" },
   { href: "/buscar", label: "Repuestos" },
   { href: "/como-comprar", label: "Cómo comprar" },
   { href: "/locales", label: "Locales" },

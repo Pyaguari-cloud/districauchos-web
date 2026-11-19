@@ -77,6 +77,25 @@ public class QuoteTests
     }
 
     [Fact]
+    public void National_delivery_adds_fee_without_counting_for_mayor()
+    {
+        var r = _q.Calculate([new("96180071", null, 33)], Catalog, delivery: Delivery.National); // 33 × 6 = 198 < 200
+        Assert.False(r.MayorApplied);
+        Assert.Equal((330.00m, 5.00m, 335.00m), (r.Total, r.Shipping, r.GrandTotal));
+        Assert.Contains("Entrega: envío nacional por cooperativa (+$5.00)\nTotal con envío: $335.00", r.Message);
+    }
+
+    [Theory]
+    [InlineData(Delivery.Quito, "Entrega: envío dentro de Quito (sin costo)")]
+    [InlineData(Delivery.Pickup, "Entrega: retiro en local")]
+    public void Local_delivery_is_free(Delivery d, string text)
+    {
+        var r = _q.Calculate([new("0682561", null, 1)], Catalog, delivery: d);
+        Assert.Equal(0m, r.Shipping);
+        Assert.Contains(text, r.Message);
+    }
+
+    [Fact]
     public void Merges_duplicates_clamps_qty_and_reports_unknown()
     {
         var r = _q.Calculate([

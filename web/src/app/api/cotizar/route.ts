@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ error: "JSON inválido" }, { status: 400 });
   }
-  const b = body as { items?: unknown; vehicle?: unknown };
+  const b = body as { items?: unknown; vehicle?: unknown; delivery?: unknown };
   const items = Array.isArray(b.items)
     ? b.items.slice(0, 50).map((i) => ({
         oem: String((i as { oem?: unknown }).oem ?? "").slice(0, 64),
@@ -28,11 +28,12 @@ export async function POST(req: Request) {
       }))
     : [];
   const vehicle = typeof b.vehicle === "string" ? b.vehicle.slice(0, 80) : null;
+  const delivery = typeof b.delivery === "string" && ["pickup", "quito", "national"].includes(b.delivery) ? b.delivery : null;
 
   const res = await fetch(`${API_URL}/api/quote/preview`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ items, vehicle }),
+    body: JSON.stringify({ items, vehicle, delivery }),
     cache: "no-store",
   });
   if (!res.ok) return NextResponse.json({ error: "No se pudo calcular la cotización" }, { status: res.status === 400 ? 400 : 502 });

@@ -6,13 +6,13 @@ import { searchCatalog } from "@/lib/api";
 import { isRealCategory, sentenceCase, vehicleLabel } from "@/lib/format";
 import { askLink } from "@/lib/whatsapp";
 
-type Params = { q?: string; marca?: string; modelo?: string; categoria?: string; disponible?: string; pagina?: string };
+type Params = { q?: string; marca?: string; modelo?: string; categoria?: string; disponible?: string; importado?: string; pagina?: string };
 
 const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v)?.trim() || undefined;
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<Params> }): Promise<Metadata> {
   const p = await searchParams;
-  const what = [p.q, p.marca && vehicleLabel(p.marca, p.modelo ?? null), p.categoria && sentenceCase(p.categoria)].filter(Boolean).join(" · ");
+  const what = [p.q, p.importado === "1" && "Importación directa", p.marca && vehicleLabel(p.marca, p.modelo ?? null), p.categoria && sentenceCase(p.categoria)].filter(Boolean).join(" · ");
   // Las páginas de resultados no se indexan en Google (evita contenido duplicado); las fichas sí.
   return { title: what ? `Resultados: ${what}` : "Todos los repuestos", robots: { index: false, follow: true } };
 }
@@ -25,6 +25,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     modelo: one(raw.modelo),
     categoria: one(raw.categoria),
     disponible: one(raw.disponible) === "1",
+    importado: one(raw.importado) === "1",
     pagina: Math.max(1, Number(one(raw.pagina)) || 1),
   };
 
@@ -34,6 +35,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     model: p.marca ? p.modelo : undefined,
     category: p.categoria,
     available: p.disponible ? true : undefined,
+    vch: p.importado ? true : undefined,
     page: p.pagina,
     pageSize: 24,
   });
@@ -42,12 +44,13 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     const next = new URLSearchParams();
     const merged = { ...p, pagina: undefined, ...changes } as Record<string, unknown>;
     if (merged.disponible === true) merged.disponible = "1";
+    if (merged.importado === true) merged.importado = "1";
     for (const [k, v] of Object.entries(merged)) if (v && v !== false) next.set(k, String(v));
     return `/buscar?${next}`;
   };
 
   const vehicle = p.marca ? vehicleLabel(p.marca, p.modelo ?? null) : undefined;
-  const heading = p.q ? `“${p.q}”` : p.categoria ? sentenceCase(p.categoria) : vehicle ?? "Todos los repuestos";
+  const heading = p.q ? `“${p.q}”` : p.categoria ? sentenceCase(p.categoria) : p.importado ? "Importación directa" : vehicle ?? "Todos los repuestos";
   const brands = Object.entries(result.facets.brands ?? {}).sort((a, b) => b[1] - a[1]).slice(0, 12);
   const categories = Object.entries(result.facets.categories ?? {})
     .filter(([name]) => isRealCategory(name))
@@ -70,11 +73,19 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       </div>
 
       {/* Filtros activos */}
-      {(p.marca || p.categoria || p.disponible) && (
+      {p.importado && !p.q && (
+        <p className="max-w-3xl rounded-lg border border-line bg-white px-4 py-3">
+          Repuestos que <strong>importamos directamente</strong> (Importadora VCH) desde Corea, Japón y Tailandia. Tienen
+          precio al por mayor al llevar $200 o más en estos productos.
+        </p>
+      )}
+
+      {(p.marca || p.categoria || p.disponible || p.importado) && (
         <ul className="flex flex-wrap gap-2" aria-label="Filtros activos">
           {p.marca && <Chip label={vehicle!} href={href({ marca: undefined, modelo: undefined })} />}
           {p.categoria && <Chip label={sentenceCase(p.categoria)} href={href({ categoria: undefined })} />}
           {p.disponible && <Chip label="Solo disponibles" href={href({ disponible: undefined })} />}
+          {p.importado && <Chip label="Importación directa" href={href({ importado: undefined })} />}
         </ul>
       )}
 
@@ -85,6 +96,11 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             {!p.disponible && (
               <Link href={href({ disponible: "1" })} className="self-start font-semibold underline underline-offset-4">
                 Mostrar solo disponibles
+              </Link>
+            )}
+            {!p.importado && (
+              <Link href={href({ importado: "1" })} className="self-start font-semibold underline underline-offset-4">
+                Solo importación directa
               </Link>
             )}
             {!p.marca && brands.length > 1 && (

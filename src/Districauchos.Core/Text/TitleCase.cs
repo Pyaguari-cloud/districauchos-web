@@ -99,7 +99,8 @@ public sealed partial class TitleCase
         return word.ToLowerInvariant();
     }
 
-    [GeneratedRegex(@"\(?\s*\bI?MPORTADORA\s*VCH\b\s*\)?", RegexOptions.IgnoreCase)] private static partial Regex SupplierTag();
+    // Cualquier variante mal escrita: "importadora", "importacion", "impotadora", "imprtadora"… seguida de VCH.
+    [GeneratedRegex(@"\(?\s*\b[A-Z]*MP[A-Z]*\s*VCH\b\s*\)?", RegexOptions.IgnoreCase)] private static partial Regex SupplierTag();
     [GeneratedRegex(@"^(?:II|III|IV|VI|VII|VIII|IX)$", RegexOptions.IgnoreCase)] private static partial Regex Roman();
     [GeneratedRegex(@"[\p{L}\p{N}]+(?:[-.][\p{L}\p{N}]+)*")] private static partial Regex Word();
 }
