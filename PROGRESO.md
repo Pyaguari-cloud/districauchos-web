@@ -66,6 +66,7 @@ Pruebas: 139 en `tests/` (`dotnet test`). Lint de la web: `cd web && npx tsc --n
 
 **Cotizaciones y avisos**
 - Todas las cotizaciones y avisos de venta van al **WhatsApp de Cusubamba**: +593 98 559 5439.
+- Aviso de cada venta pagada por **correo a districauchosich@hotmail.com** (confirmado). Hoy por WhatsApp les llega solo "tenemos un nuevo pedido confirmado" con los datos del cliente y lo pedido; el correo nuestro trae eso y más.
 
 **Envíos**
 - Quito gratis.
@@ -77,7 +78,7 @@ Pruebas: 139 en `tests/` (`dotnet test`). Lint de la web: `cd web && npx tsc --n
 - También **transferencia** al Banco Pichincha (los datos están en `web/src/content/negocio.ts`).
 
 **Sin stock**
-- Se puede pagar como **"Bajo pedido, llega en ~4 días"**, y el comprador lo acepta antes de pagar (`BACKORDER_DAYS=4`).
+- Se puede pagar como **"Bajo pedido, llega en ~4 días"**, y el comprador lo acepta antes de pagar (`BACKORDER_DAYS=4`). **Confirmado por el cliente (2026-11-18).**
 - Los importados VCH están en bodega.
 
 **Factura**
@@ -138,15 +139,15 @@ Probar con el simulador:
 
 **Del cliente**
 - [x] Token de una aplicación **Web** en PayPhone Developer (2026-11-19).
-- [ ] Captura de cómo les llega hoy el aviso de venta al WhatsApp: ¿lo manda su tienda o la app PayPhone?
-- [ ] Confirmar "bajo pedido ~4 días".
-- [ ] Correo para los avisos de pedidos. Por defecto: districauchosich@hotmail.com.
-- [ ] Credenciales del dominio y la carpeta de fotos de Drive.
+- [ ] Carpeta de fotos de Drive (el cliente ya la está preparando).
+- [ ] Visto bueno y pago del servidor (ffxf Nano, ~$6 USD/mes).
+- [ ] Tarjeta vigente en WordPress.com: el dominio se renueva el **10-dic-2026** ($13/año). **No cancelar** el plan Personal ($9/mes) hasta el lanzamiento.
 - [ ] Los 18 productos del PDF de importación que en la hoja no figuran como VCH.
 - [ ] Los 8 productos del Excel que no son VCH, y el precio de 9023781 ($13 por mayor contra $5 público).
 
 **Nuestros: Semana 4**
-- [ ] VPS, Docker, `.env` de producción y `secrets/google-sa.json`.
+- [ ] VPS **ffxf Nano** (1 vCPU, 2 GB, 20 GB; Montreal) + 2 GB de swap; las imágenes se construyen fuera del servidor, Docker, `.env` de producción y `secrets/google-sa.json`.
+- [ ] Dominio: sigue registrado en WordPress.com; en su panel se cambian los nameservers a Cloudflare (gratis). Hoy el DNS solo tiene registros de WordPress, sin correo.
 - [ ] Cloudflare: DNS, HTTPS y proxy hacia la web. La API **no se expone**: solo escucha en 127.0.0.1.
 - [ ] SMTP para los avisos de pedidos.
 - [ ] En el servidor, volver a correr `import-prices` con el Excel de sugeridos (ver README).
