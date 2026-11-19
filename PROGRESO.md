@@ -166,7 +166,7 @@ Probar con el simulador:
 - Remitente `Districauchos VCH - Pedidos web <pedidos@districauchosvch.com>`, una dirección que solo envía (no tiene buzón). Las respuestas van al comprador por Reply-To.
 - Destino: `ORDERS_EMAIL_TO=districauchosich@hotmail.com`.
 - `SMTP_*` cargados en el `.env` del servidor (`smtp-relay.brevo.com:587`). La clave la generó el usuario y pasó al servidor sin mostrarse.
-- Correo de prueba enviado OK el 2026-11-19. **Falta que el cliente confirme que llegó a la bandeja de entrada y no a spam.**
+- Correo de prueba enviado OK el 2026-11-19. **El cliente confirmó que llegó a su Hotmail.**
 - No se usó la conexión automática Brevo↔Cloudflare, para no dar permisos sobre el DNS.
 
 **Repositorio**
@@ -189,7 +189,7 @@ Probar con el simulador:
 - [ ] Lanzamiento: apuntar el DNS en Cloudflare al servidor (ver §6).
 - [ ] Cloudflare: DNS, HTTPS y proxy hacia la web. La API **no se expone**: solo escucha en 127.0.0.1.
 - [x] SMTP para los avisos de pedidos (Brevo, 2026-11-19).
-- [ ] Confirmar con el cliente que el correo de prueba llegó a la bandeja de entrada del Hotmail.
+- [x] El cliente confirmó que recibe el correo de prueba en su Hotmail.
 - [x] `import-prices` corrido contra la base del servidor (65 precios, 2026-11-19).
 - [ ] `PAYMENTS_MODE=payphone` y una compra real de $1, que luego se anula desde PayPhone Business.
 - [ ] Desactivar la aplicación PayPhone vieja cuando la nueva esté en producción.
