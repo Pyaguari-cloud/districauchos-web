@@ -135,6 +135,13 @@ Probar con el simulador:
 - ffxf, **cuenta propia del cliente** (pagada por él). `districauchos-1`: Nano, Montreal, Ubuntu 24.04, IPv4 `23.159.52.27`. Renueva el 19 de cada mes.
 - Acceso: `ssh -i ~/.ssh/districauchos_ed25519 ubuntu@23.159.52.27` (usuario `ubuntu` con sudo; root no entra). La clave `districauchos_ed25519` es solo para este cliente y está solo en la computadora del desarrollador.
 - Se creó con "solo clave": **no hay contraseña de consola VNC**. Hay que crearla si hace falta una entrada de emergencia.
+- **Preparado (2026-11-19):**
+  - sistema actualizado, zona horaria America/Guayaquil y actualizaciones de seguridad automáticas;
+  - SSH solo con clave, sin root (`/etc/ssh/sshd_config.d/00-districauchos.conf`);
+  - firewall ufw con 22, 80 y 443; fail2ban para sshd;
+  - swap de 2 GB (swappiness 10);
+  - Docker 29 + Compose, con registros limitados a 3×10 MB.
+- **Ojo:** Docker publica sus puertos saltándose ufw. En producción, todo puerto de contenedor va en `127.0.0.1:` salvo el proxy web (80/443).
 - Plan acordado: publicar **directo en districauchosvch.com** (sin subdominio de borrador). El cliente revisa en vivo y la página de WordPress.com queda un mes de respaldo.
 
 **Repositorio**
@@ -151,7 +158,8 @@ Probar con el simulador:
 - [ ] Los 8 productos del Excel que no son VCH, y el precio de 9023781 ($13 por mayor contra $5 público).
 
 **Nuestros: Semana 4**
-- [ ] VPS **ffxf Nano** (1 vCPU, 2 GB, 20 GB; Montreal) + 2 GB de swap; las imágenes se construyen fuera del servidor, Docker, `.env` de producción y `secrets/google-sa.json`.
+- [x] Servidor preparado: seguridad, swap y Docker (2026-11-19).
+- [ ] Instalar la página en el VPS **ffxf Nano** (1 vCPU, 2 GB, 20 GB; Montreal) + 2 GB de swap; las imágenes se construyen fuera del servidor, Docker, `.env` de producción y `secrets/google-sa.json`.
 - [ ] Dominio: sigue registrado en WordPress.com; en su panel se cambian los nameservers a Cloudflare (gratis). Hoy el DNS solo tiene registros de WordPress, sin correo.
 - [ ] Cloudflare: DNS, HTTPS y proxy hacia la web. La API **no se expone**: solo escucha en 127.0.0.1.
 - [ ] SMTP para los avisos de pedidos.
