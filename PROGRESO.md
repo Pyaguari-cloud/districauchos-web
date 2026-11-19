@@ -154,6 +154,14 @@ Probar con el simulador:
 - Chrome fuerza HTTPS, así que por IP no se ve en el navegador (curl sí). Se verá al cambiar el dominio.
 - Plan acordado: publicar **directo en districauchosvch.com** (sin subdominio de borrador). El cliente revisa en vivo y la página de WordPress.com queda un mes de respaldo.
 
+**Cloudflare (2026-11-19)**
+- Cuenta **del cliente**, plan Free, zona `districauchosvch.com`. Nameservers: `janet.ns.cloudflare.com` y `justin.ns.cloudflare.com`, ya guardados en WordPress.com. DNSSEC estaba apagado.
+- Registros importados apuntan **todavía a WordPress.com** (`A` 192.0.78.184 y .236, `www` CNAME), en **DNS only**. La página vieja sigue en línea.
+- **Lanzamiento:**
+  1. en Cloudflare cambiar los `A` a `23.159.52.27` y `www` a CNAME del dominio, con el **proxy activado**;
+  2. SSL/TLS en **Full (strict)**;
+  3. en el servidor, `SITE_ADDRESS=districauchosvch.com, www.districauchosvch.com` y `docker compose up -d caddy`.
+
 **Repositorio**
 - GitHub **privado**: `https://github.com/Pyaguari-cloud/districauchos-web`, rama `main`.
 - Subido el 2026-11-19. El `git push` lo hace el usuario con `! git push`.
@@ -170,7 +178,8 @@ Probar con el simulador:
 **Nuestros: Semana 4**
 - [x] Servidor preparado: seguridad, swap y Docker (2026-11-19).
 - [x] Página instalada en el VPS (2026-11-19). Era: VPS **ffxf Nano** (1 vCPU, 2 GB, 20 GB; Montreal) + 2 GB de swap; las imágenes se construyen fuera del servidor, Docker, `.env` de producción y `secrets/google-sa.json`.
-- [ ] Dominio: sigue registrado en WordPress.com; en su panel se cambian los nameservers a Cloudflare (gratis). Hoy el DNS solo tiene registros de WordPress, sin correo.
+- [x] Nameservers del dominio pasados a Cloudflare (2026-11-19). El dominio sigue registrado en WordPress.com.
+- [ ] Lanzamiento: apuntar el DNS en Cloudflare al servidor (ver §6).
 - [ ] Cloudflare: DNS, HTTPS y proxy hacia la web. La API **no se expone**: solo escucha en 127.0.0.1.
 - [ ] SMTP para los avisos de pedidos.
 - [x] `import-prices` corrido contra la base del servidor (65 precios, 2026-11-19).
