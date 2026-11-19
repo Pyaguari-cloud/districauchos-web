@@ -121,7 +121,7 @@ Probar con el simulador:
   - dominio `https://districauchosvch.com`;
   - respuesta `/pago/respuesta`.
   Su Token está en `.env` y **funciona**: la API crea el pedido y PayPhone devuelve el `payUrl`.
-- **Store ID:** el que está en `.env` da "La tienda asociada no existe". **Dejar `PAYPHONE_STORE_ID` vacío**, con lo que PayPhone usa la tienda principal y funciona, o copiar el correcto desde la aplicación o PayPhone Business.
+- **Store ID:** se deja **vacío** (`PAYPHONE_STORE_ID=`): los pagos van a la tienda principal. Probado OK el 2026-11-19 con la configuración real de `.env`. No es ningún campo de la aplicación de desarrollador (Identificador, Clave secreta, etc.); está en PayPhone Business, en Tiendas, y solo hace falta si el cliente quiere los pagos en una sucursal concreta.
 - Abrir el `payUrl` fuera del dominio real (con curl desde local) muestra "No autorizado". Es lo esperado: PayPhone exige que el pago venga de `districauchosvch.com`. **La página de pago y el cobro de $1 se prueban en el servidor** (Semana 4).
 
 **Cómo repetir la prueba de conexión** (no cobra nada):
@@ -138,7 +138,6 @@ Probar con el simulador:
 
 **Del cliente**
 - [x] Token de una aplicación **Web** en PayPhone Developer (2026-11-19).
-- [ ] Store ID correcto, o dejarlo vacío.
 - [ ] Captura de cómo les llega hoy el aviso de venta al WhatsApp: ¿lo manda su tienda o la app PayPhone?
 - [ ] Confirmar "bajo pedido ~4 días".
 - [ ] Correo para los avisos de pedidos. Por defecto: districauchosich@hotmail.com.
