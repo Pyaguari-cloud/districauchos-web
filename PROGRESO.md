@@ -180,6 +180,12 @@ Probar con el simulador:
 - Celular: el inicio se ensanchaba (efecto "zoom" + franja blanca) por códigos OEM y títulos largos sin espacios. Tarjetas con `min-w-0` + corte de palabras largas, categorías con el número debajo en celular, y `overflow-x: clip` en html/body. Verificado a 320, 360 y 390 px.
 - Ícono de pestaña: era el de Next. Ahora `favicon.ico`, `icon.svg` y `apple-icon.png` con el auto "VCH" del logo.
 
+**Observaciones del cliente tras el lanzamiento (2026-11-19)**
+- "alza cabina dmax" salía vacío y en su POS no. Dos causas, **arregladas**: (1) "Mi garaje" tenía un Aveo y filtraba todo → ahora, si con el vehículo no hay nada, se muestran los de todos los vehículos con aviso; (2) el reintento quitaba palabras desde el final y se quedaba con "alza" → ahora prueba quitando una palabra cada vez (`ProductIndex.DropOneWord`). Resultado: las 3 "Base cabina DMAX" igual que el POS.
+- **Pendiente de aprobación del cliente:** publicar los productos **sin OEM** (4.563 con precio, 2.651 con existencias; el brief decía no publicarlos). Propuesta: ficha por código interno.
+- "Como Amazon" (guardar el carro): ya existe sin cuenta (localStorage, hasta 5). No se hará login. Posible mejora: hacer más visible que quedó guardado.
+- Cantidades: se mantiene la regla de no mostrarlas (competencia; la hoja no es en tiempo real y hasta tiene existencias negativas). Opción a consultar: etiqueta "Últimas unidades" sin número.
+
 **Repositorio**
 - GitHub **privado**: `https://github.com/Pyaguari-cloud/districauchos-web`, rama `main`.
 - Subido el 2026-11-19. El `git push` lo hace el usuario con `! git push`.
