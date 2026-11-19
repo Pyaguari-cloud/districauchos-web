@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { HowItWorks } from "@/components/HowItWorks";
 import { negocio } from "@/content/negocio";
+import { getOrdersConfig } from "@/lib/orders";
 
 export const metadata: Metadata = {
   title: "Cómo comprar y preguntas frecuentes",
@@ -11,7 +12,8 @@ export const metadata: Metadata = {
 
 // Solo respuestas confirmadas por el cliente (ver content/negocio.ts).
 const { shipping, payments } = negocio;
-const faq: { q: string; a: React.ReactNode }[] = [
+type Faq = { q: string; a: React.ReactNode };
+const faq: Faq[] = [
   {
     q: "¿Cómo cotizo?",
     a: (
@@ -64,18 +66,30 @@ const faq: { q: string; a: React.ReactNode }[] = [
     q: "¿Qué significa “Consultar disponibilidad”?",
     a: "Que en este momento no lo tenemos en ningún local. Escríbenos: podemos conseguirlo o sugerirte una alternativa.",
   },
-  {
+];
+
+/** La respuesta depende de si el pago en línea está activo (PAYMENTS_MODE en la API). */
+function buyOnlineFaq(enabled: boolean, backorderDays: number): Faq {
+  return {
     q: "¿Puedo comprar directamente en la página?",
-    a: (
+    a: enabled ? (
+      <>
+        Sí. En el carrito elige cómo lo recibes y toca <strong>“Pagar en línea”</strong>: pagas con tarjeta o con la app
+        PayPhone en su página segura. Nosotros no vemos los datos de tu tarjeta.
+        {backorderDays > 0 && <> Los repuestos sin stock se venden <strong>bajo pedido</strong> y llegan en aproximadamente {backorderDays} días.</>}
+      </>
+    ) : (
       <>
         La página es para cotizar: confirmamos disponibilidad y la compra se cierra por WhatsApp o en nuestros{" "}
         <Link href="/locales" className="font-semibold underline underline-offset-2">locales</Link>. No se cobra nada en la página.
       </>
     ),
-  },
-];
+  };
+}
 
-export default function HowToBuyPage() {
+export default async function HowToBuyPage() {
+  const config = await getOrdersConfig();
+  const items = [...faq, buyOnlineFaq(config.enabled, config.backorderDays)];
   return (
     <div className="flex flex-col gap-8">
       <h1 className="font-display text-3xl font-bold uppercase tracking-wide">Cómo comprar</h1>
@@ -83,7 +97,7 @@ export default function HowToBuyPage() {
       <section aria-labelledby="faq" className="max-w-3xl">
         <h2 id="faq" className="mb-3 font-display text-2xl font-bold uppercase tracking-wide">Preguntas frecuentes</h2>
         <div className="flex flex-col gap-2">
-          {faq.map((f) => (
+          {items.map((f) => (
             <details key={f.q} className="group rounded-xl border border-line bg-white p-4 open:shadow-sm">
               <summary className="cursor-pointer list-none font-semibold marker:hidden">
                 <span className="flex items-center justify-between gap-4">

@@ -93,10 +93,32 @@ dotnet run --project src/Districauchos.Tools -- import-prices --file "out/costos
 Solo lee "ID Producto" y "precio x mayor sugerido" (el costo nunca se lee). Los precios quedan en `price_overrides`
 (base de datos, no en la hoja): **volver a correrlo al montar el servidor** o cuando el cliente actualice el Excel.
 
-## PayPhone (decisión pendiente)
+## Pagos en línea con PayPhone
 
-La página anterior cobraba con PayPhone. Opciones:
-- **A. Enlace de pago (recomendado para el lanzamiento):** se cotiza por WhatsApp, el local confirma stock y envía un
-  enlace de pago de PayPhone desde su panel. Sin desarrollo y sin cobrar repuestos que no hay.
-- **B. Pago en el carrito:** botón de PayPhone en /carrito con confirmación en el servidor, registro de pedidos y
-  avisos. Necesita token y Store ID de PayPhone Developer (van en `.env`, nunca en el código).
+Decisión del cliente (2026-11-18): el comprador paga directo en la página, como invitado (sin cuenta).
+Flujo (Botón de Pagos por redirección, docs.payphone.app):
+
+1. Carrito → `/pagar`: datos de contacto, factura (cédula, RUC, pasaporte o consumidor final) y entrega.
+2. `POST /api/orders` (API): recalcula precios, envío y stock, valida los datos, guarda el pedido
+   (`orders`, estado `Pending`) y pide a PayPhone el enlace de pago (`api/button/Prepare`).
+3. El comprador paga en la página de PayPhone (tarjeta o app) y vuelve a `/pago/respuesta`.
+4. `POST /api/orders/confirm`: la API verifica con PayPhone (`api/button/V2/Confirm`) que el pago está
+   aprobado, que el monto cuadra y que es este pedido. **Hay 5 minutos**; si no, PayPhone lo reversa solo.
+   Recargar la página no confirma dos veces. Si el monto no cuadra queda en `Review` (revisión manual).
+5. Aviso al local por correo (`SMTP_*`, `ORDERS_EMAIL_TO`) con todo lo necesario para facturar en su POS,
+   y botón para que el comprador avise por WhatsApp a Cusubamba.
+
+- Sin stock: se vende **bajo pedido** (~`BACKORDER_DAYS` días, el comprador lo acepta). `BACKORDER_DAYS=0` lo bloquea.
+- Los montos van a PayPhone separando base e IVA (`IVA_RATE`, precios con IVA incluido).
+- No se guardan datos de tarjeta. Los datos del comprador solo los lee la API (nunca endpoints públicos).
+- `PAYMENTS_MODE`: `off` (solo WhatsApp) · `payphone` · `fake` (simulador en `/pago/prueba`, solo con
+  `SITE_URL` en localhost). Probar en local:
+  `SITE_URL=http://localhost:3000 PAYMENTS_MODE=fake docker compose --profile web up -d --build api web`
+
+**Para activar el cobro real** (en el servidor, nunca por chat ni en el código):
+1. En developer.payphone.app (cuenta Business del cliente) crear la aplicación web y copiar Token y Store ID.
+2. En `.env`: `PAYMENTS_MODE=payphone`, `PAYPHONE_TOKEN`, `PAYPHONE_STORE_ID`, `SITE_URL` real y `SMTP_*`.
+3. Hacer un pago real pequeño y anularlo desde PayPhone Business.
+
+Pendiente del cliente: confirmar "bajo pedido ~4 días", el límite de consumidor final con su contador
+(`CONSUMIDOR_FINAL_MAX`, por defecto $50) y cómo les llega hoy el aviso de venta al WhatsApp.

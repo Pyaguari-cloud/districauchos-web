@@ -4,28 +4,19 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { QuoteResponse } from "@/lib/quote";
 import { cart, useCart, type CartItem } from "@/lib/cart";
-import { createLocalStore } from "@/lib/local-store";
-import type { Delivery } from "@/lib/quote";
-import { negocio } from "@/content/negocio";
+import { DELIVERY_OPTIONS, deliveryStore } from "@/lib/delivery";
 import { money } from "@/lib/format";
 import { useMyVehicle, vehicleText } from "@/lib/vehicle";
 import { QtyStepper } from "./AddToCart";
 import { WhatsAppButton } from "./WhatsAppButton";
 
-const deliveryStore = createLocalStore<Delivery>("dc.delivery.v1", "none", (v) =>
-  v === "pickup" || v === "quito" || v === "national" ? v : "none",
-);
-
-const DELIVERY_OPTIONS: { value: Exclude<Delivery, "none">; label: string; note: string }[] = [
-  { value: "pickup", label: "Retiro en local", note: "Sin costo" },
-  { value: "quito", label: "Envío dentro de Quito", note: "Gratis" },
-  { value: "national", label: "Envío a provincia", note: `Por cooperativa, +$${negocio.shipping.national.fee}` },
-];
+/** Pago en línea: viene de la API (PAYMENTS_MODE). Apagado = solo cotización por WhatsApp. */
+export type PaymentsInfo = { enabled: boolean; backorderDays: number };
 
 type State = { status: "idle" | "loading" | "ok" | "error"; quote?: QuoteResponse; forPayload?: string };
 
 /** Carrito: los precios mostrados son siempre los que calcula el servidor. */
-export function CartView() {
+export function CartView({ payments, canceled = false }: { payments: PaymentsInfo; canceled?: boolean }) {
   const items = useCart();
   const vehicle = useMyVehicle();
   const delivery = deliveryStore.use();
@@ -85,7 +76,11 @@ export function CartView() {
                 <p className="text-sm text-muted">
                   OEM <span className="font-mono">{i.oem}</span>
                   {line?.showCode && <> · opción <span className="font-mono">{i.code}</span></>}
-                  {line && !line.available && <span className="ml-2 text-ask">· Consultar disponibilidad</span>}
+                  {line && !line.available && (
+                    <span className="ml-2 text-ask">
+                      · {payments.enabled && payments.backorderDays > 0 ? `Bajo pedido, llega en ~${payments.backorderDays} días` : "Consultar disponibilidad"}
+                    </span>
+                  )}
                 </p>
                 {missing && <p className="mt-1 text-sm text-brand-red">Este repuesto ya no está en el catálogo. Quítalo del carrito.</p>}
               </div>
@@ -116,6 +111,9 @@ export function CartView() {
       </ul>
 
       <aside className="flex flex-col gap-4 rounded-xl border border-line bg-white p-4 lg:sticky lg:top-4" aria-live="polite">
+        {canceled && (
+          <p className="rounded-lg bg-ask-bg px-3 py-2 text-ask">El pago se canceló y no se cobró nada. Puedes intentarlo de nuevo.</p>
+        )}
         {state.status === "error" && (
           <p className="rounded-lg bg-ask-bg px-3 py-2 text-ask">No pudimos calcular los precios. Revisa tu conexión e inténtalo de nuevo.</p>
         )}
@@ -148,13 +146,41 @@ export function CartView() {
           </div>
         )}
         {vehicle && <p className="text-sm text-muted">Vehículo: <span className="font-semibold text-brand-ink">{vehicleText(vehicle)}</span> (va en el mensaje)</p>}
+        {payments.enabled && q && (() => {
+          const noStock = payments.backorderDays === 0 && q.lines.some((l) => !l.available);
+          const ready = delivery !== "none" && q.missing.length === 0 && q.lines.length > 0 && !noStock;
+          return (
+            <>
+              {ready ? (
+                <Link href="/pagar" className="inline-flex min-h-12 w-full items-center justify-center rounded-lg bg-brand-yellow px-5 font-display text-lg font-bold uppercase tracking-wide text-brand-black hover:bg-brand-yellow-dark">
+                  Pagar en línea · {money(q.grandTotal)}
+                </Link>
+              ) : (
+                <p className="rounded-lg bg-surface px-3 py-2 text-sm">
+                  {delivery === "none" ? "Elige cómo lo recibes para pagar en línea." : noStock ? "Hay repuestos sin stock: cotízalos por WhatsApp." : "Quita los repuestos que ya no están para pagar en línea."}
+                </p>
+              )}
+              <p className="-mt-2 text-center text-sm text-muted">Tarjeta de crédito, débito o app PayPhone</p>
+              {q.lines.some((l) => !l.available) && payments.backorderDays > 0 && (
+                <p className="rounded-lg bg-ask-bg px-3 py-2 text-sm text-ask">
+                  Algunos repuestos son <strong>bajo pedido</strong>: llegan en aproximadamente {payments.backorderDays} días.
+                </p>
+              )}
+              <div className="flex items-center gap-3 text-sm text-muted" aria-hidden="true">
+                <span className="h-px flex-1 bg-line" />o<span className="h-px flex-1 bg-line" />
+              </div>
+            </>
+          );
+        })()}
         {q?.whatsappUrl ? (
-          <WhatsAppButton href={q.whatsappUrl} label="Enviar cotización por WhatsApp" full />
+          <WhatsAppButton href={q.whatsappUrl} label={payments.enabled ? "Cotizar por WhatsApp" : "Enviar cotización por WhatsApp"} full />
         ) : q && (
           <p className="text-sm text-muted">El envío por WhatsApp no está disponible en este momento.</p>
         )}
         <p className="text-sm text-muted">
-          Es una cotización: te confirmamos disponibilidad y precio final por WhatsApp. No se cobra nada en la página.
+          {payments.enabled
+            ? "¿Tienes dudas? Cotiza por WhatsApp y te confirmamos disponibilidad y precio antes de pagar."
+            : "Es una cotización: te confirmamos disponibilidad y precio final por WhatsApp. No se cobra nada en la página."}
         </p>
         <button type="button" onClick={() => cart.clear()} className="self-start text-sm text-muted underline underline-offset-2 hover:text-brand-ink">
           Vaciar carrito

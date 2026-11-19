@@ -67,6 +67,8 @@ services:
       DATABASE_URL: postgres://districauchos:${POSTGRES_PASSWORD}@db:5432/districauchos
       ASPNETCORE_URLS: http://+:8080
       MEILI_URL: http://search:7700
+      SITE_URL: ${SITE_URL:-https://districauchosvch.com}
+      PAYMENTS_MODE: ${PAYMENTS_MODE:-off}
     volumes:
       - ./media:/app/media:ro
     ports: ["127.0.0.1:8080:8080"]

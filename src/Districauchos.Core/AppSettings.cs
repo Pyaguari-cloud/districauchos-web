@@ -21,6 +21,29 @@ public sealed record AppSettings
     public string CategoriesJsonPath { get; init; } = "data/categories.json";
     public decimal EnvioNacional { get; init; } = 5m;
     public string MeiliUrl { get; init; } = "http://localhost:7700";
+
+    // ---- Pagos en línea (PayPhone, Botón de Pagos por redirección) ----
+    /// <summary>off = solo cotización por WhatsApp; payphone = cobro real; fake = simulador local (solo localhost).</summary>
+    public string PaymentsMode { get; init; } = "off";
+    public string? PayPhoneToken { get; init; }
+    public string? PayPhoneStoreId { get; init; }
+    public string PayPhoneApiUrl { get; init; } = "https://pay.payphonetodoesposible.com";
+    /// <summary>Dirección pública de la web: PayPhone devuelve al cliente a {SiteUrl}/pago/respuesta.</summary>
+    public string SiteUrl { get; init; } = "https://districauchosvch.com";
+    /// <summary>IVA incluido en los precios (para separar base e impuesto como pide PayPhone).</summary>
+    public decimal IvaRate { get; init; } = 0.15m;
+    /// <summary>Días de entrega de lo que no está en stock. 0 = no se puede pagar lo que no hay.</summary>
+    public int BackorderDays { get; init; } = 4;
+    /// <summary>Monto máximo para facturar a "Consumidor final" (por encima se pide cédula/RUC). 0 = sin límite.</summary>
+    public decimal ConsumidorFinalMax { get; init; } = 50m;
+
+    // ---- Aviso de pedidos por correo ----
+    public string? SmtpHost { get; init; }
+    public int SmtpPort { get; init; } = 587;
+    public string? SmtpUser { get; init; }
+    public string? SmtpPass { get; init; }
+    public string? SmtpFrom { get; init; }
+    public string? OrdersEmailTo { get; init; }
     public string? MeiliMasterKey { get; init; }
 
     /// <summary>
@@ -49,6 +72,20 @@ public sealed record AppSettings
         VehiclesJsonPath = c["VEHICLES_JSON_PATH"] ?? "data/vehicles.json",
         CategoriesJsonPath = c["CATEGORIES_JSON_PATH"] ?? "data/categories.json",
         MeiliUrl = c["MEILI_URL"] ?? "http://localhost:7700",
+        PaymentsMode = (c["PAYMENTS_MODE"] ?? "off").Trim().ToLowerInvariant(),
+        PayPhoneToken = c["PAYPHONE_TOKEN"],
+        PayPhoneStoreId = c["PAYPHONE_STORE_ID"],
+        PayPhoneApiUrl = c["PAYPHONE_API_URL"] ?? "https://pay.payphonetodoesposible.com",
+        SiteUrl = (c["SITE_URL"] ?? "https://districauchosvch.com").TrimEnd('/'),
+        IvaRate = Dec(c["IVA_RATE"], 0.15m),
+        BackorderDays = int.TryParse(c["BACKORDER_DAYS"], out var bd) && bd >= 0 ? bd : 4,
+        ConsumidorFinalMax = Dec(c["CONSUMIDOR_FINAL_MAX"], 50m),
+        SmtpHost = c["SMTP_HOST"],
+        SmtpPort = int.TryParse(c["SMTP_PORT"], out var sp) ? sp : 587,
+        SmtpUser = c["SMTP_USER"],
+        SmtpPass = c["SMTP_PASS"],
+        SmtpFrom = c["SMTP_FROM"],
+        OrdersEmailTo = c["ORDERS_EMAIL_TO"],
         MeiliMasterKey = c["MEILI_MASTER_KEY"],
         StockColumnOccurrence = int.TryParse(c["STOCK_COLUMN_OCCURRENCE"], out var o) && o is 1 or 2 ? o : 1,
         LocalCsvDir = c["LOCAL_CSV_DIR"],

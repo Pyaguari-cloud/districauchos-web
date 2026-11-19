@@ -2,12 +2,13 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Districauchos.Api.Payments;
 using Districauchos.Core;
 using Districauchos.Core.Pricing;
 using Districauchos.Data;
 using Districauchos.Search;
 
-// API pública del catálogo (brief §8). Solo lectura de catálogo + cálculo de cotizaciones.
+// API del catálogo (brief §8): lectura del catálogo, cotizaciones y pedidos pagados con PayPhone.
 var builder = WebApplication.CreateBuilder(args);
 var settings = AppSettings.From(builder.Configuration);
 builder.Services.AddSingleton(settings);
@@ -18,6 +19,7 @@ builder.Services.AddSingleton(_ => MeiliClient.Create(settings));
 builder.Services.AddSingleton<ProductIndex>();
 builder.Services.AddSingleton(new QuoteCalculator(
     new PricingRules(settings.MayorDescuento, settings.MayorUmbral), nationalShipping: settings.EnvioNacional));
+builder.AddPayments(settings);
 builder.Services.ConfigureHttpJsonOptions(o =>
 {
     o.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
@@ -25,6 +27,8 @@ builder.Services.ConfigureHttpJsonOptions(o =>
 });
 
 var app = builder.Build();
+if (OrderEndpoints.Enabled(settings))
+    await app.Services.GetRequiredService<OrderRepository>().EnsureSchemaAsync(CancellationToken.None);
 
 // Caché corta en Cloudflare/navegador: los datos cambian como mucho cada 60 min.
 app.Use(async (ctx, next) =>
@@ -118,6 +122,8 @@ app.MapPost("/api/admin/sync", async (HttpRequest http, Npgsql.NpgsqlDataSource 
     await SyncSignal.RequestAsync(db, ct);
     return Results.Accepted(value: new { status = "pedida", hint = "Revisa /api/health en unos segundos" });
 });
+
+app.MapOrders(settings);
 
 app.Run();
 
