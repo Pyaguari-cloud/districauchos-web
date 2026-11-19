@@ -76,9 +76,9 @@ export default async function HomePage() {
             <li key={c.name}>
               <Link
                 href={`/buscar?categoria=${encodeURIComponent(c.name)}`}
-                className="flex min-h-16 min-w-0 items-center justify-between gap-2 rounded-xl border border-line bg-white px-3 py-3 font-semibold hover:border-gray-500 sm:px-4"
+                className="flex min-h-16 min-w-0 flex-col items-start justify-center gap-0.5 rounded-xl border border-line bg-white px-3 py-3 font-semibold hover:border-gray-500 sm:flex-row sm:items-center sm:justify-between sm:gap-2 sm:px-4"
               >
-                <span className="min-w-0 hyphens-auto [overflow-wrap:anywhere]">{sentenceCase(c.name)}</span>
+                <span className="min-w-0 break-words">{sentenceCase(c.name)}</span>
                 <span className="text-sm font-normal text-muted">{c.count}</span>
               </Link>
             </li>
