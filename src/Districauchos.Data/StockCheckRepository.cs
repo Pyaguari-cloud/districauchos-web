@@ -89,24 +89,30 @@ public sealed class StockCheckRepository(NpgsqlDataSource db)
 
         await using var conn = await db.OpenConnectionAsync(ct);
         await using var tx = await conn.BeginTransactionAsync(ct);
+        // Dos pasos: en una sola instrucción con CTE, la suma vería las variantes ANTES del UPDATE.
+        var touched = new List<string>();
         await using (var cmd = new NpgsqlCommand("""
-            WITH fresh AS (SELECT * FROM unnest($1::text[], $2::numeric[]) AS f(code, stock)),
-            upd AS (
-                UPDATE catalog_variants v SET stock = f.stock, available = f.stock > 0
-                FROM fresh f WHERE v.code = f.code AND v.stock IS DISTINCT FROM f.stock
-                RETURNING v.oem_norm
-            ),
-            totals AS (
-                SELECT v.oem_norm, sum(v.stock) AS stock, bool_or(v.available) AS available
-                FROM catalog_variants v WHERE v.oem_norm IN (SELECT oem_norm FROM upd) GROUP BY v.oem_norm
-            )
-            UPDATE catalog_items i SET stock = t.stock, available = t.available
-            FROM totals t WHERE i.oem_norm = t.oem_norm
-            RETURNING i.slug, i.stock, i.available
+            UPDATE catalog_variants v SET stock = f.stock, available = f.stock > 0
+            FROM unnest($1::text[], $2::numeric[]) AS f(code, stock)
+            WHERE v.code = f.code AND v.stock IS DISTINCT FROM f.stock
+            RETURNING v.oem_norm
             """, conn, tx))
         {
             cmd.Parameters.Add(new() { Value = codes.ToArray(), NpgsqlDbType = NpgsqlDbType.Array | NpgsqlDbType.Text });
             cmd.Parameters.Add(new() { Value = stocks, NpgsqlDbType = NpgsqlDbType.Array | NpgsqlDbType.Numeric });
+            await using var r = await cmd.ExecuteReaderAsync(ct);
+            while (await r.ReadAsync(ct)) touched.Add(r.GetString(0));
+        }
+        if (touched.Count > 0)
+        {
+            await using var cmd = new NpgsqlCommand("""
+                UPDATE catalog_items i SET stock = t.stock, available = t.available
+                FROM (SELECT oem_norm, sum(stock) AS stock, bool_or(available) AS available
+                      FROM catalog_variants WHERE oem_norm = ANY($1) GROUP BY oem_norm) t
+                WHERE i.oem_norm = t.oem_norm
+                RETURNING i.slug, i.stock, i.available
+                """, conn, tx);
+            cmd.Parameters.Add(new() { Value = touched.Distinct().ToArray(), NpgsqlDbType = NpgsqlDbType.Array | NpgsqlDbType.Text });
             await using var r = await cmd.ExecuteReaderAsync(ct);
             while (await r.ReadAsync(ct)) changes.Add(new(r.GetString(0), r.GetDecimal(1), r.GetBoolean(2)));
         }
