@@ -189,7 +189,7 @@ Probar con el simulador:
 
 **Nuevos pedidos del cliente (2026-11-19, "como Amazon"; la compra de prueba de $1 queda para el final)**
 1. ✅ **Cantidades publicadas (2026-11-19).** Suma bruta de todos los locales (un -6 en Maldonado resta al +4 de Tabiazo); disponibles pasaron de 5.540 a 5.094. "12 disponibles", "¡Solo quedan 2!" (≤ 3, `LOW_STOCK` en `Availability.tsx`). Si piden más de lo que hay: "3 disponibles + 2 bajo pedido" en carrito, pago, WhatsApp y correo. Sincronización cada **10 min** (`SYNC_INTERVAL_MINUTES=10` en el `.env` del servidor). **Falta:** revisar el stock al pagar (el Worker leería solo las 4 pestañas de stock a pedido; la API no debe tener la llave de Google).
-2. **Tiempo de entrega** estilo Amazon. **Respuesta del cliente:** mismo día en Quito si se pide **hasta las 17:00, lunes a viernes**; fuera de Quito por **Servientrega** 24–48 h; **Galápagos 3 días por avión, igual que al exterior, con recargo de $80** por envío.
+2. **Tiempo de entrega** estilo Amazon. **Respuesta del cliente:** mismo día en Quito si se pide **hasta las 17:00, lunes a viernes**; fuera de Quito por **Servientrega** 24–48 h; **Galápagos 3 días por avión, igual que al exterior, con recargo de $80** por envío. **Domingos y feriados no se despacha**: lo pedido esos días sale el siguiente día laborable.
 3. **Cuentas de usuario.** Propuesta: sin contraseñas (código al correo), compra como invitado se mantiene.
 4. **Imagen del vehículo** elegido en "Mi garaje". Propuesta: siluetas propias por tipo de carrocería (las fotos de internet tienen derechos de autor).
 
