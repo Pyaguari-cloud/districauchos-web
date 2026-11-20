@@ -82,7 +82,12 @@ public sealed class ProductIndex(MeiliClient meili)
         // Relevancia primero; luego clase A > B > C; luego disponibles primero (brief §6.6).
         rankingRules = new[] { "words", "typo", "proximity", "attribute", "sort", "exactness", "vch_rank:desc", "abc_rank:asc", "available_rank:desc" },
         // Códigos y OEM deben coincidir exacto: un error de tipeo ahí devolvería otra pieza.
-        typoTolerance = new { disableOnAttributes = new[] { "oem", "oem_aliases", "codes", "alt_codes" } },
+        // Desde 4 letras se tolera 1 diferencia: "alza" encuentra "ALZAS", "buje" → "BUJES", "base" → "BASES".
+        typoTolerance = new
+        {
+            minWordSizeForTypos = new { oneTypo = 4, twoTypos = 9 },
+            disableOnAttributes = new[] { "oem", "oem_aliases", "codes", "alt_codes" },
+        },
         synonyms = Synonyms,
         pagination = new { maxTotalHits = 5000 },
         faceting = new { maxValuesPerFacet = 300 },
@@ -206,8 +211,9 @@ public sealed class ProductIndex(MeiliClient meili)
     {
         if (string.IsNullOrWhiteSpace(q)) return "";
         var t = q.Trim();
-        var looksLikeCode = !t.Contains(' ') && t.Any(char.IsAsciiDigit) && t.All(c => char.IsAsciiLetterOrDigit(c) || c is '-' or '.' or '/');
-        return looksLikeCode ? TextNorm.NormalizeOem(t) ?? t : t;
+        var looksLikeCode = !t.Contains(' ') && t.Any(char.IsAsciiDigit) && t.All(c => char.IsAsciiLetterOrDigit(c) || c is '-' or '.' or '/' or '\'');
+        // Los códigos del cliente traen apóstrofos ("DH'40"); escrito junto ("DH40") coincide solo con esa pieza.
+        return looksLikeCode ? (TextNorm.NormalizeOem(t) ?? t).Replace("'", "") : t;
     }
 
     private static string Quote(string value) => "\"" + value.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";

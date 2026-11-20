@@ -52,6 +52,7 @@ public class SearchTests
     [Theory]
     [InlineData("96-180.071", "96180071")]
     [InlineData("C220", "C220")]
+    [InlineData("DH'40", "DH40")]
     [InlineData("manguera aveo", "manguera aveo")]
     [InlineData("  ", "")]
     [InlineData(null, "")]
