@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import type { QuoteResponse } from "@/lib/quote";
 import { cart, useCart, type CartItem } from "@/lib/cart";
 import { DELIVERY_OPTIONS, deliveryStore } from "@/lib/delivery";
-import { money } from "@/lib/format";
+import { isCodeKey, money, partRef } from "@/lib/format";
 import { useMyVehicle, vehicleText } from "@/lib/vehicle";
 import { QtyStepper } from "./AddToCart";
 import { WhatsAppButton } from "./WhatsAppButton";
@@ -74,8 +74,8 @@ export function CartView({ payments, canceled = false }: { payments: PaymentsInf
               <div className="min-w-0 flex-1">
                 <Link href={`/repuesto/${i.slug}`} className="font-semibold underline-offset-2 hover:underline">{i.title}</Link>
                 <p className="text-sm text-muted">
-                  OEM <span className="font-mono">{i.oem}</span>
-                  {line?.showCode && <> · opción <span className="font-mono">{i.code}</span></>}
+                  {partRef(i.oem, i.code).label} <span className="font-mono">{partRef(i.oem, i.code).value}</span>
+                  {line?.showCode && !isCodeKey(i.oem) && <> · opción <span className="font-mono">{i.code}</span></>}
                   {line && !line.available && (
                     <span className="ml-2 text-ask">
                       · {payments.enabled && payments.backorderDays > 0 ? `Bajo pedido, llega en ~${payments.backorderDays} días` : "Consultar disponibilidad"}

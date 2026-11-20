@@ -48,7 +48,8 @@ public sealed class ProductIndex(MeiliClient meili)
                 Slug: i.Slug,
                 Title: i.Title,
                 Description: i.Description,
-                Oem: i.OemNorm,
+                // Ficha por código (sin OEM): campo vacío; el código ya está en "codes" y se busca igual.
+                Oem: CatalogKey.Oem(i.OemNorm) ?? "",
                 OemAliases: i.OemAliases,
                 Codes: i.Codes,
                 AltCodes: i.AltCodes,
@@ -187,7 +188,7 @@ public sealed class ProductIndex(MeiliClient meili)
             ["facets"] = new[] { "brands", "category" },
             ["attributesToRetrieve"] = new[]
             {
-                "slug", "title", "oem", "brands", "models", "category", "subcategory",
+                "slug", "title", "oem", "codes", "brands", "models", "category", "subcategory",
                 "available", "is_vch", "abc_class", "pvp_min", "pvp_max", "mayor_min", "image",
             },
         };

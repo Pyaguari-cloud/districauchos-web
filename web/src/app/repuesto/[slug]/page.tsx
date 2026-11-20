@@ -8,7 +8,7 @@ import { PartImage } from "@/components/PartImage";
 import { VehicleFit } from "@/components/VehicleFit";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { getItem, type Vehicle } from "@/lib/api";
-import { displayTitle, money, priceRange, sentenceCase, vehicleLabel } from "@/lib/format";
+import { displayTitle, money, partRef, priceRange, sentenceCase, vehicleLabel } from "@/lib/format";
 import { quoteOneLink } from "@/lib/whatsapp";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -20,12 +20,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const item = await load((await params).slug);
   if (!item) return { title: "Repuesto no encontrado", robots: { index: false } };
   const title = displayTitle(item.title);
+  const ref = partRef(item.oem, item.variants[0]?.code);
   const vehicles = uniqueVehicles(item.vehicles).slice(0, 4).join(", ");
-  const description = `${title}. OEM ${item.oem}${vehicles ? `. Compatible con ${vehicles}` : ""}. ${
+  const description = `${title}. ${ref.label} ${ref.value}${vehicles ? `. Compatible con ${vehicles}` : ""}. ${
     item.available ? "Disponible" : "Consulta disponibilidad"
   } en Districauchos, Quito. Cotiza por WhatsApp.`;
   return {
-    title: `${title} (OEM ${item.oem})`,
+    title: `${title} (${ref.label} ${ref.value})`,
     description,
     alternates: { canonical: `/repuesto/${item.slug}` },
     openGraph: { title, description, url: `/repuesto/${item.slug}` },
@@ -40,7 +41,8 @@ export default async function ItemPage({ params }: Props) {
   const vehicles = groupVehicles(item.vehicles);
   // La principal es la primera variante (disponible y más barata), la misma que usa la cotización.
   const main = item.variants[0];
-  const wa = quoteOneLink({ oem: item.oem, title, price: main?.pvp ?? item.pvpMin });
+  const ref = partRef(item.oem, main?.code);
+  const wa = quoteOneLink({ oem: item.oem, code: main?.code, title, price: main?.pvp ?? item.pvpMin });
   const otherNames = item.description
     .split(" | ")
     .map(displayTitle)
@@ -51,8 +53,9 @@ export default async function ItemPage({ params }: Props) {
     "@context": "https://schema.org",
     "@type": "Product",
     name: title,
-    mpn: item.oem,
-    sku: item.oem,
+    // mpn = número de parte del fabricante: solo si hay OEM real.
+    ...(ref.label === "OEM" ? { mpn: ref.value } : {}),
+    sku: ref.value,
     category: item.category ?? undefined,
     brand: { "@type": "Brand", name: "Districauchos" },
     ...(item.image ? { image: item.image } : {}),
@@ -73,7 +76,7 @@ export default async function ItemPage({ params }: Props) {
               /
             </li>
           )}
-          <li aria-current="page" className="line-clamp-1">OEM {item.oem}</li>
+          <li aria-current="page" className="line-clamp-1">{ref.label} {ref.value}</li>
         </ol>
       </nav>
 
@@ -84,7 +87,8 @@ export default async function ItemPage({ params }: Props) {
           <div>
             <h1 className="font-display text-3xl font-bold leading-tight">{title}</h1>
             <p className="mt-1 text-muted">
-              Código OEM <span className="font-mono font-semibold text-brand-ink">{item.oem}</span>
+              {ref.label === "OEM" ? "Código OEM" : "Código"}{" "}
+              <span className="font-mono font-semibold text-brand-ink">{ref.value}</span>
               {item.oemAliases.length > 0 && <> · también {item.oemAliases.join(", ")}</>}
             </p>
           </div>

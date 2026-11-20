@@ -35,3 +35,17 @@ export function sentenceCase(text: string) {
 export function vehicleLabel(brand: string, model: string | null) {
   return model ? `${brand} ${model}` : brand;
 }
+
+/**
+ * Fichas sin OEM (aprobado por el cliente 2026-11-19): su clave es "COD:{codigo}".
+ * Misma regla que CatalogKey en el servidor (src/Districauchos.Core/Catalog/CatalogKey.cs).
+ */
+const CODE_PREFIX = "COD:";
+export const isCodeKey = (key: string) => key.startsWith(CODE_PREFIX);
+
+/** Cómo se identifica la pieza: { label: "OEM", value: "96180071" } o { label: "Código", value: "DH'40" }. */
+export function partRef(key: string, code?: string | null): { label: "OEM" | "Código"; value: string } {
+  return isCodeKey(key) || key === ""
+    ? { label: "Código", value: code || key.slice(CODE_PREFIX.length) }
+    : { label: "OEM", value: key };
+}

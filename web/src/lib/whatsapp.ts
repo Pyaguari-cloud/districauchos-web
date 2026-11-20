@@ -1,5 +1,5 @@
 import "server-only";
-import { money } from "./format";
+import { money, partRef } from "./format";
 
 /** Número del negocio (WHATSAPP_NUMBER, formato internacional sin "+": 5939XXXXXXXX). */
 export function whatsappNumber(): string | null {
@@ -15,9 +15,11 @@ function link(text: string): string | null {
 }
 
 /** Cotización de un solo producto desde la ficha (formato del brief §6.7). */
-export function quoteOneLink(p: { oem: string; title: string; price: number }) {
+export function quoteOneLink(p: { oem: string; code?: string; title: string; price: number }) {
+  const ref = partRef(p.oem, p.code);
+  const id = ref.label === "OEM" ? ref.value : `cód. ${ref.value}`;
   return link(
-    ["Hola, quiero cotizar:", `1) ${p.oem} – ${p.title} – Cant: 1 – ${money(p.price)} c/u`, `Enviado desde ${SITE}`].join("\n"),
+    ["Hola, quiero cotizar:", `1) ${id} – ${p.title} – Cant: 1 – ${money(p.price)} c/u`, `Enviado desde ${SITE}`].join("\n"),
   );
 }
 

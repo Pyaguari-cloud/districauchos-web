@@ -1,3 +1,4 @@
+using Districauchos.Core.Catalog;
 using System.Text;
 using Districauchos.Core.Pricing;
 
@@ -52,7 +53,7 @@ public static class OrderText
         for (var i = 0; i < o.Lines.Count; i++)
         {
             var l = o.Lines[i];
-            var id = l.ShowCode ? $"{l.Oem} (cód. {l.Code})" : l.Oem;
+            var id = CatalogKey.Label(l.Oem, l.Code, l.ShowCode);
             sb.Append($"{i + 1}) {id} – {l.Title} – Cant: {l.Qty} – {QuoteCalculator.Money(l.UnitPrice)} c/u = {QuoteCalculator.Money(l.LineTotal)}");
             if (l.MayorApplied) sb.Append(" (por mayor)");
             if (l.Backorder) sb.Append($" [BAJO PEDIDO ~{o.BackorderDays} días]");
@@ -76,7 +77,7 @@ public static class OrderText
     public static string ForCustomerWhatsApp(Order o)
     {
         var sb = new StringBuilder($"Hola, acabo de pagar el pedido #{o.Number} en la página ({QuoteCalculator.Money(o.Total)}).\n");
-        foreach (var l in o.Lines) sb.Append($"- {l.Oem} {l.Title} x{l.Qty}{(l.Backorder ? " (bajo pedido)" : "")}\n");
+        foreach (var l in o.Lines) sb.Append($"- {CatalogKey.Label(l.Oem, l.Code, l.ShowCode)} {l.Title} x{l.Qty}{(l.Backorder ? " (bajo pedido)" : "")}\n");
         sb.Append($"Entrega: {DeliveryText(o.Delivery, o.Customer.City)}\n");
         sb.Append($"A nombre de: {o.Customer.Name}");
         return sb.ToString();

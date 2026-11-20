@@ -1,3 +1,4 @@
+using Districauchos.Core.Catalog;
 using System.Globalization;
 using System.Text;
 
@@ -87,7 +88,7 @@ public sealed class QuoteCalculator(PricingRules pricing, string site = "distric
         for (var i = 0; i < lines.Count; i++)
         {
             var l = lines[i];
-            var id = l.ShowCode ? $"{l.Oem} (cód. {l.Code})" : l.Oem;
+            var id = CatalogKey.Label(l.Oem, l.Code, l.ShowCode);
             sb.Append($"{i + 1}) {id} – {l.Title} – Cant: {l.Qty} – {Money(l.UnitPrice)} c/u");
             if (l.MayorApplied) sb.Append(" (por mayor)");
             sb.Append('\n');

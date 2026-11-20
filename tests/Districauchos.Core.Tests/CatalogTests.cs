@@ -115,7 +115,7 @@ public class CatalogBuilderTests
     private readonly CatalogBuilder _b = new(new PricingRules(), Fixtures.Extractor());
 
     [Fact]
-    public void Excludes_generic_no_description_no_price_and_no_oem()
+    public void Excludes_generic_no_description_and_no_price()
     {
         var r = _b.Build([
             Fixtures.Master("50", "VENTA RAPIDA", 1m, "X1"),
@@ -126,12 +126,49 @@ public class CatalogBuilderTests
             Fixtures.Master("A3", "OK AVEO", 5m, "X5"),
         ], []);
 
-        Assert.Single(r.Items);
+        Assert.Equal(2, r.Items.Count); // A3 (OEM X5) y 96180071 (sin OEM → ficha por código)
         Assert.Equal(2, r.Stats.ExcludedGeneric);
         Assert.Equal(1, r.Stats.ExcludedNoDescription);
         Assert.Equal(1, r.Stats.ExcludedNoPrice);
         Assert.Equal(1, r.Stats.WithoutOem);
+        Assert.Equal(1, r.Stats.ProductsWithOem);
     }
+
+    [Fact]
+    public void Rows_without_oem_become_their_own_item_keyed_by_code()
+    {
+        // Caso real: "ALZAS CAUCHO DE CABINA" (DH'40) no tiene OEM y sí existencias.
+        var r = _b.Build(
+            [
+                Fixtures.Master("DH'40", "ALZAS CAUCHO DE CABINA UNIVERSALES 51X10X26", 3m, null, row: 7),
+                Fixtures.Master("DH'50", "ALZAS CAUCHO DE CABINA UNIVERSALES 62X14X25", 3m, null, row: 8),
+                Fixtures.Master("A3", "BASE CABINA DMAX", 9m, "8980513280", row: 9),
+            ],
+            [new StockRow("DH'40", StockLocation.Tabiazo, 4, null, 7)]);
+
+        Assert.Equal(3, r.Items.Count); // no se agrupan entre sí aunque se parezcan
+        var dh40 = Assert.Single(r.Items, i => i.OemNorm == "COD:DH'40");
+        Assert.True(CatalogKey.IsCode(dh40.OemNorm));
+        Assert.Null(CatalogKey.Oem(dh40.OemNorm));
+        Assert.Empty(dh40.OemAliases);
+        Assert.Equal(["DH'40"], dh40.Codes);
+        Assert.True(dh40.Available);
+        Assert.Equal("cod-dh-40-alzas-caucho-de-cabina-universales-51x10x26", dh40.Slug);
+        Assert.False(Assert.Single(r.Items, i => i.OemNorm == "COD:DH'50").Available);
+
+        // La ficha con OEM va primero y conserva su URL de siempre.
+        Assert.Equal("8980513280", r.Items[0].OemNorm);
+        Assert.Equal("8980513280-base-cabina-dmax", r.Items[0].Slug);
+        Assert.Contains(r.Variants, v => v.OemNorm == "COD:DH'40" && v.Code == "DH'40");
+    }
+
+    [Theory]
+    [InlineData("96180071", "C1", false, "96180071")]
+    [InlineData("96180071", "C1", true, "96180071 (cód. C1)")]
+    [InlineData("COD:DH'40", "DH'40", false, "cód. DH'40")]
+    [InlineData("COD:DH'40", "DH'40", true, "cód. DH'40")]
+    public void Catalog_key_label_for_people(string key, string code, bool showCode, string expected) =>
+        Assert.Equal(expected, CatalogKey.Label(key, code, showCode));
 
     [Fact]
     public void Groups_by_oem_and_sums_positive_stock_only()

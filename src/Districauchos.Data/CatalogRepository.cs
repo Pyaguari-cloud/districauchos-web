@@ -44,7 +44,7 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
         return result;
     }
 
-    /// <summary>Fichas publicadas y códigos → OEM, para emparejar el Excel de precios sugeridos.</summary>
+    /// <summary>Fichas publicadas y códigos → clave de ficha (OEM o COD:código), para emparejar el Excel de precios sugeridos.</summary>
     public async Task<(Dictionary<string, SuggestedPriceTarget> ByOem, Dictionary<string, string> OemByCodeKey)> LoadPriceTargetsAsync(CancellationToken ct)
     {
         var byOem = new Dictionary<string, SuggestedPriceTarget>(StringComparer.Ordinal);
@@ -54,7 +54,7 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
                 byOem[r.GetString(0)] = new(r.GetString(0), r.GetBoolean(1), r.GetDecimal(2));
 
         var byCode = new Dictionary<string, string>(StringComparer.Ordinal);
-        await using (var cmd = db.CreateCommand("SELECT code_norm, oem_norm FROM products_raw WHERE oem_norm IS NOT NULL"))
+        await using (var cmd = db.CreateCommand($"SELECT code_norm, COALESCE(oem_norm, '{CatalogKey.CodePrefix}' || code_norm) FROM products_raw"))
         await using (var r = await cmd.ExecuteReaderAsync(ct))
             while (await r.ReadAsync(ct))
                 if (TextNorm.CodeMatchKey(r.GetString(0)) is { } key) byCode.TryAdd(key, r.GetString(1));

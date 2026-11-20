@@ -12,7 +12,9 @@ const REVALIDATE_SECONDS = 300;
 export type CatalogHit = {
   slug: string;
   title: string;
+  /** Vacío en fichas sin OEM: entonces se muestra codes[0]. */
   oem: string;
+  codes: string[];
   brands: string[];
   models: string[];
   category: string | null;

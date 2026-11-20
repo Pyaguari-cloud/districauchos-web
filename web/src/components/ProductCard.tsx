@@ -1,11 +1,12 @@
 import Link from "next/link";
 import type { CatalogHit } from "@/lib/api";
-import { displayTitle, money, priceRange } from "@/lib/format";
+import { displayTitle, money, partRef, priceRange } from "@/lib/format";
 import { Availability } from "./Availability";
 import { PartImage } from "./PartImage";
 
 export function ProductCard({ item }: { item: CatalogHit }) {
   const title = displayTitle(item.title);
+  const ref = partRef(item.oem, item.codes?.[0]);
   const vehicles = [...item.models.slice(0, 3)];
   return (
     <li className="h-full min-w-0">
@@ -26,7 +27,7 @@ export function ProductCard({ item }: { item: CatalogHit }) {
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
           <h3 className="line-clamp-3 font-semibold leading-snug [overflow-wrap:anywhere]">{title}</h3>
           <p className="text-sm text-muted [overflow-wrap:anywhere]">
-            OEM <span className="font-mono">{item.oem}</span>
+            {ref.label} <span className="font-mono">{ref.value}</span>
           </p>
           {vehicles.length > 0 && (
             <p className="line-clamp-1 text-sm text-muted">Para: {vehicles.join(", ")}{item.models.length > 3 ? "…" : ""}</p>

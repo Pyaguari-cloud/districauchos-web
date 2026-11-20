@@ -71,7 +71,9 @@ public sealed class CatalogBuilder(
         var stockTotals = AggregateStock(stockRows, products, allMasterKeys, result, out var abcByCode);
 
         var usedSlugs = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var group in products.GroupBy(p => p.OemNorm!, StringComparer.Ordinal).OrderBy(g => g.Key, StringComparer.Ordinal))
+        // Primero las fichas con OEM (sus URLs no deben cambiar al sumar las de código), luego las de código.
+        foreach (var group in products.GroupBy(KeyOf, StringComparer.Ordinal)
+                     .OrderBy(g => CatalogKey.IsCode(g.Key)).ThenBy(g => g.Key, StringComparer.Ordinal))
         {
             var oem = group.Key;
             var rows = group.OrderBy(r => r.SourceRow).ToList();
@@ -95,8 +97,10 @@ public sealed class CatalogBuilder(
                 .Select(d => titles?.Format(d) ?? d)
                 .Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
-            var slug = Slug.ForItem(oem, title);
-            for (var n = 2; !usedSlugs.Add(slug); n++) slug = $"{Slug.ForItem(oem, title)}-{n}";
+            // Ficha por código: la URL lleva "cod-{codigo}" para no confundirse con un OEM.
+            var slugKey = CatalogKey.IsCode(oem) ? $"cod-{rows[0].CodeNorm}" : oem;
+            var slug = Slug.ForItem(slugKey, title);
+            for (var n = 2; !usedSlugs.Add(slug); n++) slug = $"{Slug.ForItem(slugKey, title)}-{n}";
 
             var sheetCategory = rows.Select(r => r.Category).FirstOrDefault(c => c is not null);
             var sheetSubcategory = rows.Select(r => r.Subcategory).FirstOrDefault(c => c is not null);
@@ -162,14 +166,18 @@ public sealed class CatalogBuilder(
                 result.Warnings.Add(new("duplicate_code", $"Código repetido {row.Code}; se usa la primera fila", "Codigos Existentes", row.SourceRow));
                 continue;
             }
-            if (row.OemNorm is null) { stats.WithoutOem++; continue; }
-            if (row.Oems.Count > 1) stats.MultiOemCells++;
+            // Sin OEM: se publica como ficha propia por código (aprobado por el cliente 2026-11-19).
+            if (row.OemNorm is null) stats.WithoutOem++;
+            else if (row.Oems.Count > 1) stats.MultiOemCells++;
             products.Add(row);
         }
 
-        stats.ProductsWithOem = products.Count;
+        stats.ProductsWithOem = products.Count - stats.WithoutOem;
         return products;
     }
+
+    /// <summary>Clave de ficha: el OEM, o <c>COD:{codigo}</c> si la fila no tiene OEM.</summary>
+    private static string KeyOf(MasterRow r) => r.OemNorm ?? CatalogKey.ForCode(r.CodeNorm);
 
     /// <summary>
     /// stock_total(codigo) = Σ max(0, stock del local). Varias filas del mismo código en un local se suman antes de recortar.
