@@ -1,0 +1,814 @@
+{
+  "Chevrolet|Aveo": {
+    "src": "/vehiculos/chevrolet-aveo.webp",
+    "author": "Vauxford",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2012_Chevrolet_Aveo_LTZ_1.4_Front.jpg"
+  },
+  "Chevrolet|Spark": {
+    "src": "/vehiculos/chevrolet-spark.webp",
+    "author": "MercurySable99",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2020_Chevrolet_Spark_LS,_front_right,_09-07-2024.jpg"
+  },
+  "Chevrolet|Sail": {
+    "src": "/vehiculos/chevrolet-sail.webp",
+    "author": "RL GNZLZ from Chile",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Chevrolet_Sail_1.5_LT_2016.jpg"
+  },
+  "Chevrolet|Optra": {
+    "src": "/vehiculos/chevrolet-optra.webp",
+    "author": "Elise240SX",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2005_Chevrolet_Optra_LS_Sedan_in_Melange_Beige,_Front_Right,_10-31-2022.jpg"
+  },
+  "Chevrolet|Corsa": {
+    "src": "/vehiculos/chevrolet-corsa.webp",
+    "author": "No machine-readable author provided. Milkmandan~commonswiki assumed (based on copyright claims).",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "source": "https://commons.wikimedia.org/wiki/File:Chevrolet_classic_front_right.jpg"
+  },
+  "Chevrolet|Cruze": {
+    "src": "/vehiculos/chevrolet-cruze.webp",
+    "author": "Elise240SX",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2017_Chevrolet_Cruze_LT_in_Arctic_Blue_Metallic,_Front_Left.jpg"
+  },
+  "Chevrolet|Captiva": {
+    "src": "/vehiculos/chevrolet-captiva.webp",
+    "author": "M 93",
+    "license": "CC BY-SA 3.0 de",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Chevrolet_Captiva_LTZ_2.2_D_4WD_(Facelift)_%E2%80%93_Frontansicht,_18._M%C3%A4rz_2012,_Wuppertal.jpg"
+  },
+  "Chevrolet|Grand Vitara": {
+    "src": "/vehiculos/chevrolet-grand-vitara.webp",
+    "author": "EurovisionNim",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2018_Suzuki_Vitara_(LY)_S_Turbo_wagon_(2018-11-02)_01.jpg"
+  },
+  "Chevrolet|Vitara": {
+    "src": "/vehiculos/chevrolet-grand-vitara.webp",
+    "author": "EurovisionNim",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2018_Suzuki_Vitara_(LY)_S_Turbo_wagon_(2018-11-02)_01.jpg"
+  },
+  "Chevrolet|Luv": {
+    "src": "/vehiculos/chevrolet-luv.webp",
+    "author": "293.xx.xxx.xx",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Chevrolet_LUV_ver2.JPG"
+  },
+  "Chevrolet|D-Max": {
+    "src": "/vehiculos/chevrolet-d-max.webp",
+    "author": "Alexander Migl",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Isuzu_D-Max_(third_generation)_autoMOBIL_T%C3%BCbingen_2025_DSC_2758.jpg"
+  },
+  "Chevrolet|Esteem": {
+    "src": "/vehiculos/chevrolet-esteem.webp",
+    "author": "order_242 from Chile",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Suzuki_Baleno_1.6_GL_1998.jpg"
+  },
+  "Chevrolet|Forsa": {
+    "src": "/vehiculos/chevrolet-forsa.webp",
+    "author": "TTTNIS",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:2nd_generation_Suzuki_Cultus.jpg"
+  },
+  "Chevrolet|Trooper": {
+    "src": "/vehiculos/chevrolet-trooper.webp",
+    "author": "IFCAR",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Isuzu_Trooper_--_03-16-2012.JPG"
+  },
+  "Chevrolet|Rodeo": {
+    "src": "/vehiculos/chevrolet-rodeo.webp",
+    "author": "IFCAR",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:2001-2003_Isuzu_Rodeo.jpg"
+  },
+  "Chevrolet|Beat": {
+    "src": "/vehiculos/chevrolet-spark.webp",
+    "author": "MercurySable99",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2020_Chevrolet_Spark_LS,_front_right,_09-07-2024.jpg"
+  },
+  "Chevrolet|Onix": {
+    "src": "/vehiculos/chevrolet-onix.webp",
+    "author": "Just a Man",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2022_Chevrolet_Onix_RS_1.0_Turbo.jpg"
+  },
+  "Chevrolet|Tracker": {
+    "src": "/vehiculos/chevrolet-tracker.webp",
+    "author": "Bull-Doser",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:%2798_Chevy_Tracker.jpg"
+  },
+  "Chevrolet|N300": {
+    "src": "/vehiculos/chevrolet-n300.webp",
+    "author": "Kevauto",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2013_Wuling_Rongguang,_front_8.16.18.jpg"
+  },
+  "Chevrolet|NHR": {
+    "src": "/vehiculos/chevrolet-nhr.webp",
+    "author": "Ypy31",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Nippon_Rent-A-Car_Isuzu_Elf_NJR85A.jpg"
+  },
+  "Chevrolet|NKR": {
+    "src": "/vehiculos/chevrolet-nhr.webp",
+    "author": "Ypy31",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Nippon_Rent-A-Car_Isuzu_Elf_NJR85A.jpg"
+  },
+  "Chevrolet|NPR": {
+    "src": "/vehiculos/chevrolet-nhr.webp",
+    "author": "Ypy31",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Nippon_Rent-A-Car_Isuzu_Elf_NJR85A.jpg"
+  },
+  "Chevrolet|Super Carry": {
+    "src": "/vehiculos/chevrolet-super-carry.webp",
+    "author": "DY5W-sport",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Suzuki_Carry_Truck_KC_4WD_DA16T.JPG"
+  },
+  "Chevrolet|Chevette": {
+    "src": "/vehiculos/chevrolet-chevette.webp",
+    "author": "dave_7",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:ChevroletChevette.jpg"
+  },
+  "Chevrolet|Sprint": {
+    "src": "/vehiculos/chevrolet-forsa.webp",
+    "author": "TTTNIS",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:2nd_generation_Suzuki_Cultus.jpg"
+  },
+  "Chevrolet|Monza": {
+    "src": "/vehiculos/chevrolet-monza.webp",
+    "author": "Mr.choppers",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:1978-1980_Chevrolet_Monza_Coup%C3%A9,_front_right_(Belmont).jpg"
+  },
+  "Chevrolet|San Remo": {
+    "src": "/vehiculos/chevrolet-forsa.webp",
+    "author": "TTTNIS",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:2nd_generation_Suzuki_Cultus.jpg"
+  },
+  "Suzuki|Forsa": {
+    "src": "/vehiculos/chevrolet-forsa.webp",
+    "author": "TTTNIS",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:2nd_generation_Suzuki_Cultus.jpg"
+  },
+  "Suzuki|Vitara": {
+    "src": "/vehiculos/chevrolet-grand-vitara.webp",
+    "author": "EurovisionNim",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2018_Suzuki_Vitara_(LY)_S_Turbo_wagon_(2018-11-02)_01.jpg"
+  },
+  "Suzuki|Grand Vitara": {
+    "src": "/vehiculos/chevrolet-grand-vitara.webp",
+    "author": "EurovisionNim",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2018_Suzuki_Vitara_(LY)_S_Turbo_wagon_(2018-11-02)_01.jpg"
+  },
+  "Suzuki|Swift": {
+    "src": "/vehiculos/suzuki-swift.webp",
+    "author": "Alexander-93",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Suzuki_Swift_(2024)_hybrid_DSC_6076.jpg"
+  },
+  "Suzuki|Alto": {
+    "src": "/vehiculos/suzuki-alto.webp",
+    "author": "TTTNIS",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:1994-1997_Suzuki_Alto.jpg"
+  },
+  "Hyundai|Accent": {
+    "src": "/vehiculos/hyundai-accent.webp",
+    "author": "Kevauto",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2019_Hyundai_Accent_1.6L,_front_10.8.19.jpg"
+  },
+  "Hyundai|Elantra": {
+    "src": "/vehiculos/hyundai-elantra.webp",
+    "author": "Cutlass",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:2023_Hyundai_Elantra_Limited_in_Silver,_front_left,_04-04-2026.jpg"
+  },
+  "Hyundai|Tucson": {
+    "src": "/vehiculos/hyundai-tucson.webp",
+    "author": "© M 93",
+    "license": "CC BY-SA 3.0 de",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Hyundai_Tucson_1.6_T-GDI_PHEV_Prime_(IV)_%E2%80%93_f_05072025.jpg"
+  },
+  "Hyundai|Santa Fe": {
+    "src": "/vehiculos/hyundai-santa-fe.webp",
+    "author": "Elise240SX",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2024_Hyundai_Santa_Fe_Luxury_AWD_in_Hampton_Grey,_front_left,_2024-06-30.jpg"
+  },
+  "Hyundai|i10": {
+    "src": "/vehiculos/hyundai-i10.webp",
+    "author": "© M 93",
+    "license": "CC BY-SA 3.0 de",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Hyundai_i10_1.0_Intro_(III)_%E2%80%93_f_03012021.jpg"
+  },
+  "Hyundai|Getz": {
+    "src": "/vehiculos/hyundai-getz.webp",
+    "author": "Mick from Northamptonshire, England",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Hyundai_Getz_-_Flickr_-_mick_-_Lumix.jpg"
+  },
+  "Hyundai|H1": {
+    "src": "/vehiculos/hyundai-h1.webp",
+    "author": "Alex Neman",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2012_Hyundai_H-1_(first_facelift).jpg"
+  },
+  "Hyundai|H100": {
+    "src": "/vehiculos/hyundai-h100.webp",
+    "author": "Bull-Doser at English Wikipedia",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Hyundai_H100.JPG"
+  },
+  "Kia|Rio": {
+    "src": "/vehiculos/kia-rio.webp",
+    "author": "Vauxford",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2021_Kia_Rio_3_MHEV_facelift_1.0.jpg"
+  },
+  "Kia|Picanto": {
+    "src": "/vehiculos/kia-picanto.webp",
+    "author": "Vauxford",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2018_Kia_Picanto_3_Automatic_1.2_Front.jpg"
+  },
+  "Kia|Sportage": {
+    "src": "/vehiculos/kia-sportage.webp",
+    "author": "LuvsMG481",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2025_Kia_Sportage_S_front_only.jpg"
+  },
+  "Kia|Cerato": {
+    "src": "/vehiculos/kia-cerato.webp",
+    "author": "LuvsMG481",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2019_Kia_Cerato_S_hatchback_front.jpg"
+  },
+  "Kia|Soluto": {
+    "src": "/vehiculos/kia-soluto.webp",
+    "author": "JamesYoung8167",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Kia_Pegas_Shishi_01_2022-10-15.jpg"
+  },
+  "Kia|Sorento": {
+    "src": "/vehiculos/kia-sorento.webp",
+    "author": "Kevauto",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2024_Kia_Sorento_X-Line_SX_Prestige_(facelift),_front_12.20.24.jpg"
+  },
+  "Kia|Pregio": {
+    "src": "/vehiculos/kia-pregio.webp",
+    "author": "Jeremy from Sydney, Australia",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2005_Kia_Pregio_(CT2_MY05)_van.jpg"
+  },
+  "Toyota|Hilux": {
+    "src": "/vehiculos/toyota-hilux.webp",
+    "author": "Vauxford",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2016_Toyota_HiLux_Invincible_D-4D_4WD_2.4_Front.jpg"
+  },
+  "Toyota|Corolla": {
+    "src": "/vehiculos/toyota-corolla.webp",
+    "author": "Alexander Migl",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Toyota_Corolla_Hybrid_(E210)_IMG_4338.jpg"
+  },
+  "Toyota|Yaris": {
+    "src": "/vehiculos/toyota-yaris.webp",
+    "author": "Vauxford",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2020_Toyota_Yaris_Design_HEV_CVT_1.5_Front.jpg"
+  },
+  "Toyota|Fortuner": {
+    "src": "/vehiculos/toyota-fortuner.webp",
+    "author": "NZ Car Freak",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2015_Toyota_Fortuner_(New_Zealand).jpg"
+  },
+  "Toyota|Land Cruiser": {
+    "src": "/vehiculos/toyota-land-cruiser.webp",
+    "author": "Autosdeprimera",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2021_Toyota_Land_Cruiser_300_3.4_ZX_(Colombia)_front_view_04.png"
+  },
+  "Toyota|RAV4": {
+    "src": "/vehiculos/toyota-rav4.webp",
+    "author": "Mr.choppers",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2024_Toyota_RAV4_Prime_XSE_Premium_in_Silver_Sky_with_Midnight_Black_roof,_front_left.jpg"
+  },
+  "Nissan|Sentra": {
+    "src": "/vehiculos/nissan-sentra.webp",
+    "author": "Alexander Migl",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2024_Nissan_Sentra_(B18)_DSC_3754.jpg"
+  },
+  "Nissan|Tiida": {
+    "src": "/vehiculos/nissan-tiida.webp",
+    "author": "Tennen-Gas",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "source": "https://commons.wikimedia.org/wiki/File:Nissan_Tiida_C11_003.JPG"
+  },
+  "Nissan|Versa": {
+    "src": "/vehiculos/nissan-versa.webp",
+    "author": "MercurySable99",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2011_Nissan_Versa_1.6_Sedan.jpg"
+  },
+  "Nissan|Frontier": {
+    "src": "/vehiculos/nissan-frontier.webp",
+    "author": "Autosdeprimera",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2021_Nissan_Frontier_Pro_4X_(Colombia;_facelift)_front_view_01.png"
+  },
+  "Nissan|X-Trail": {
+    "src": "/vehiculos/nissan-x-trail.webp",
+    "author": "Alexander-93",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Nissan_X-Trail_(T33)_1X7A7179.jpg"
+  },
+  "Nissan|March": {
+    "src": "/vehiculos/nissan-march.webp",
+    "author": "Elise240SX",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2015_Nissan_Micra_SR_in_Brilliant_Silver,_front_right,_2024-10-11.jpg"
+  },
+  "Mazda|BT-50": {
+    "src": "/vehiculos/mazda-bt-50.webp",
+    "author": "RL GNZLZ",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2022_Mazda_BT-50_3.0d_Turbo_4x4_(Chile)_front_view.jpg"
+  },
+  "Mazda|Mazda 3": {
+    "src": "/vehiculos/mazda-mazda-3.webp",
+    "author": "TTTNIS",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Mazda3_SKYACTIV-G.jpg"
+  },
+  "Mazda|Allegro": {
+    "src": "/vehiculos/mazda-allegro.webp",
+    "author": "OSX",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:2003_Mazda_323_(BJ_II)_Proteg%C3%A9_Shades_sedan_(2015-08-07)_01.jpg"
+  },
+  "Mazda|B2200": {
+    "src": "/vehiculos/mazda-b2200.webp",
+    "author": "Rudolf Stricker",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "source": "https://commons.wikimedia.org/wiki/File:Mazda_B2500_front_20080215.jpg"
+  },
+  "Mazda|B2600": {
+    "src": "/vehiculos/mazda-b2200.webp",
+    "author": "Rudolf Stricker",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "source": "https://commons.wikimedia.org/wiki/File:Mazda_B2500_front_20080215.jpg"
+  },
+  "Mazda|323": {
+    "src": "/vehiculos/mazda-allegro.webp",
+    "author": "OSX",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:2003_Mazda_323_(BJ_II)_Proteg%C3%A9_Shades_sedan_(2015-08-07)_01.jpg"
+  },
+  "Ford|Ranger": {
+    "src": "/vehiculos/ford-ranger.webp",
+    "author": "Alexander-93",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Ford_Ranger_(T6,_P703)_Wildtrak_IMG_7320.jpg"
+  },
+  "Ford|Explorer": {
+    "src": "/vehiculos/ford-explorer.webp",
+    "author": "Alexander Migl",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Ford_Explorer_(sixth_generation)_IMG_6063.jpg"
+  },
+  "Ford|Escape": {
+    "src": "/vehiculos/ford-escape.webp",
+    "author": "Mr.choppers",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2021_Ford_Escape_Hybrid_SEL_AWD_in_Oxford_White,_front_left.jpg"
+  },
+  "Ford|Fiesta": {
+    "src": "/vehiculos/ford-fiesta.webp",
+    "author": "© M 93",
+    "license": "CC BY-SA 3.0 de",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Ford_Fiesta_ST-Line_(VII,_Facelift)_%E2%80%93_f_30012023.jpg"
+  },
+  "Ford|F-150": {
+    "src": "/vehiculos/ford-f-150.webp",
+    "author": "Kevauto",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2018_Ford_F-150_XLT_Crew_Cab,_front_11.10.19.jpg"
+  },
+  "Renault|Logan": {
+    "src": "/vehiculos/renault-logan.webp",
+    "author": "Mihnea Lazăr",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Dacia_Logan_2023_Front_2_(cropped).jpg"
+  },
+  "Renault|Sandero": {
+    "src": "/vehiculos/renault-sandero.webp",
+    "author": "Alexander-93",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2023_Dacia_Sandero_III_DSC_6012.jpg"
+  },
+  "Renault|Duster": {
+    "src": "/vehiculos/renault-duster.webp",
+    "author": "© M 93",
+    "license": "CC BY-SA 3.0 de",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Dacia_Duster_TCe_130_Extreme_(III)_%E2%80%93_f_13102024.jpg"
+  },
+  "Renault|Kwid": {
+    "src": "/vehiculos/renault-kwid.webp",
+    "author": "Autosdeprimera",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2023_Renault_Kwid_Iconic_(Colombia)_front_view_01.png"
+  },
+  "Renault|Megane": {
+    "src": "/vehiculos/renault-megane.webp",
+    "author": "Vauxford",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2017_Renault_Megane_Dynamique_S_NAV_DC_1.5_Front.jpg"
+  },
+  "Renault|Clio": {
+    "src": "/vehiculos/renault-clio.webp",
+    "author": "© M 93",
+    "license": "CC BY-SA 3.0 de",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Renault_Clio_(V,_Facelift)_%E2%80%93_f_02092025.jpg"
+  },
+  "Volkswagen|Gol": {
+    "src": "/vehiculos/volkswagen-gol.webp",
+    "author": "RL GNZLZ from Chile",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Volkswagen_Gol_Highline_2023_(53708009248)_(cropped).jpg"
+  },
+  "Volkswagen|Amarok": {
+    "src": "/vehiculos/volkswagen-amarok.webp",
+    "author": "© M 93",
+    "license": "CC BY-SA 3.0 de",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:VW_Amarok_3.0_TDI_4Motion_Style_(II)_%E2%80%93_f_05072025.jpg"
+  },
+  "Volkswagen|Jetta": {
+    "src": "/vehiculos/volkswagen-jetta.webp",
+    "author": "Kevauto",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2025_Volkswagen_Jetta_SEL,_front_3.28.25.jpg"
+  },
+  "Volkswagen|Passat": {
+    "src": "/vehiculos/volkswagen-passat.webp",
+    "author": "© M 93",
+    "license": "CC BY-SA 3.0 de",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:VW_Passat_Variant_Elegance_(B9)_%E2%80%93_f_18052025.jpg"
+  },
+  "Volkswagen|Golf": {
+    "src": "/vehiculos/volkswagen-golf.webp",
+    "author": "Vauxford",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2020_Volkswagen_Golf_Style_1.5_Front.jpg"
+  },
+  "Mitsubishi|L200": {
+    "src": "/vehiculos/mitsubishi-l200.webp",
+    "author": "Ethan Llamas",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Mitsubishi_Triton_LC_2.4_GLS_2WD_Blade_Silver_Metallic_(cropped).jpg"
+  },
+  "Mitsubishi|Montero": {
+    "src": "/vehiculos/mitsubishi-montero.webp",
+    "author": "DY5W-sport",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Mitsubishi_V98_Pajero_Long_Body_Super_Exceed_3200_DI-D.JPG"
+  },
+  "Mitsubishi|Lancer": {
+    "src": "/vehiculos/mitsubishi-lancer.webp",
+    "author": "IFCAR",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:2012_Mitsubishi_Lancer_SE_sedan_--_02-04-2012_2.jpg"
+  },
+  "Great Wall|Wingle": {
+    "src": "/vehiculos/great-wall-wingle.webp",
+    "author": "China Street Shots",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Great_Wall_Wingle_7_004.jpg"
+  },
+  "Chery|QQ": {
+    "src": "/vehiculos/chery-qq.webp",
+    "author": "Mike384",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Chery_QQ_Ph.JPG"
+  },
+  "Chery|Tiggo": {
+    "src": "/vehiculos/chery-tiggo.webp",
+    "author": "JamesYoung8167",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Chery_Tiggo_3_facelift_Shishi_01_2022-05-22.jpg"
+  },
+  "Daewoo|Lanos": {
+    "src": "/vehiculos/daewoo-lanos.webp",
+    "author": "IFCAR",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Daewoo_Lanos_hatchback_--_04-22-2011_front.jpg"
+  },
+  "Daewoo|Cielo": {
+    "src": "/vehiculos/daewoo-cielo.webp",
+    "author": "Chu",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:20101003_daewoo_lemans_1.jpg"
+  },
+  "Daewoo|Racer": {
+    "src": "/vehiculos/daewoo-cielo.webp",
+    "author": "Chu",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:20101003_daewoo_lemans_1.jpg"
+  },
+  "Daewoo|Matiz": {
+    "src": "/vehiculos/chevrolet-spark.webp",
+    "author": "MercurySable99",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2020_Chevrolet_Spark_LS,_front_right,_09-07-2024.jpg"
+  },
+  "Daewoo|Tico": {
+    "src": "/vehiculos/daewoo-tico.webp",
+    "author": "Stahlkocher",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Daewoo_Tico_vl_(cropped).png"
+  },
+  "Daewoo|Nubira": {
+    "src": "/vehiculos/daewoo-nubira.webp",
+    "author": "OSX",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:1999_Daewoo_Nubira_(J100)_SE_sedan_(2015-07-03)_01.jpg"
+  },
+  "Daewoo|Espero": {
+    "src": "/vehiculos/daewoo-espero.webp",
+    "author": "Vauxford",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:1995_Daewoo_Espero_CDXi_2.0_Front.jpg"
+  },
+  "Daihatsu|Terios": {
+    "src": "/vehiculos/daihatsu-terios.webp",
+    "author": "Wilzz99",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2018_Daihatsu_Terios_1.5_R_Deluxe_wagon_(F800RG;_01-12-2019),_South_Tangerang.jpg"
+  },
+  "Daihatsu|Delta": {
+    "src": "/vehiculos/daihatsu-delta.webp",
+    "author": "Comyu",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2019_Hakone_Ekiden_Photographer_Truck_DYNA.jpg"
+  },
+  "Daihatsu|Charade": {
+    "src": "/vehiculos/daihatsu-charade.webp",
+    "author": "Tommi Nummelin",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:1991_Daihatsu_Charade_SG_Sedan_cropped.JPG"
+  },
+  "Fiat|Uno": {
+    "src": "/vehiculos/fiat-uno.webp",
+    "author": "juan elo;Cropped and digitally altered by uploader Mr.choppers",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2011_Fiat_Uno_1.4_Attractive.jpg"
+  },
+  "Fiat|Palio": {
+    "src": "/vehiculos/fiat-palio.webp",
+    "author": "order_242 from Chile",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Fiat_Palio_1.4_Attractive_2014_(12280182114).jpg"
+  },
+  "Fiat|Fiorino": {
+    "src": "/vehiculos/fiat-fiorino.webp",
+    "author": "M 93",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Fiat_Fiorino_2008_front.jpg"
+  },
+  "Peugeot|206": {
+    "src": "/vehiculos/peugeot-206.webp",
+    "author": "Vauxford",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2002_Peugeot_206_LX_1.4_Front.jpg"
+  },
+  "Peugeot|307": {
+    "src": "/vehiculos/peugeot-307.webp",
+    "author": "Vauxford",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2002_Peugeot_307_Rapier_16V_1.6_Front.jpg"
+  },
+  "Peugeot|405": {
+    "src": "/vehiculos/peugeot-405.webp",
+    "author": "Nrike darklighter",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Peugeot_405_SRI_1992_(cropped).jpg"
+  },
+  "Citroen|C4": {
+    "src": "/vehiculos/citroen-c4.webp",
+    "author": "Alexander Migl",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Citroen_C4_(2020)_1X7A5851.jpg"
+  },
+  "Citroen|Picasso": {
+    "src": "/vehiculos/citroen-picasso.webp",
+    "author": "Rudolf Stricker",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "source": "https://commons.wikimedia.org/wiki/File:Citroen_Xsara_Picasso_front_20070928.jpg"
+  },
+  "Citroen|Xsara": {
+    "src": "/vehiculos/citroen-xsara.webp",
+    "author": "Charles01",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Citro%C3%ABn_Xsara_in_St_Trond.jpg"
+  },
+  "Skoda|Fabia": {
+    "src": "/vehiculos/skoda-fabia.webp",
+    "author": "Alexander-93",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:%C5%A0koda_Fabia_IV_1X7A7110_(cropped).jpg"
+  },
+  "Skoda|Superb": {
+    "src": "/vehiculos/skoda-superb.webp",
+    "author": "© M 93",
+    "license": "CC BY-SA 3.0 de",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Skoda_Superb_L%26K_(IV)_%E2%80%93_f_12042026.jpg"
+  },
+  "Skoda|Felicia": {
+    "src": "/vehiculos/skoda-felicia.webp",
+    "author": "Charles01",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Skoda_Felicia_outside_Robinson.JPG"
+  },
+  "Skoda|Favorit": {
+    "src": "/vehiculos/skoda-favorit.webp",
+    "author": "Kankolka",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Favorit_1994_corp.jpg"
+  },
+  "Skoda|Forman": {
+    "src": "/vehiculos/skoda-favorit.webp",
+    "author": "Kankolka",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Favorit_1994_corp.jpg"
+  },
+  "Skoda|Octavia": {
+    "src": "/vehiculos/skoda-octavia.webp",
+    "author": "Mike-fiesta",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Skoda_Octavia_IV_liftback_(cropped).jpg"
+  },
+  "Honda|Civic": {
+    "src": "/vehiculos/honda-civic.webp",
+    "author": "© M 93",
+    "license": "CC BY-SA 3.0 de",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Honda_Civic_e-HEV_Sport_(XI)_%E2%80%93_f_30062024.jpg"
+  },
+  "Honda|Accord": {
+    "src": "/vehiculos/honda-accord.webp",
+    "author": "MercurySable99",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2023_Honda_Accord_LX,_front_left,_07-13-2023.jpg"
+  },
+  "Honda|CR-V": {
+    "src": "/vehiculos/honda-cr-v.webp",
+    "author": "© M 93",
+    "license": "CC BY-SA 3.0 de",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Honda_CR-V_e-HEV_Elegance_AWD_(VI)_%E2%80%93_f_14072024.jpg"
+  },
+  "Honda|Fit": {
+    "src": "/vehiculos/honda-fit.webp",
+    "author": "© M 93",
+    "license": "CC BY-SA 3.0 de",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Honda_Jazz_Hybrid_Executive_(IV)_%E2%80%93_f_18102020.jpg"
+  }
+}

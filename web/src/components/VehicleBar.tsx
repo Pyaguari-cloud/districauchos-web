@@ -1,8 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { garage, MAX_GARAGE, useGarage, vehicleText, type MyVehicle } from "@/lib/vehicle";
+import { vehiclePhoto } from "@/lib/vehicle-photos";
 
 export type VehicleOption = { brand: string; models: string[] };
 
@@ -22,6 +24,7 @@ export function VehicleBar({ options }: { options: VehicleOption[] }) {
   const [brand, setBrand] = useState("");
 
   const active = g.vehicles.find((v) => v.id === g.activeId) ?? null;
+  const photo = active ? vehiclePhoto(active.brand, active.model) : null;
   const showForm = adding || g.vehicles.length === 0;
   const models = options.find((o) => o.brand === brand)?.models ?? [];
 
@@ -79,6 +82,13 @@ export function VehicleBar({ options }: { options: VehicleOption[] }) {
           </>
         ) : (
           <>
+            {/* Foto del vehículo elegido, como Amazon. El crédito del autor va en la foto grande y en /creditos. */}
+            {photo && (
+              <Image
+                src={photo.src} alt="" width={72} height={45} sizes="72px"
+                className="h-11 w-[70px] shrink-0 rounded-md bg-white/10 object-cover"
+              />
+            )}
             <label htmlFor="vb-activo" className="sr-only">Vehículo activo</label>
             <select
               id="vb-activo"

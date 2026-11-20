@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ProductGrid } from "@/components/ProductCard";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { searchCatalog } from "@/lib/api";
 import { isRealCategory, sentenceCase, vehicleLabel } from "@/lib/format";
 import { askLink } from "@/lib/whatsapp";
+import { photoCredit, vehiclePhoto } from "@/lib/vehicle-photos";
 
 type Params = { q?: string; marca?: string; modelo?: string; categoria?: string; disponible?: string; importado?: string; pagina?: string };
 
@@ -53,6 +55,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   };
 
   const vehicle = p.marca ? vehicleLabel(p.marca, p.modelo ?? null) : undefined;
+  const photo = p.marca && !vehicleFallback ? vehiclePhoto(p.marca, p.modelo) : null;
   const heading = p.q ? `“${p.q}”` : p.categoria ? sentenceCase(p.categoria) : p.importado ? "Importación directa" : vehicle ?? "Todos los repuestos";
   const brands = Object.entries(result.facets.brands ?? {}).sort((a, b) => b[1] - a[1]).slice(0, 12);
   const categories = Object.entries(result.facets.categories ?? {})
@@ -62,6 +65,20 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
   return (
     <div className="flex flex-col gap-5">
+      {photo && vehicle && (
+        // Como Amazon: el vehículo elegido arriba de los resultados, con su foto.
+        <figure className="flex items-center gap-4 overflow-hidden rounded-xl border border-line bg-white p-3">
+          <Image src={photo.src} alt={vehicle} width={160} height={100} sizes="160px" priority
+            className="h-20 w-32 shrink-0 rounded-lg object-cover sm:h-24 sm:w-40" />
+          <figcaption className="min-w-0">
+            <p className="text-sm text-muted">Repuestos para tu</p>
+            <p className="font-display text-2xl font-bold uppercase leading-tight tracking-wide">{vehicle}</p>
+            <Link href="/creditos" className="mt-1 block truncate text-xs text-muted underline-offset-2 hover:underline">
+              {photoCredit(photo)}
+            </Link>
+          </figcaption>
+        </figure>
+      )}
       <div>
         <h1 className="font-display text-3xl font-bold uppercase tracking-wide">{heading}</h1>
         <p className="text-muted" aria-live="polite">

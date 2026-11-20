@@ -36,6 +36,7 @@ export function Footer() {
             <li><Link href="/como-comprar" className={link}>Cómo comprar</Link></li>
             <li><Link href="/locales" className={link}>Locales</Link></li>
             <li><Link href="/nosotros" className={link}>Nosotros</Link></li>
+            <li><Link href="/creditos" className={link}>Créditos de fotos</Link></li>
             <li><a href={`mailto:${negocio.email}`} className={link}>{negocio.email}</a></li>
           </ul>
           <ul className="flex gap-4">
