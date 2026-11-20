@@ -109,6 +109,7 @@ dotnet run --project src/Districauchos.Worker
 | Códigos con ceros a la izquierda | Se guarda el original; stock se empata ignorando ceros iniciales | `TextNorm.CodeMatchKey` |
 | Código repetido en el maestro | Se usa la primera fila y se registra advertencia | `CatalogBuilder` |
 | Vitara, Grand Vitara, Forza (Chevrolet = Suzuki) | **Resuelto 2026-11-18:** son el mismo vehículo; siempre se asignan a ambas marcas | `equivalents` en `data/vehicles.json` |
+| Productos sin OEM | **Resuelto 2026-11-19 (cliente):** se publican, una ficha por código, clave `COD:{codigo}` | `CatalogKey`, `CatalogBuilder` |
 | Categorías (propuesta de mejora 2) | Se asignan por cómo empieza la descripción; si no hay regla, desde la hoja; si no, "Otros". Solo presentación | `data/categories.json`, `CategoryClassifier` |
 
 ## Reglas que no se negocian

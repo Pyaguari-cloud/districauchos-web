@@ -182,7 +182,8 @@ Probar con el simulador:
 
 **Observaciones del cliente tras el lanzamiento (2026-11-19)**
 - "alza cabina dmax" salía vacío y en su POS no. Dos causas, **arregladas**: (1) "Mi garaje" tenía un Aveo y filtraba todo → ahora, si con el vehículo no hay nada, se muestran los de todos los vehículos con aviso; (2) el reintento quitaba palabras desde el final y se quedaba con "alza" → ahora prueba quitando una palabra cada vez (`ProductIndex.DropOneWord`). Resultado: las 3 "Base cabina DMAX" igual que el POS.
-- **Pendiente de aprobación del cliente:** publicar los productos **sin OEM** (4.563 con precio, 2.651 con existencias; el brief decía no publicarlos). Propuesta: ficha por código interno.
+- **Productos sin OEM: publicados (aprobado por el cliente 2026-11-19).** Cada código es su propia ficha con clave `COD:{codigo}` (`CatalogKey`), URL `/repuesto/cod-{codigo}-…`, y la web muestra "Código" en vez de "OEM". El catálogo pasó de **3.902 a 8.429 fichas** (5.540 disponibles); las URLs de las fichas con OEM no cambiaron. Si el cliente llena el OEM de un producto, pasa solo a la ficha agrupada (su URL `cod-…` deja de existir).
+- Buscador: tolera 1 letra de diferencia desde 4 letras (`alza` → `ALZAS`); los códigos con apóstrofo (`DH'40`) se buscan exacto.
 - "Como Amazon" (guardar el carro): ya existe sin cuenta (localStorage, hasta 5). No se hará login. Posible mejora: hacer más visible que quedó guardado.
 - Cantidades: se mantiene la regla de no mostrarlas (competencia; la hoja no es en tiempo real y hasta tiene existencias negativas). Opción a consultar: etiqueta "Últimas unidades" sin número.
 
