@@ -36,6 +36,10 @@ export function CheckoutForm({ backorderDays }: { backorderDays: number }) {
   const [sending, setSending] = useState(false);
   // Sube cuando el servidor avisa que el stock cambió al pagar: vuelve a pedir la cotización.
   const [refresh, setRefresh] = useState(0);
+  // Placa o VIN (opcional): no se valida contra ninguna base; solo ayuda al vendedor a confirmar el repuesto.
+  const [plate, setPlate] = useState("");
+  const plateClean = plate.toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 17);
+  const vehicleForOrder = [vehicleText(vehicle), plateClean.length >= 5 ? `Placa/VIN: ${plateClean}` : ""].filter(Boolean).join(" · ");
 
   const payloadItems = items.map(({ oem, code, qty }) => ({ oem, code, qty }));
   const itemsKey = JSON.stringify(payloadItems);
@@ -87,7 +91,7 @@ export function CheckoutForm({ backorderDays }: { backorderDays: number }) {
       const res = await fetch("/api/pedido", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: payloadItems, delivery, vehicle: vehicleText(vehicle) || null,
+          items: payloadItems, delivery, vehicle: vehicleForOrder || null,
           customer: f, acceptBackorder,
         }),
       });
@@ -169,6 +173,18 @@ export function CheckoutForm({ backorderDays }: { backorderDays: number }) {
           ) : (
             <p className="text-muted">Te avisamos por WhatsApp cuando tu pedido esté listo para retirar.</p>
           )}
+          <div className="flex flex-col gap-1">
+            <label htmlFor="f-plate" className="font-semibold">Placa o VIN de tu vehículo (opcional)</label>
+            <input
+              id="f-plate" value={plate} onChange={(e) => setPlate(e.target.value)} maxLength={20} autoComplete="off" autoCapitalize="characters"
+              placeholder="PBA-1234 o número de chasis" aria-describedby="h-plate"
+              className="min-h-12 rounded-lg border border-line bg-white px-3 text-base uppercase"
+            />
+            <p id="h-plate" className="text-sm text-muted">
+              {vehicle ? <>Vehículo: <strong>{vehicleText(vehicle)}</strong>. </> : null}
+              Nuestro vendedor confirma que el repuesto es el correcto antes de enviarlo.
+            </p>
+          </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="f-notes" className="font-semibold">Nota (opcional)</label>
             <textarea id="f-notes" value={f.notes} onChange={set("notes")} maxLength={300} rows={2}

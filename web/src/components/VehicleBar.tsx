@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { garage, MAX_GARAGE, useGarage, vehicleText, type MyVehicle } from "@/lib/vehicle";
@@ -10,6 +11,7 @@ export type VehicleOption = { brand: string; models: string[] };
 
 const NONE = "__none__";
 const ADD = "__add__";
+const MANAGE = "__manage__";
 
 /**
  * "Mi garaje" bajo el encabezado, en todas las páginas: elegir el vehículo activo,
@@ -52,9 +54,9 @@ export function VehicleBar({ options }: { options: VehicleOption[] }) {
   return (
     <div className="border-t border-white/10 bg-brand-ink">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-4 py-2">
-        <span id="mi-garaje" className="w-full font-display text-sm font-bold uppercase tracking-wide text-brand-yellow sm:w-auto">
+        <Link id="mi-garaje" href="/mi-garaje" className="w-full font-display text-sm font-bold uppercase tracking-wide text-brand-yellow underline-offset-4 hover:underline sm:w-auto">
           Mi garaje
-        </span>
+        </Link>
 
         {showForm ? (
           <>
@@ -97,6 +99,7 @@ export function VehicleBar({ options }: { options: VehicleOption[] }) {
               aria-describedby="mi-garaje"
               onChange={(e) => {
                 if (e.target.value === ADD) return setAdding(true);
+                if (e.target.value === MANAGE) return router.push("/mi-garaje");
                 const id = e.target.value === NONE ? null : e.target.value;
                 garage.activate(id);
                 const v = g.vehicles.find((x) => x.id === id);
@@ -106,17 +109,9 @@ export function VehicleBar({ options }: { options: VehicleOption[] }) {
               {g.vehicles.map((v) => <option key={v.id} value={v.id}>{vehicleText(v)}</option>)}
               <option value={NONE}>Sin filtro (todos los vehículos)</option>
               <option value={ADD}>{g.vehicles.length >= MAX_GARAGE ? "＋ Agregar (reemplaza el más antiguo)" : "＋ Agregar otro vehículo"}</option>
+              <option value={MANAGE}>⚙ Administrar mi garaje (año, quitar…)</option>
             </select>
-            {active && (
-              <button
-                type="button"
-                className={link}
-                onClick={() => { garage.remove(active.id); applyToSearch(null); }}
-                aria-label={`Quitar ${vehicleText(active)} de mi garaje`}
-              >
-                Quitar
-              </button>
-            )}
+            <Link href="/mi-garaje" className={link}>Ver garaje</Link>
           </>
         )}
       </div>
