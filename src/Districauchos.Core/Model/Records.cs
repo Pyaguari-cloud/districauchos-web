@@ -37,7 +37,7 @@ public sealed record CatalogVariant(
     decimal Pvp,
     decimal? PrecioMayor,
     bool Available,
-    /// <summary>Unidades a mostrar: suma de todos los locales y bodega (negativos incluidos), mínimo 0.</summary>
+    /// <summary>Unidades a mostrar: suma de los locales y bodega con stock positivo (los negativos no restan).</summary>
     decimal Stock = 0);
 
 public sealed record CatalogItem(

@@ -27,7 +27,7 @@ Reemplaza la tienda WordPress/WooCommerce actual en `districauchosvch.com`.
 ## 2. Reglas que no se negocian
 
 1. **Las hojas de Google del cliente solo se LEEN.** Nunca se escribe, borra ni modifica nada en ellas.
-2. **Nunca se muestran** costos ni en qué local está cada repuesto. **La cantidad total sí** (decisión del cliente 2026-11-19): suma de todos los locales y bodega, negativos incluidos; si es ≤ 0, "Bajo pedido"/"Consultar".
+2. **Nunca se muestran** costos ni en qué local está cada repuesto. **La cantidad total sí** (decisión del cliente 2026-11-19): suma de los locales y bodega con stock **positivo** (los negativos no restan: son datos sin cuadrar); si es 0, "Bajo pedido"/"Consultar".
 3. **Los secretos van solo en `.env`**, que nunca se sube a git. Son tokens (PayPhone, Meilisearch, admin), contraseñas y la cuenta de Google en `secrets/`.
 4. **Estos archivos no se suben a git:**
    - `BRIEF-*.md`, con los IDs de las hojas;
@@ -188,7 +188,7 @@ Probar con el simulador:
 - Cantidades: se mantiene la regla de no mostrarlas (competencia; la hoja no es en tiempo real y hasta tiene existencias negativas). Opción a consultar: etiqueta "Últimas unidades" sin número.
 
 **Nuevos pedidos del cliente (2026-11-19, "como Amazon"; la compra de prueba de $1 queda para el final)**
-1. ✅ **Cantidades publicadas (2026-11-19).** Suma bruta de todos los locales (un -6 en Maldonado resta al +4 de Tabiazo); disponibles pasaron de 5.540 a 5.094. "12 disponibles", "¡Solo quedan 2!" (≤ 3, `LOW_STOCK` en `Availability.tsx`). Si piden más de lo que hay: "3 disponibles + 2 bajo pedido" en carrito, pago, WhatsApp y correo. Sincronización cada **10 min** (`SYNC_INTERVAL_MINUTES=10` en el `.env` del servidor). **Falta:** revisar el stock al pagar (el Worker leería solo las 4 pestañas de stock a pedido; la API no debe tener la llave de Google).
+1. ✅ **Cantidades publicadas (2026-11-19).** Suma de los locales con stock positivo (se probó la suma bruta, pero dejaba 512 productos con unidades como "Bajo pedido" por negativos sin cuadrar, que promedian -62). Reporte para cuadrar: `out/negativos_para_cuadrar_<fecha>.csv`. "12 disponibles", "¡Solo quedan 2!" (≤ 3, `LOW_STOCK` en `Availability.tsx`). Si piden más de lo que hay: "3 disponibles + 2 bajo pedido" en carrito, pago, WhatsApp y correo. Sincronización cada **10 min** (`SYNC_INTERVAL_MINUTES=10` en el `.env` del servidor). **Falta:** revisar el stock al pagar (el Worker leería solo las 4 pestañas de stock a pedido; la API no debe tener la llave de Google).
 2. **Tiempo de entrega** estilo Amazon. **Respuesta del cliente:** mismo día en Quito si se pide **hasta las 17:00, lunes a viernes**; fuera de Quito por **Servientrega** 24–48 h; **Galápagos 3 días por avión, igual que al exterior, con recargo de $80** por envío. **Domingos y feriados no se despacha**: lo pedido esos días sale el siguiente día laborable.
 3. **Cuentas de usuario.** Propuesta: sin contraseñas (código al correo), compra como invitado se mantiene.
 4. **Imagen del vehículo** elegido en "Mi garaje". Propuesta: siluetas propias por tipo de carrocería (las fotos de internet tienen derechos de autor).

@@ -171,7 +171,7 @@ public class CatalogBuilderTests
         Assert.Equal(expected, CatalogKey.Label(key, code, showCode));
 
     [Fact]
-    public void Groups_by_oem_and_sums_stock_of_all_locations()
+    public void Groups_by_oem_and_sums_positive_stock_only()
     {
         var r = _b.Build(
             [
@@ -189,8 +189,8 @@ public class CatalogBuilderTests
 
         var buje = Assert.Single(r.Items, i => i.OemNorm == "96180071");
         Assert.Equal(["C1", "C2"], buje.Codes);
-        Assert.True(buje.Available); // C2: -2 Cusubamba + 3 Maldonado = 1
-        Assert.Equal(1m, buje.Stock); // C1: -5 + 0 → 0 (nunca negativo)
+        Assert.True(buje.Available); // C2: -2 Cusubamba no resta; +3 Maldonado
+        Assert.Equal(3m, buje.Stock); // C1: -5 + 0 → 0
         Assert.True(buje.IsVch);
         Assert.Equal(8m, buje.PvpMin);
         Assert.Equal(10m, buje.PvpMax);
@@ -210,13 +210,13 @@ public class CatalogBuilderTests
     }
 
     [Fact]
-    public void Negative_in_one_store_cancels_positive_in_another()
+    public void Negative_in_one_store_does_not_cancel_positive_in_another()
     {
-        // Caso real del POS: Maldonado -6, Tabiazo +4 → en realidad no quedan; se muestra "Bajo pedido".
+        // Caso real del POS: Maldonado -6 (sin cuadrar), Tabiazo +4 → se muestran 4.
         var r = _b.Build([Fixtures.Master("14000", "BASE CABINA LUV-DMAX ALTA", 11m, "8980513280")],
             [new StockRow("14000", StockLocation.Maldonado, -6, null, 7), new StockRow("14000", StockLocation.Tabiazo, 4, null, 7)]);
-        Assert.False(r.Items[0].Available);
-        Assert.Equal(0m, r.Items[0].Stock);
+        Assert.True(r.Items[0].Available);
+        Assert.Equal(4m, r.Items[0].Stock);
     }
 
     [Fact]

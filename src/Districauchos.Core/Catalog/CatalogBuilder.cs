@@ -181,9 +181,9 @@ public sealed class CatalogBuilder(
     private static string KeyOf(MasterRow r) => r.OemNorm ?? CatalogKey.ForCode(r.CodeNorm);
 
     /// <summary>
-    /// stock_total(codigo) = Σ stock de todos los locales y bodega, <b>negativos incluidos</b> (pedido del cliente
-    /// 2026-11-19: "la sumatoria de todas las bodegas"). Un -6 en un local suele ser una venta que salió de otro
-    /// sin registrar la transferencia, así que restarlo da el número real. Si el total es ≤ 0 → "Bajo pedido".
+    /// stock_total(codigo) = Σ max(0, stock del local). Varias filas del mismo código en un local se suman antes de
+    /// recortar. Los negativos NO restan (decidido 2026-11-19): en la hoja promedian -62 por local, son datos sin
+    /// cuadrar, y restarlos dejaba 512 productos con unidades como "Bajo pedido". Si el total es 0 → "Bajo pedido".
     /// </summary>
     private static Dictionary<string, decimal> AggregateStock(
         IEnumerable<StockRow> stockRows, List<MasterRow> products, HashSet<string> allMasterKeys,
@@ -211,7 +211,7 @@ public sealed class CatalogBuilder(
 
         var totals = new Dictionary<string, decimal>(StringComparer.Ordinal);
         foreach (var ((key, _), stock) in perLocation)
-            totals[key] = totals.GetValueOrDefault(key) + stock;
+            totals[key] = totals.GetValueOrDefault(key) + Math.Max(0, stock);
         return totals;
     }
 
