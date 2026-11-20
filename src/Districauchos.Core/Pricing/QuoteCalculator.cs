@@ -11,11 +11,20 @@ public sealed record QuoteRequestLine(string Oem, string? Code, int Qty);
 public enum Delivery { None, Pickup, Quito, National }
 
 /// <summary>Datos de catálogo de una variante, tal como están publicados.</summary>
-public sealed record QuoteVariant(string Oem, string Title, string Code, decimal Pvp, decimal? PrecioMayor, bool Available, int VariantCount);
+public sealed record QuoteVariant(
+    string Oem, string Title, string Code, decimal Pvp, decimal? PrecioMayor, bool Available, int VariantCount, decimal Stock = 0);
 
+/// <summary>
+/// <c>InStock</c> = unidades que salen de inventario; <c>BackorderQty</c> = las que se piden al proveedor
+/// (p. ej. pide 5, hay 3 → 3 + 2 bajo pedido).
+/// </summary>
 public sealed record QuoteLine(
     string Oem, string Code, string Title, int Qty, decimal Pvp, decimal UnitPrice, bool MayorApplied,
-    decimal LineTotal, bool Available, bool ShowCode);
+    decimal LineTotal, bool Available, bool ShowCode, int InStock = 0)
+{
+    public int BackorderQty => Qty - InStock;
+    public bool Backorder => BackorderQty > 0;
+}
 
 public sealed record Quote(
     IReadOnlyList<QuoteLine> Lines, IReadOnlyList<string> Missing,
@@ -65,7 +74,10 @@ public sealed class QuoteCalculator(PricingRules pricing, string site = "distric
         {
             var mayor = applies && c.V.PrecioMayor is not null;
             var unit = mayor ? c.V.PrecioMayor!.Value : c.V.Pvp;
-            return new QuoteLine(c.V.Oem, c.V.Code, c.V.Title, c.Qty, c.V.Pvp, unit, mayor, unit * c.Qty, c.V.Available, c.V.VariantCount > 1);
+            // Solo unidades enteras salen de inventario (hay 1 producto que se vende por fracción).
+            var inStock = (int)Math.Clamp(Math.Floor(c.V.Stock), 0, c.Qty);
+            return new QuoteLine(c.V.Oem, c.V.Code, c.V.Title, c.Qty, c.V.Pvp, unit, mayor, unit * c.Qty, c.V.Available,
+                c.V.VariantCount > 1, inStock);
         }).ToList();
 
         var total = lines.Sum(l => l.LineTotal);
@@ -91,6 +103,7 @@ public sealed class QuoteCalculator(PricingRules pricing, string site = "distric
             var id = CatalogKey.Label(l.Oem, l.Code, l.ShowCode);
             sb.Append($"{i + 1}) {id} – {l.Title} – Cant: {l.Qty} – {Money(l.UnitPrice)} c/u");
             if (l.MayorApplied) sb.Append(" (por mayor)");
+            if (l.Backorder) sb.Append(l.InStock > 0 ? $" ({l.BackorderQty} bajo pedido)" : " (bajo pedido)");
             sb.Append('\n');
         }
         sb.Append($"Subtotal: {Money(total)}");

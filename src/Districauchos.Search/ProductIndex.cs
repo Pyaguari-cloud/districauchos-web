@@ -4,7 +4,7 @@ using Districauchos.Core.Text;
 
 namespace Districauchos.Search;
 
-/// <summary>Documento del índice <c>products</c>: una ficha OEM. Solo datos públicos (sin costo ni cantidades).</summary>
+/// <summary>Documento del índice <c>products</c>: una ficha. Solo datos públicos (sin costo ni ubicaciones).</summary>
 public sealed record SearchDocument(
     string Id,
     string Slug,
@@ -29,7 +29,9 @@ public sealed record SearchDocument(
     decimal PvpMin,
     decimal PvpMax,
     decimal? MayorMin,
-    string? Image);
+    string? Image,
+    /// <summary>Unidades totales (todos los locales); nunca por local.</summary>
+    decimal Stock);
 
 /// <summary>Índice Meilisearch del catálogo (brief §6.6).</summary>
 public sealed class ProductIndex(MeiliClient meili)
@@ -67,7 +69,8 @@ public sealed class ProductIndex(MeiliClient meili)
                 PvpMin: i.PvpMin,
                 PvpMax: i.PvpMax,
                 MayorMin: i.MayorMin,
-                Image: null); // semana 2: fotos desde Drive
+                Image: null, // semana 2: fotos desde Drive
+                Stock: i.Stock);
         }).ToList();
     }
 
@@ -194,7 +197,7 @@ public sealed class ProductIndex(MeiliClient meili)
             ["attributesToRetrieve"] = new[]
             {
                 "slug", "title", "oem", "codes", "brands", "models", "category", "subcategory",
-                "available", "is_vch", "abc_class", "pvp_min", "pvp_max", "mayor_min", "image",
+                "available", "is_vch", "abc_class", "pvp_min", "pvp_max", "mayor_min", "image", "stock",
             },
         };
         // Sin texto de búsqueda: primero importación directa (pedido del cliente), luego clase A.

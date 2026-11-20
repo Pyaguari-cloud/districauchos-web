@@ -108,6 +108,16 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
         await cmd.ExecuteNonQueryAsync(ct);
     }
 
+    /// <summary>Idempotente: columnas agregadas después de crear la base (cantidades, 2026-11-19).</summary>
+    public async Task EnsureSchemaAsync(CancellationToken ct)
+    {
+        await using var cmd = db.CreateCommand("""
+            ALTER TABLE catalog_items    ADD COLUMN IF NOT EXISTS stock numeric(12,2) NOT NULL DEFAULT 0;
+            ALTER TABLE catalog_variants ADD COLUMN IF NOT EXISTS stock numeric(12,2) NOT NULL DEFAULT 0;
+            """);
+        await cmd.ExecuteNonQueryAsync(ct);
+    }
+
     public async Task WriteSnapshotAsync(
         IReadOnlyList<MasterRow> master, IReadOnlyList<StockRow> stock, CatalogBuildResult catalog, CancellationToken ct)
     {
@@ -159,7 +169,7 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
         }
 
         await using (var w = await conn.BeginBinaryImportAsync(
-            "COPY catalog_items (oem_norm, slug, title, description, category, subcategory, is_vch, pvp_min, pvp_max, mayor_min, available, abc_class, oem_aliases, codes, alt_codes, updated_at) FROM STDIN (FORMAT BINARY)", ct))
+            "COPY catalog_items (oem_norm, slug, title, description, category, subcategory, is_vch, pvp_min, pvp_max, mayor_min, available, stock, abc_class, oem_aliases, codes, alt_codes, updated_at) FROM STDIN (FORMAT BINARY)", ct))
         {
             foreach (var i in catalog.Items)
             {
@@ -175,6 +185,7 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
                 await w.WriteAsync(i.PvpMax, NpgsqlDbType.Numeric, ct);
                 await WriteNullable(w, i.MayorMin, NpgsqlDbType.Numeric, ct);
                 await w.WriteAsync(i.Available, ct);
+                await w.WriteAsync(i.Stock, NpgsqlDbType.Numeric, ct);
                 await WriteNullable(w, i.AbcClass, NpgsqlDbType.Text, ct);
                 await w.WriteAsync(i.OemAliases.ToArray(), NpgsqlDbType.Array | NpgsqlDbType.Text, ct);
                 await w.WriteAsync(i.Codes.ToArray(), NpgsqlDbType.Array | NpgsqlDbType.Text, ct);
@@ -185,7 +196,7 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
         }
 
         await using (var w = await conn.BeginBinaryImportAsync(
-            "COPY catalog_variants (oem_norm, code, supplier, is_vch, pvp, precio_mayor, available) FROM STDIN (FORMAT BINARY)", ct))
+            "COPY catalog_variants (oem_norm, code, supplier, is_vch, pvp, precio_mayor, available, stock) FROM STDIN (FORMAT BINARY)", ct))
         {
             foreach (var v in catalog.Variants)
             {
@@ -197,6 +208,7 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
                 await w.WriteAsync(v.Pvp, NpgsqlDbType.Numeric, ct);
                 await WriteNullable(w, v.PrecioMayor, NpgsqlDbType.Numeric, ct);
                 await w.WriteAsync(v.Available, ct);
+                await w.WriteAsync(v.Stock, NpgsqlDbType.Numeric, ct);
             }
             await w.CompleteAsync(ct);
         }

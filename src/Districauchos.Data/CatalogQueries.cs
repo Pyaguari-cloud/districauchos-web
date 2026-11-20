@@ -3,14 +3,15 @@ using Npgsql;
 
 namespace Districauchos.Data;
 
-// Respuestas públicas: nunca incluyen costo, proveedor, cantidades ni ubicaciones.
-public sealed record VariantDto(string Code, bool IsVch, decimal Pvp, decimal? PrecioMayor, bool Available);
+// Respuestas públicas: nunca incluyen costo, proveedor ni ubicaciones. La cantidad sí (decisión del cliente
+// 2026-11-19), pero solo el total de todos los locales.
+public sealed record VariantDto(string Code, bool IsVch, decimal Pvp, decimal? PrecioMayor, bool Available, decimal Stock);
 public sealed record VehicleDto(string Brand, string? Model);
 public sealed record ItemDto(
     string Slug, string Oem, IReadOnlyList<string> OemAliases, string Title, string Description,
     string? Category, string? Subcategory, bool IsVch, decimal PvpMin, decimal PvpMax, decimal? MayorMin,
     bool Available, string? AbcClass, string? Image, DateTimeOffset UpdatedAt,
-    IReadOnlyList<VariantDto> Variants, IReadOnlyList<VehicleDto> Vehicles);
+    IReadOnlyList<VariantDto> Variants, IReadOnlyList<VehicleDto> Vehicles, decimal Stock);
 public sealed record ModelCount(string Name, int Count);
 public sealed record BrandDto(string Brand, int Count, IReadOnlyList<ModelCount> Models);
 public sealed record SubcategoryCount(string Name, int Count);
@@ -29,7 +30,7 @@ public sealed class CatalogQueries(NpgsqlDataSource db)
 
         await using (var cmd = new NpgsqlCommand("""
             SELECT oem_norm, oem_aliases, title, description, category, subcategory, is_vch,
-                   pvp_min, pvp_max, mayor_min, available, abc_class, image_path, updated_at
+                   pvp_min, pvp_max, mayor_min, available, abc_class, image_path, updated_at, stock
             FROM catalog_items WHERE slug = $1
             """, conn))
         {
@@ -40,19 +41,19 @@ public sealed class CatalogQueries(NpgsqlDataSource db)
             item = new ItemDto(slug, oem, r.GetFieldValue<string[]>(1), r.GetString(2), r.GetString(3),
                 Str(r, 4), Str(r, 5), r.GetBoolean(6), r.GetDecimal(7), r.GetDecimal(8),
                 r.IsDBNull(9) ? null : r.GetDecimal(9), r.GetBoolean(10), Str(r, 11), Str(r, 12),
-                r.GetFieldValue<DateTimeOffset>(13), [], []);
+                r.GetFieldValue<DateTimeOffset>(13), [], [], r.GetDecimal(14));
         }
 
         var variants = new List<VariantDto>();
         await using (var cmd = new NpgsqlCommand("""
-            SELECT code, is_vch, pvp, precio_mayor, available FROM catalog_variants
+            SELECT code, is_vch, pvp, precio_mayor, available, stock FROM catalog_variants
             WHERE oem_norm = $1 ORDER BY available DESC, pvp, code
             """, conn))
         {
             cmd.Parameters.Add(new() { Value = oem });
             await using var r = await cmd.ExecuteReaderAsync(ct);
             while (await r.ReadAsync(ct))
-                variants.Add(new(r.GetString(0), r.GetBoolean(1), r.GetDecimal(2), r.IsDBNull(3) ? null : r.GetDecimal(3), r.GetBoolean(4)));
+                variants.Add(new(r.GetString(0), r.GetBoolean(1), r.GetDecimal(2), r.IsDBNull(3) ? null : r.GetDecimal(3), r.GetBoolean(4), r.GetDecimal(5)));
         }
 
         var vehicles = new List<VehicleDto>();
@@ -131,7 +132,7 @@ public sealed class CatalogQueries(NpgsqlDataSource db)
         if (oems.Count == 0) return result;
         await using var cmd = db.CreateCommand("""
             SELECT v.oem_norm, i.title, v.code, v.pvp, v.precio_mayor, v.available,
-                   count(*) OVER (PARTITION BY v.oem_norm)
+                   count(*) OVER (PARTITION BY v.oem_norm), v.stock
             FROM catalog_variants v JOIN catalog_items i USING (oem_norm)
             WHERE v.oem_norm = ANY($1)
             ORDER BY v.oem_norm, v.available DESC, v.pvp, v.code
@@ -141,7 +142,7 @@ public sealed class CatalogQueries(NpgsqlDataSource db)
         await using (var r = await cmd.ExecuteReaderAsync(ct))
             while (await r.ReadAsync(ct))
                 rows.Add(new(r.GetString(0), r.GetString(1), r.GetString(2), r.GetDecimal(3),
-                    r.IsDBNull(4) ? null : r.GetDecimal(4), r.GetBoolean(5), (int)r.GetInt64(6)));
+                    r.IsDBNull(4) ? null : r.GetDecimal(4), r.GetBoolean(5), (int)r.GetInt64(6), r.GetDecimal(7)));
         foreach (var g in rows.GroupBy(x => x.Oem)) result[g.Key] = g.ToList();
         return result;
     }

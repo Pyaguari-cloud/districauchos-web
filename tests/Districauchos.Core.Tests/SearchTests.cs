@@ -45,7 +45,9 @@ public class SearchTests
         var json = JsonSerializer.Serialize(ProductIndex.BuildDocuments(Catalog()), MeiliClient.Json);
         Assert.Contains("\"oem_aliases\"", json);
         Assert.DoesNotContain("IMPORTADORA", json.Replace("BUJE CHEVROLET AVEO", ""), StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("stock", json, StringComparison.OrdinalIgnoreCase);
+        // La cantidad total sí se publica (cliente, 2026-11-19); en qué local está, nunca.
+        foreach (var local in new[] { "tabiazo", "cusubamba", "maldonado", "bodega", "location" })
+            Assert.DoesNotContain(local, json, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("cost", json, StringComparison.OrdinalIgnoreCase);
     }
 

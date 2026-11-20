@@ -76,9 +76,12 @@ export function CartView({ payments, canceled = false }: { payments: PaymentsInf
                 <p className="text-sm text-muted">
                   {partRef(i.oem, i.code).label} <span className="font-mono">{partRef(i.oem, i.code).value}</span>
                   {line?.showCode && !isCodeKey(i.oem) && <> · opción <span className="font-mono">{i.code}</span></>}
-                  {line && !line.available && (
+                  {line?.backorder && (
                     <span className="ml-2 text-ask">
-                      · {payments.enabled && payments.backorderDays > 0 ? `Bajo pedido, llega en ~${payments.backorderDays} días` : "Consultar disponibilidad"}
+                      · {line.inStock > 0 && <>{line.inStock} disponible{line.inStock === 1 ? "" : "s"} + {line.backorderQty} </>}
+                      {payments.enabled && payments.backorderDays > 0
+                        ? `${line.inStock > 0 ? "b" : "B"}ajo pedido, llega en ~${payments.backorderDays} días`
+                        : line.inStock > 0 ? "a consultar" : "Consultar disponibilidad"}
                     </span>
                   )}
                 </p>
@@ -147,7 +150,7 @@ export function CartView({ payments, canceled = false }: { payments: PaymentsInf
         )}
         {vehicle && <p className="text-sm text-muted">Vehículo: <span className="font-semibold text-brand-ink">{vehicleText(vehicle)}</span> (va en el mensaje)</p>}
         {payments.enabled && q && (() => {
-          const noStock = payments.backorderDays === 0 && q.lines.some((l) => !l.available);
+          const noStock = payments.backorderDays === 0 && q.lines.some((l) => l.backorder);
           const ready = delivery !== "none" && q.missing.length === 0 && q.lines.length > 0 && !noStock;
           return (
             <>
@@ -161,7 +164,7 @@ export function CartView({ payments, canceled = false }: { payments: PaymentsInf
                 </p>
               )}
               <p className="-mt-2 text-center text-sm text-muted">Tarjeta de crédito, débito o app PayPhone</p>
-              {q.lines.some((l) => !l.available) && payments.backorderDays > 0 && (
+              {q.lines.some((l) => l.backorder) && payments.backorderDays > 0 && (
                 <p className="rounded-lg bg-ask-bg px-3 py-2 text-sm text-ask">
                   Algunos repuestos son <strong>bajo pedido</strong>: llegan en aproximadamente {payments.backorderDays} días.
                 </p>

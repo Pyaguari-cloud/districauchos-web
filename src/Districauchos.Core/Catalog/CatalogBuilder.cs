@@ -82,9 +82,9 @@ public sealed class CatalogBuilder(
             var variants = rows.Select(r =>
             {
                 var isVch = PricingRules.IsVch(r.Supplier);
-                var stock = stockTotals.GetValueOrDefault(TextNorm.CodeMatchKey(r.CodeNorm)!, 0m);
+                var stock = Math.Max(0m, stockTotals.GetValueOrDefault(TextNorm.CodeMatchKey(r.CodeNorm)!, 0m));
                 return new CatalogVariant(oem, r.Code, r.Supplier, isVch, r.Pvp!.Value,
-                    pricing.PrecioMayor(r.Pvp!.Value, isVch, ovr?.PrecioMayor), stock > 0);
+                    pricing.PrecioMayor(r.Pvp!.Value, isVch, ovr?.PrecioMayor), stock > 0, stock);
             }).ToList();
 
             var principalIdx = Math.Max(0, variants.FindIndex(v => v.Available));
@@ -133,7 +133,8 @@ public sealed class CatalogBuilder(
                 Available: variants.Any(v => v.Available),
                 AbcClass: abc,
                 Codes: rows.Select(r => r.Code).ToList(),
-                AltCodes: rows.Select(r => r.AltCode).Where(a => a is not null).Distinct().ToList()!);
+                AltCodes: rows.Select(r => r.AltCode).Where(a => a is not null).Distinct().ToList()!,
+                Stock: variants.Sum(v => v.Stock));
 
             result.Items.Add(item);
             result.Variants.AddRange(variants);
@@ -180,7 +181,9 @@ public sealed class CatalogBuilder(
     private static string KeyOf(MasterRow r) => r.OemNorm ?? CatalogKey.ForCode(r.CodeNorm);
 
     /// <summary>
-    /// stock_total(codigo) = Σ max(0, stock del local). Varias filas del mismo código en un local se suman antes de recortar.
+    /// stock_total(codigo) = Σ stock de todos los locales y bodega, <b>negativos incluidos</b> (pedido del cliente
+    /// 2026-11-19: "la sumatoria de todas las bodegas"). Un -6 en un local suele ser una venta que salió de otro
+    /// sin registrar la transferencia, así que restarlo da el número real. Si el total es ≤ 0 → "Bajo pedido".
     /// </summary>
     private static Dictionary<string, decimal> AggregateStock(
         IEnumerable<StockRow> stockRows, List<MasterRow> products, HashSet<string> allMasterKeys,
@@ -208,7 +211,7 @@ public sealed class CatalogBuilder(
 
         var totals = new Dictionary<string, decimal>(StringComparer.Ordinal);
         foreach (var ((key, _), stock) in perLocation)
-            totals[key] = totals.GetValueOrDefault(key) + Math.Max(0, stock);
+            totals[key] = totals.GetValueOrDefault(key) + stock;
         return totals;
     }
 

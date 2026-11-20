@@ -26,6 +26,8 @@ export type CatalogHit = {
   pvpMax: number;
   mayorMin: number | null;
   image: string | null;
+  /** Unidades totales de todos los locales (0 = bajo pedido). */
+  stock: number;
 };
 
 export type CatalogPage = {
@@ -37,7 +39,7 @@ export type CatalogPage = {
   facets: { brands?: Record<string, number>; categories?: Record<string, number> };
 };
 
-export type Variant = { code: string; isVch: boolean; pvp: number; precioMayor: number | null; available: boolean };
+export type Variant = { code: string; isVch: boolean; pvp: number; precioMayor: number | null; available: boolean; stock: number };
 export type Vehicle = { brand: string; model: string | null };
 
 export type Item = {
@@ -58,6 +60,7 @@ export type Item = {
   updatedAt: string;
   variants: Variant[];
   vehicles: Vehicle[];
+  stock: number;
 };
 
 export type Brand = { brand: string; count: number; models: { name: string; count: number }[] };

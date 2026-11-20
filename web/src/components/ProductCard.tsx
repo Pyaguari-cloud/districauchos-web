@@ -38,7 +38,7 @@ export function ProductCard({ item }: { item: CatalogHit }) {
               <span className="text-sm font-semibold text-brand-red">Por mayor {money(item.mayorMin)}</span>
             )}
           </div>
-          <Availability available={item.available} />
+          <Availability available={item.available} stock={item.stock} />
         </div>
       </Link>
     </li>

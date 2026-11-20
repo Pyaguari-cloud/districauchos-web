@@ -68,14 +68,14 @@ public static class OrderEndpoints
             if (quote.Missing.Count > 0)
                 return Problem("Algunos repuestos ya no están en el catálogo. Quítalos del carrito para continuar.");
             if (quote.Lines.Count == 0) return Problem("El carrito está vacío.");
-            if (s.BackorderDays == 0 && quote.Lines.Any(l => !l.Available))
+            if (s.BackorderDays == 0 && quote.Lines.Any(l => l.Backorder))
                 return Problem("Hay repuestos sin stock en el carrito. Quítalos o cotízalos por WhatsApp.");
 
             var (customer, errors) = CustomerValidator.Validate(req.Customer ?? new(null, null, null, null, null, null, null, null), delivery);
             if (customer is null) return Results.Json(new { error = "Revisa los datos marcados.", fields = errors }, statusCode: 400);
 
             var orderLines = quote.Lines.Select(l => new OrderLine(
-                l.Oem, l.Code, l.Title, l.Qty, l.UnitPrice, l.LineTotal, l.MayorApplied, Backorder: !l.Available, l.ShowCode)).ToList();
+                l.Oem, l.Code, l.Title, l.Qty, l.UnitPrice, l.LineTotal, l.MayorApplied, l.Backorder, l.ShowCode, l.InStock)).ToList();
             var token = NewToken();
             var number = await orders.CreateAsync(token, customer, delivery, orderLines, quote.Total, quote.Shipping, quote.GrandTotal,
                 quote.MayorApplied, vehicle, s.BackorderDays, ct);

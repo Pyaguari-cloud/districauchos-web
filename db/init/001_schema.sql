@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS catalog_items (
     pvp_max      numeric(12,2) NOT NULL,
     mayor_min    numeric(12,2),
     available    boolean       NOT NULL,
+    stock        numeric(12,2) NOT NULL DEFAULT 0,
     abc_class    text,
     oem_aliases  text[]        NOT NULL DEFAULT '{}',
     codes        text[]        NOT NULL DEFAULT '{}',
@@ -58,6 +59,7 @@ CREATE TABLE IF NOT EXISTS catalog_variants (
     pvp           numeric(12,2) NOT NULL,
     precio_mayor  numeric(12,2),
     available     boolean       NOT NULL,
+    stock         numeric(12,2) NOT NULL DEFAULT 0,
     PRIMARY KEY (oem_norm, code)
 );
 

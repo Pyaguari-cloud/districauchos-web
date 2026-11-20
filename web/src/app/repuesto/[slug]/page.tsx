@@ -93,7 +93,7 @@ export default async function ItemPage({ params }: Props) {
             </p>
           </div>
 
-          <Availability available={item.available} />
+          <Availability available={item.available} stock={main?.stock ?? item.stock} />
           <VehicleFit vehicles={item.vehicles} />
 
           <div className="rounded-xl border border-line bg-white p-4">
@@ -154,7 +154,7 @@ export default async function ItemPage({ params }: Props) {
                       {money(v.pvp)}
                       {v.precioMayor !== null && <span className="block text-sm text-brand-red">Por mayor {money(v.precioMayor)}</span>}
                     </td>
-                    <td className="py-2 pr-3"><Availability available={v.available} /></td>
+                    <td className="py-2 pr-3"><Availability available={v.available} stock={v.stock} /></td>
                     <td className="py-2 text-right">
                       <AddToCart compact oem={item.oem} code={v.code} slug={item.slug} title={title} price={v.pvp} />
                     </td>

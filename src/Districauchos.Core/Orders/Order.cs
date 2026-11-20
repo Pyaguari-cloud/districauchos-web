@@ -8,7 +8,16 @@ public enum OrderStatus { Pending, Paid, Canceled, Failed, Review }
 
 /// <summary>Línea del pedido tal como se cobró (precio fijado por el servidor al crear el pedido).</summary>
 public sealed record OrderLine(
-    string Oem, string Code, string Title, int Qty, decimal UnitPrice, decimal LineTotal, bool MayorApplied, bool Backorder, bool ShowCode);
+    string Oem, string Code, string Title, int Qty, decimal UnitPrice, decimal LineTotal, bool MayorApplied, bool Backorder, bool ShowCode,
+    /// <summary>Unidades que había en inventario al pagar (pedidos viejos: -1 = no se registró).</summary>
+    int InStock = -1)
+{
+    /// <summary>"[BAJO PEDIDO ~4 días]" o "[3 en stock + 2 BAJO PEDIDO ~4 días]".</summary>
+    public string? BackorderNote(int days) =>
+        !Backorder ? null
+        : InStock > 0 ? $"[{InStock} en stock + {Qty - InStock} BAJO PEDIDO ~{days} días]"
+        : $"[BAJO PEDIDO ~{days} días]";
+}
 
 /// <summary>Pedido pagado en línea. <c>Token</c> = clientTransactionId de PayPhone (aleatorio, no adivinable).</summary>
 public sealed record Order(
@@ -56,7 +65,7 @@ public static class OrderText
             var id = CatalogKey.Label(l.Oem, l.Code, l.ShowCode);
             sb.Append($"{i + 1}) {id} – {l.Title} – Cant: {l.Qty} – {QuoteCalculator.Money(l.UnitPrice)} c/u = {QuoteCalculator.Money(l.LineTotal)}");
             if (l.MayorApplied) sb.Append(" (por mayor)");
-            if (l.Backorder) sb.Append($" [BAJO PEDIDO ~{o.BackorderDays} días]");
+            if (l.BackorderNote(o.BackorderDays) is { } note) sb.Append($" {note}");
             sb.Append('\n');
         }
         sb.Append($"\nSubtotal: {QuoteCalculator.Money(o.Subtotal)}\n");
@@ -77,7 +86,7 @@ public static class OrderText
     public static string ForCustomerWhatsApp(Order o)
     {
         var sb = new StringBuilder($"Hola, acabo de pagar el pedido #{o.Number} en la página ({QuoteCalculator.Money(o.Total)}).\n");
-        foreach (var l in o.Lines) sb.Append($"- {CatalogKey.Label(l.Oem, l.Code, l.ShowCode)} {l.Title} x{l.Qty}{(l.Backorder ? " (bajo pedido)" : "")}\n");
+        foreach (var l in o.Lines) sb.Append($"- {CatalogKey.Label(l.Oem, l.Code, l.ShowCode)} {l.Title} x{l.Qty}{(l.Backorder ? (l.InStock > 0 ? $" ({l.Qty - l.InStock} bajo pedido)" : " (bajo pedido)") : "")}\n");
         sb.Append($"Entrega: {DeliveryText(o.Delivery, o.Customer.City)}\n");
         sb.Append($"A nombre de: {o.Customer.Name}");
         return sb.ToString();

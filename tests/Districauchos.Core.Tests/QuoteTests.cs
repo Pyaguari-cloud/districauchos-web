@@ -9,10 +9,10 @@ public class QuoteTests
     private static readonly Dictionary<string, IReadOnlyList<QuoteVariant>> Catalog = new()
     {
         // VCH: tiene precio por mayor
-        ["96180071"] = [new("96180071", "Manguera tubo distribuidor agua Chevrolet Aveo", "A1", 10.00m, 6.00m, true, 1)],
+        ["96180071"] = [new("96180071", "Manguera tubo distribuidor agua Chevrolet Aveo", "A1", 10.00m, 6.00m, true, 1, Stock: 100)],
         // No VCH, dos variantes
         ["0682561"] = [
-            new("0682561", "Base motor Chevrolet Corsa", "B1", 17.00m, null, true, 2),
+            new("0682561", "Base motor Chevrolet Corsa", "B1", 17.00m, null, true, 2, Stock: 100),
             new("0682561", "Base motor Chevrolet Corsa", "B2", 21.50m, null, false, 2),
         ],
     };
@@ -68,7 +68,7 @@ public class QuoteTests
         Assert.Equal("""
             Hola, quiero cotizar:
             1) 96180071 – Manguera tubo distribuidor agua Chevrolet Aveo – Cant: 2 – $10.00 c/u
-            2) 0682561 (cód. B2) – Base motor Chevrolet Corsa – Cant: 1 – $21.50 c/u
+            2) 0682561 (cód. B2) – Base motor Chevrolet Corsa – Cant: 1 – $21.50 c/u (bajo pedido)
             Subtotal: $41.50 (precio al por mayor no aplicado)
             Vehículo: Chevrolet Aveo
             Precios con IVA incluido
@@ -113,5 +113,26 @@ public class QuoteTests
         var many = Enumerable.Range(0, 80).Select(i => new QuoteRequestLine($"X{i}", null, 1));
         Assert.Equal(QuoteCalculator.MaxLines, _q.Calculate(many, Catalog).Missing.Count);
         Assert.Equal(QuoteCalculator.MaxQty, _q.Calculate([new("96180071", null, 1_000_000)], Catalog).Lines[0].Qty);
+    }
+
+    [Fact]
+    public void Splits_line_between_stock_and_backorder()
+    {
+        var cat = new Dictionary<string, IReadOnlyList<QuoteVariant>>
+        {
+            ["X"] = [new("X", "Buje", "X1", 5m, null, true, 1, Stock: 3)],
+            ["Y"] = [new("Y", "Base", "Y1", 5m, null, false, 1, Stock: 0)],
+        };
+        var r = _q.Calculate([new("X", null, 5), new("Y", null, 1), ], cat);
+
+        var x = r.Lines.Single(l => l.Oem == "X");
+        Assert.Equal(3, x.InStock);
+        Assert.Equal(2, x.BackorderQty);
+        Assert.True(x.Backorder);
+        Assert.Contains("Cant: 5 – $5.00 c/u (2 bajo pedido)", r.Message);
+        Assert.Contains("Cant: 1 – $5.00 c/u (bajo pedido)", r.Message);
+
+        var full = _q.Calculate([new("X", null, 3)], cat).Lines.Single();
+        Assert.False(full.Backorder);
     }
 }

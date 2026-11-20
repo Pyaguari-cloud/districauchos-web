@@ -60,7 +60,7 @@ export function CheckoutForm({ backorderDays }: { backorderDays: number }) {
     );
   }
 
-  const hasBackorder = !!quote?.lines.some((l) => !l.available);
+  const hasBackorder = !!quote?.lines.some((l) => l.backorder);
   const needsAddress = delivery === "quito" || delivery === "national";
   const deliveryLabel = DELIVERY_OPTIONS.find((o) => o.value === delivery)?.label;
 
@@ -175,7 +175,11 @@ export function CheckoutForm({ backorderDays }: { backorderDays: number }) {
               <li key={`${l.oem}|${l.code}`} className="flex justify-between gap-3">
                 <span className="min-w-0">
                   {l.qty} × {l.title}
-                  {!l.available && <span className="block text-ask">Bajo pedido, ~{backorderDays} días</span>}
+                  {l.backorder && (
+                    <span className="block text-ask">
+                      {l.inStock > 0 ? `${l.inStock} disponible${l.inStock === 1 ? "" : "s"} + ${l.backorderQty} bajo pedido` : "Bajo pedido"}, ~{backorderDays} días
+                    </span>
+                  )}
                 </span>
                 <span className="shrink-0 font-semibold">{money(l.lineTotal)}</span>
               </li>

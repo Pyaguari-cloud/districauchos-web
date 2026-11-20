@@ -25,6 +25,7 @@ public sealed class SyncBackgroundService(
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await repo.EnsureSchemaAsync(stoppingToken);
         var listener = SyncSignal.ListenAsync(db, OnRequest,
             ex => log.LogWarning(ex, "Escucha de avisos de sincronización caída; reintento en 30 s"), stoppingToken);
 

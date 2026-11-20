@@ -36,7 +36,9 @@ public sealed record CatalogVariant(
     bool IsVch,
     decimal Pvp,
     decimal? PrecioMayor,
-    bool Available);
+    bool Available,
+    /// <summary>Unidades a mostrar: suma de todos los locales y bodega (negativos incluidos), mínimo 0.</summary>
+    decimal Stock = 0);
 
 public sealed record CatalogItem(
     string OemNorm,
@@ -53,7 +55,9 @@ public sealed record CatalogItem(
     bool Available,
     string? AbcClass,
     IReadOnlyList<string> Codes,
-    IReadOnlyList<string> AltCodes);
+    IReadOnlyList<string> AltCodes,
+    /// <summary>Suma de las unidades de sus variantes (nunca por local: las ubicaciones no se publican).</summary>
+    decimal Stock = 0);
 
 public sealed record ProductVehicle(string OemNorm, string Brand, string Model);
 
