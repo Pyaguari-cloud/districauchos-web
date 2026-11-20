@@ -262,7 +262,9 @@ public sealed class CatalogBuilder(
             var oem = items.Contains(row.OemNorm) ? row.OemNorm : byTrimmed.GetValueOrDefault(row.OemNorm.TrimStart('0'));
             if (oem is null) { unknownOem.Add(row); continue; }
             var matches = vehicles.Extract($"{row.Brand} {row.Model}").Matches.Where(m => m.Model is not null).ToList();
-            var models = matches.Where(m => string.Equals(m.Brand, row.Brand, StringComparison.OrdinalIgnoreCase))
+            // La marca de la hoja pasa por el diccionario: "Isuzu" es alias de Chevrolet (así se venden en Ecuador).
+            var rowBrands = vehicles.Extract(row.Brand).Matches.Select(m => m.Brand).Append(row.Brand).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var models = matches.Where(m => rowBrands.Contains(m.Brand))
                 .Select(m => m.Model!).Distinct().ToList();
             if (models.Count == 0) { unknownModel.Add(row); continue; }
             result.Stats.CompatRowsApplied++;

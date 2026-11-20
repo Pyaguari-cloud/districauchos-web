@@ -10,7 +10,7 @@ internal static class Fixtures
 {
     public const string VehiclesJson = """
         { "version": "test", "brands": [
-          { "name": "Chevrolet", "aliases": ["CHEVROLET","CHEV","GM"], "models": [
+          { "name": "Chevrolet", "aliases": ["CHEVROLET","CHEV","GM","ISUZU"], "models": [
               { "name": "Aveo", "aliases": ["AVEO","AVEO EMOTION","CHEVYTAXI"] },
               { "name": "D-Max", "aliases": ["D MAX","DMAX"] },
               { "name": "Vitara", "aliases": ["VITARA"] } ] },
@@ -171,13 +171,15 @@ public class CatalogBuilderTests
                 new CompatSheetRow("930025028", "Kia", "Rio", "", 2011, 2017, 4),               // Sheets le quitó el cero
                 new CompatSheetRow("NOEXISTE", "Chevrolet", "Aveo", "", 2010, 2012, 5),
                 new CompatSheetRow("96180071", "Chevrolet", "Modelo raro", "", 2010, 2012, 6),
+                new CompatSheetRow("96180071", "Isuzu", "D-Max RT75", "3.0", 2016, 2018, 7),   // Isuzu = Chevrolet en Ecuador
             ]);
         Assert.Contains(new ProductVehicle("96180071", "Chevrolet", "D-Max"), r.Vehicles);
         Assert.Contains(r.VehicleYears, y => y.OemNorm == "96180071" && y.Model == "Aveo" && y.Version == "Aveo Family" && y.YearFrom == 2009 && y.Source == "hoja");
         Assert.Contains(r.VehicleYears, y => y.Model == "D-Max" && y.YearFrom == 2014 && y.YearTo >= 2026);
         Assert.Contains(r.VehicleYears, y => y.OemNorm == "0930025028" && y.Model == "Rio");
         Assert.DoesNotContain(r.WithoutVehicle, w => w.OemNorm == "0930025028");
-        Assert.Equal(3, r.Stats.CompatRowsApplied);
+        Assert.Contains(r.VehicleYears, y => y.Brand == "Chevrolet" && y.Version == "D-Max RT75" && y.YearFrom == 2016);
+        Assert.Equal(4, r.Stats.CompatRowsApplied);
         Assert.Contains(r.Warnings, w => w.Code == "compat_oem_unknown");
         Assert.Contains(r.Warnings, w => w.Code == "compat_model_unknown");
     }

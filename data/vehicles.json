@@ -4,9 +4,10 @@
     "Los alias se comparan por palabra completa sobre la descripcion normalizada (mayusculas, sin tildes, guiones/puntos = espacio).",
     "Evitar alias que sean palabras comunes (UNO, DELTA, ESCAPE): usar la forma con marca, p. ej. FORD ESCAPE.",
     "Subir version en cada cambio y revisar detalle_vehiculos_*.csv buscando falsos positivos.",
-    "equivalents: el mismo vehiculo con distinta marca; un repuesto de uno se asigna a todos (confirmado por el cliente 2026-11-18)."
+    "equivalents: el mismo vehiculo con distinta marca; un repuesto de uno se asigna a todos (confirmado por el cliente 2026-11-18).",
+    "2026-11-20b: modelos que pedían las tandas 3-5 de Compatibilidades; ISUZU es alias de Chevrolet (en Ecuador NHR/NKR/Luv/D-Max se venden como Chevrolet)."
   ],
-  "version": "2026-11-20",
+  "version": "2026-11-20b",
   "equivalents": [
     {
       "brands": [
@@ -18,6 +19,24 @@
         "Grand Vitara",
         "Forsa"
       ]
+    },
+    {
+      "brands": [
+        "Chevrolet",
+        "Daewoo"
+      ],
+      "models": [
+        "Matiz"
+      ]
+    },
+    {
+      "brands": [
+        "Chevrolet",
+        "Suzuki"
+      ],
+      "models": [
+        "Super Carry"
+      ]
     }
   ],
   "brands": [
@@ -27,7 +46,8 @@
         "CHEVROLET",
         "CHEV",
         "CHEVY",
-        "GM"
+        "GM",
+        "ISUZU"
       ],
       "models": [
         {
@@ -256,6 +276,67 @@
           "aliases": [
             "GROOVE"
           ]
+        },
+        {
+          "name": "N200",
+          "aliases": [
+            "N200",
+            "N 200"
+          ]
+        },
+        {
+          "name": "Sonic",
+          "aliases": [
+            "SONIC"
+          ]
+        },
+        {
+          "name": "Matiz",
+          "aliases": [
+            "MATIZ"
+          ]
+        },
+        {
+          "name": "FTR",
+          "aliases": [
+            "FTR"
+          ]
+        },
+        {
+          "name": "NQR",
+          "aliases": [
+            "NQR"
+          ]
+        },
+        {
+          "name": "NLR",
+          "aliases": [
+            "NLR"
+          ]
+        },
+        {
+          "name": "Spin",
+          "aliases": [
+            "CHEVROLET SPIN"
+          ]
+        },
+        {
+          "name": "Cobalt",
+          "aliases": [
+            "COBALT"
+          ]
+        },
+        {
+          "name": "Prisma",
+          "aliases": [
+            "PRISMA"
+          ]
+        },
+        {
+          "name": "Joy",
+          "aliases": [
+            "CHEVROLET JOY"
+          ]
         }
       ]
     },
@@ -298,6 +379,22 @@
           "name": "Alto",
           "aliases": [
             "ALTO"
+          ]
+        },
+        {
+          "name": "Super Carry",
+          "aliases": [
+            "SUPER CARRY",
+            "SUPERCARRY",
+            "CARRY"
+          ]
+        },
+        {
+          "name": "S-Cross",
+          "aliases": [
+            "S CROSS",
+            "SCROSS",
+            "SX4"
           ]
         }
       ]
@@ -373,6 +470,30 @@
           "name": "Terracan",
           "aliases": [
             "TERRACAN"
+          ]
+        },
+        {
+          "name": "Verna",
+          "aliases": [
+            "VERNA"
+          ]
+        },
+        {
+          "name": "i30",
+          "aliases": [
+            "I30"
+          ]
+        },
+        {
+          "name": "Creta",
+          "aliases": [
+            "CRETA"
+          ]
+        },
+        {
+          "name": "Veloster",
+          "aliases": [
+            "VELOSTER"
           ]
         }
       ]
@@ -451,6 +572,30 @@
           "aliases": [
             "SPECTRA"
           ]
+        },
+        {
+          "name": "Optima",
+          "aliases": [
+            "OPTIMA"
+          ]
+        },
+        {
+          "name": "Soul",
+          "aliases": [
+            "KIA SOUL"
+          ]
+        },
+        {
+          "name": "Seltos",
+          "aliases": [
+            "SELTOS"
+          ]
+        },
+        {
+          "name": "Cadenza",
+          "aliases": [
+            "CADENZA"
+          ]
         }
       ]
     },
@@ -524,6 +669,19 @@
           "name": "Tercel",
           "aliases": [
             "TERCEL"
+          ]
+        },
+        {
+          "name": "Dyna",
+          "aliases": [
+            "DYNA",
+            "DINA"
+          ]
+        },
+        {
+          "name": "Echo",
+          "aliases": [
+            "TOYOTA ECHO"
           ]
         }
       ]
@@ -626,6 +784,20 @@
             "323",
             "MAZDA 323"
           ]
+        },
+        {
+          "name": "Mazda 5",
+          "aliases": [
+            "MAZDA 5",
+            "MAZDA5"
+          ]
+        },
+        {
+          "name": "B1600",
+          "aliases": [
+            "B1600",
+            "B 1600"
+          ]
         }
       ]
     },
@@ -678,6 +850,19 @@
           "aliases": [
             "COURIER"
           ]
+        },
+        {
+          "name": "F-350",
+          "aliases": [
+            "F350",
+            "F 350"
+          ]
+        },
+        {
+          "name": "Focus",
+          "aliases": [
+            "FOCUS"
+          ]
         }
       ]
     },
@@ -728,6 +913,24 @@
           "aliases": [
             "TWINGO"
           ]
+        },
+        {
+          "name": "Symbol",
+          "aliases": [
+            "SYMBOL"
+          ]
+        },
+        {
+          "name": "Koleos",
+          "aliases": [
+            "KOLEOS"
+          ]
+        },
+        {
+          "name": "Stepway",
+          "aliases": [
+            "STEPWAY"
+          ]
         }
       ]
     },
@@ -770,6 +973,12 @@
           "name": "Golf",
           "aliases": [
             "GOLF"
+          ]
+        },
+        {
+          "name": "Saveiro",
+          "aliases": [
+            "SAVEIRO"
           ]
         }
       ]
@@ -907,6 +1116,12 @@
           "name": "Espero",
           "aliases": [
             "ESPERO"
+          ]
+        },
+        {
+          "name": "Damas",
+          "aliases": [
+            "DAMAS"
           ]
         }
       ]
