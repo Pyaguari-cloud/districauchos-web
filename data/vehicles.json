@@ -6,7 +6,7 @@
     "Subir version en cada cambio y revisar detalle_vehiculos_*.csv buscando falsos positivos.",
     "equivalents: el mismo vehiculo con distinta marca; un repuesto de uno se asigna a todos (confirmado por el cliente 2026-11-18)."
   ],
-  "version": "2026-11-18.5",
+  "version": "2026-11-20",
   "equivalents": [
     {
       "brands": [
@@ -46,7 +46,8 @@
           "aliases": [
             "SPARK",
             "SPARK GT",
-            "SPARK LIFE"
+            "SPARK LIFE",
+            "SPARCK"
           ]
         },
         {
@@ -74,7 +75,8 @@
         {
           "name": "Cruze",
           "aliases": [
-            "CRUZE"
+            "CRUZE",
+            "CEUZE"
           ]
         },
         {
@@ -95,7 +97,8 @@
         {
           "name": "Vitara",
           "aliases": [
-            "VITARA"
+            "VITARA",
+            "VIITARA"
           ]
         },
         {
@@ -214,6 +217,45 @@
           "aliases": [
             "SAN REMO"
           ]
+        },
+        {
+          "name": "Trailblazer",
+          "aliases": [
+            "TRAILBLAZER",
+            "TRAIL BLAZER"
+          ]
+        },
+        {
+          "name": "Silverado",
+          "aliases": [
+            "SILVERADO",
+            "SILERADO"
+          ]
+        },
+        {
+          "name": "Tahoe",
+          "aliases": [
+            "TAHOE",
+            "TAHEO"
+          ]
+        },
+        {
+          "name": "Zafira",
+          "aliases": [
+            "ZAFIRA"
+          ]
+        },
+        {
+          "name": "Astra",
+          "aliases": [
+            "ASTRA"
+          ]
+        },
+        {
+          "name": "Groove",
+          "aliases": [
+            "GROOVE"
+          ]
         }
       ]
     },
@@ -270,7 +312,8 @@
         {
           "name": "Accent",
           "aliases": [
-            "ACCENT"
+            "ACCENT",
+            "ACEENT"
           ]
         },
         {
@@ -318,6 +361,18 @@
             "H100",
             "H 100",
             "PORTER"
+          ]
+        },
+        {
+          "name": "Atos",
+          "aliases": [
+            "ATOS"
+          ]
+        },
+        {
+          "name": "Terracan",
+          "aliases": [
+            "TERRACAN"
           ]
         }
       ]
@@ -371,6 +426,31 @@
           "aliases": [
             "PREGIO"
           ]
+        },
+        {
+          "name": "Carens",
+          "aliases": [
+            "CARENS"
+          ]
+        },
+        {
+          "name": "Stylus",
+          "aliases": [
+            "STYLUS",
+            "SYTLUS"
+          ]
+        },
+        {
+          "name": "Besta",
+          "aliases": [
+            "BESTA"
+          ]
+        },
+        {
+          "name": "Spectra",
+          "aliases": [
+            "SPECTRA"
+          ]
         }
       ]
     },
@@ -416,7 +496,34 @@
           "name": "RAV4",
           "aliases": [
             "RAV4",
-            "RAV 4"
+            "RAV 4",
+            "RAV"
+          ]
+        },
+        {
+          "name": "Hiace",
+          "aliases": [
+            "HIACE",
+            "HI ACE"
+          ]
+        },
+        {
+          "name": "4Runner",
+          "aliases": [
+            "4RUNNER",
+            "4 RUNNER"
+          ]
+        },
+        {
+          "name": "Prado",
+          "aliases": [
+            "PRADO"
+          ]
+        },
+        {
+          "name": "Tercel",
+          "aliases": [
+            "TERCEL"
           ]
         }
       ]
@@ -463,6 +570,12 @@
           "name": "March",
           "aliases": [
             "MARCH"
+          ]
+        },
+        {
+          "name": "Qashqai",
+          "aliases": [
+            "QASHQAI"
           ]
         }
       ]
@@ -552,6 +665,19 @@
             "F150",
             "F 150"
           ]
+        },
+        {
+          "name": "EcoSport",
+          "aliases": [
+            "ECOSPORT",
+            "ECO SPORT"
+          ]
+        },
+        {
+          "name": "Courier",
+          "aliases": [
+            "COURIER"
+          ]
         }
       ]
     },
@@ -595,6 +721,12 @@
           "name": "Clio",
           "aliases": [
             "CLIO"
+          ]
+        },
+        {
+          "name": "Twingo",
+          "aliases": [
+            "TWINGO"
           ]
         }
       ]
@@ -666,6 +798,12 @@
           "aliases": [
             "LANCER"
           ]
+        },
+        {
+          "name": "Canter",
+          "aliases": [
+            "CANTER"
+          ]
         }
       ]
     },
@@ -699,7 +837,14 @@
         {
           "name": "Tiggo",
           "aliases": [
-            "TIGGO"
+            "TIGGO",
+            "TIGO"
+          ]
+        },
+        {
+          "name": "Arrizo",
+          "aliases": [
+            "ARRIZO"
           ]
         }
       ]
