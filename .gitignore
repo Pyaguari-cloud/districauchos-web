@@ -21,3 +21,6 @@ node_modules/
 .next/
 web/out/
 *.pdf
+
+# Lo genera `next dev` automáticamente
+web/AGENTS.md
