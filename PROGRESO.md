@@ -204,8 +204,8 @@ Objetivo: el cliente pone su carro y año (ej. Aveo 2007) y ve los repuestos que
 |---|---|---|
 | 1 | Mi garaje con año (hasta 5 carros) | ✅ publicado |
 | 2 | Piloto de 50 OEM investigados (aprendizaje: fuentes de Ecuador, tablas, el vendedor debe verificar) | ✅ hecho · ⏳ falta que el vendedor revise `out/compatibilidades-piloto-50-FINAL.csv` |
-| 3 | Años que ya están en las descripciones del inventario + filtro por año en el buscador | 🔶 **en curso**: código listo, diccionario v2026-11-20 (+22 modelos: Hiace, 4Runner, Prado, Tercel, Atos, Terracan, Carens, Stylus, Besta, Spectra, EcoSport, Courier, Twingo, Trailblazer, Silverado, Tahoe, Zafira, Astra, Groove, Qashqai, Arrizo, Canter; y errores de tipeo) → **955 fichas con años**. Falta: publicar y probar en celular |
-| 4 | Investigar los más vendidos sin año (tanda 2: 110 productos, otra IA) → reviso años → el vendedor revisa solo contradicciones | ⏳ siguiente (el resultado de la otra IA va en `out/tanda-02-investigado.csv`) |
+| 3 | Años que ya están en las descripciones del inventario + filtro por año en el buscador | ✅ **publicado 2026-11-20**: 955 fichas con años (1.419 rangos), diccionario v2026-11-20 (+22 modelos y errores de tipeo). Probado en producción: "base" para Hilux = 19 sin año, 14 con 2008, 10 con 2020; Corolla 15 → 10 (2008) → 5 (2020) |
+| 4 | Investigar los más vendidos sin año (tanda 2: 110 productos, otra IA) → reviso años → el vendedor revisa solo contradicciones | 🔶 **siguiente / en curso** (el resultado de la otra IA va en `out/tanda-02-investigado.csv`) |
 | 5 | Pestaña "Compatibilidades" en la hoja de Google del cliente, leída por el Worker (solo lectura, source `hoja`); se quita la prueba local `COMPAT_FILE` | ⏳ después de la 4 |
 | 6 | Mantenimiento: tandas de clase C si hay tiempo, catálogos de proveedores, pedir que las descripciones nuevas lleven años ("07/12") | ⏳ opcional |
 
