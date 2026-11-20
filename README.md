@@ -78,7 +78,7 @@ docker-compose.yml          db, search, worker, api (+ web con --profile web), r
 dotnet run --project src/Districauchos.Tools -- vehicles-report --out out
 ```
 
-Genera en `out/` (con `;` y UTF-8 con BOM para Excel en español):
+Genera en `out/` (o en la carpeta de `--out`; por orden, usar `--out out/reportes/...`; ver `out/LEEME.txt`) (con `;` y UTF-8 con BOM para Excel en español):
 
 - `vehiculos_detectados_<fecha>.csv` — marca, modelo, cuántas fichas (OEM) tiene cada uno
 - `sin_vehiculo_<fecha>.csv` — fichas sin vehículo detectado (para completar el diccionario o la descripción)
@@ -129,8 +129,8 @@ sincronización, se hace otra al terminar. Resultado en `/api/health`.
 ## Precios por mayor del Excel de sugeridos
 
 ```bash
-dotnet run --project src/Districauchos.Tools -- import-prices --file "out/costos y precios sugeridos.xlsx"          # vista previa + reporte
-dotnet run --project src/Districauchos.Tools -- import-prices --file "out/costos y precios sugeridos.xlsx" --apply  # guarda y sincroniza
+dotnet run --project src/Districauchos.Tools -- import-prices --file "out/cliente/costos y precios sugeridos.xlsx"          # vista previa + reporte
+dotnet run --project src/Districauchos.Tools -- import-prices --file "out/cliente/costos y precios sugeridos.xlsx" --apply  # guarda y sincroniza
 ```
 Solo lee "ID Producto" y "precio x mayor sugerido" (el costo nunca se lee). Los precios quedan en `price_overrides`
 (base de datos, no en la hoja): **volver a correrlo al montar el servidor** o cuando el cliente actualice el Excel.
