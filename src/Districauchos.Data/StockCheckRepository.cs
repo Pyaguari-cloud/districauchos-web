@@ -117,13 +117,15 @@ public sealed class StockCheckRepository(NpgsqlDataSource db)
     public async Task CompleteAsync(long[] ids, bool ok, string? error, CancellationToken ct)
     {
         if (ids.Length == 0) return;
-        await using var cmd = db.CreateCommand("""
-            UPDATE stock_checks SET done_at = now(), ok = $2, error = $3 WHERE id = ANY($1);
-            DELETE FROM stock_checks WHERE requested_at < now() - interval '7 days';
-            """);
-        cmd.Parameters.Add(new() { Value = ids });
-        cmd.Parameters.Add(new() { Value = ok });
-        cmd.Parameters.Add(new() { Value = (object?)error ?? DBNull.Value, NpgsqlDbType = NpgsqlDbType.Text });
-        await cmd.ExecuteNonQueryAsync(ct);
+        // Dos comandos: Npgsql no admite varias instrucciones con parámetros ($1…) en uno solo.
+        await using (var cmd = db.CreateCommand("UPDATE stock_checks SET done_at = now(), ok = $2, error = $3 WHERE id = ANY($1)"))
+        {
+            cmd.Parameters.Add(new() { Value = ids });
+            cmd.Parameters.Add(new() { Value = ok });
+            cmd.Parameters.Add(new() { Value = (object?)error ?? DBNull.Value, NpgsqlDbType = NpgsqlDbType.Text });
+            await cmd.ExecuteNonQueryAsync(ct);
+        }
+        await using (var purge = db.CreateCommand("DELETE FROM stock_checks WHERE requested_at < now() - interval '7 days'"))
+            await purge.ExecuteNonQueryAsync(ct);
     }
 }
