@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { StoreCard } from "@/components/StoreCard";
+import { StoresMap } from "@/components/StoresMap";
 import { negocio } from "@/content/negocio";
 import { jsonLd, storesJsonLd } from "@/lib/structured-data";
 
@@ -16,6 +17,7 @@ export default function StoresPage() {
         <h1 className="font-display text-3xl font-bold uppercase tracking-wide">Nuestros locales</h1>
         <p className="text-muted">{negocio.stores.length} locales en {negocio.city}. Escríbenos o visítanos.</p>
       </div>
+      <StoresMap />
       <div className="grid gap-4 md:grid-cols-3">
         {negocio.stores.map((s) => <StoreCard key={s.id} store={s} />)}
       </div>

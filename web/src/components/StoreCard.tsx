@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { fullAddress, mapsLink, negocio, phoneDisplay, storeWhatsApp, type Store } from "@/content/negocio";
 
 /** Tarjeta de un local: dirección, horario y botones grandes (≥ 44 px) para llamar, escribir y llegar. */
@@ -5,6 +6,16 @@ export function StoreCard({ store, compact = false }: { store: Store; compact?: 
   const btn = "inline-flex min-h-11 flex-1 items-center justify-center whitespace-nowrap rounded-lg px-3 font-display font-bold uppercase tracking-wide";
   return (
     <article className="flex flex-col gap-3 rounded-xl border border-line bg-white p-4" aria-labelledby={`local-${store.id}`}>
+      {!compact && store.photo && (
+        <Image
+          src={store.photo}
+          alt={`Fachada del local ${store.name} de ${negocio.name}`}
+          width={800}
+          height={500}
+          sizes="(min-width: 768px) 33vw, 100vw"
+          className="-mx-4 -mt-4 aspect-[8/5] w-[calc(100%+2rem)] max-w-none rounded-t-xl object-cover"
+        />
+      )}
       <div>
         <p className="text-sm font-semibold uppercase tracking-wide text-brand-red">{store.role}</p>
         <h3 id={`local-${store.id}`} className="font-display text-2xl font-bold uppercase tracking-wide">{store.name}</h3>

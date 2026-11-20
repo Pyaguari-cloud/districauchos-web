@@ -17,6 +17,11 @@ export type Store = {
   hours: Hours[];
   /** Enlace de Google Maps del local. PENDIENTE: si falta, se busca por dirección. */
   mapsUrl?: string;
+  /** Coordenadas del pin en el mapa de /locales (sacadas del enlace de Maps del cliente, 2026-11-20). */
+  lat: number;
+  lng: number;
+  /** Foto de la fachada en /public/locales/ (fotos propias del cliente). Sin foto, la tarjeta no muestra imagen. */
+  photo?: string;
 };
 
 const WEEKDAYS: Day[] = ["Mo", "Tu", "We", "Th", "Fr"];
@@ -73,6 +78,8 @@ export const negocio = {
       postalCode: "170606",
       phone: "593986151793",
       mapsUrl: "https://maps.app.goo.gl/zg47QN4bQJ8vh9fP8",
+      lat: -0.2657561,
+      lng: -78.551073,
       hours: WEEK,
     },
     {
@@ -83,6 +90,8 @@ export const negocio = {
       postalCode: "170606",
       phone: "593985595439",
       mapsUrl: "https://maps.app.goo.gl/yFZzpAPsMmkUTU5R6",
+      lat: -0.2740233,
+      lng: -78.5451066,
       hours: [...WEEK, { days: ["Su"], label: "Domingo", opens: "08:00", closes: "15:00" }],
     },
     {
@@ -93,6 +102,8 @@ export const negocio = {
       postalCode: "170146",
       phone: "593999541922",
       mapsUrl: "https://maps.app.goo.gl/FgnGkScW5f6F85Jd6",
+      lat: -0.3052964,
+      lng: -78.543233,
       hours: WEEK,
     },
   ] satisfies Store[],
