@@ -9,6 +9,8 @@ import { PartImage } from "@/components/PartImage";
 import { VehicleFit } from "@/components/VehicleFit";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { getItem, type Vehicle } from "@/lib/api";
+import { compatFor } from "@/lib/compat";
+import { yearsText } from "@/lib/compat-match";
 import { displayTitle, money, partRef, priceRange, sentenceCase, vehicleLabel } from "@/lib/format";
 import { quoteOneLink } from "@/lib/whatsapp";
 
@@ -40,6 +42,7 @@ export default async function ItemPage({ params }: Props) {
 
   const title = displayTitle(item.title);
   const vehicles = groupVehicles(item.vehicles);
+  const compat = compatFor(item.oem, item.oemAliases);
   // La principal es la primera variante (disponible y más barata), la misma que usa la cotización.
   const main = item.variants[0];
   const ref = partRef(item.oem, main?.code);
@@ -95,7 +98,7 @@ export default async function ItemPage({ params }: Props) {
           </div>
 
           <Availability available={item.available} stock={main?.stock ?? item.stock} />
-          <VehicleFit vehicles={item.vehicles} />
+          <VehicleFit vehicles={item.vehicles} compat={compat} />
 
           <div className="rounded-xl border border-line bg-white p-4">
             <p className="text-sm font-semibold uppercase tracking-wide text-muted">Precio público</p>
@@ -113,6 +116,35 @@ export default async function ItemPage({ params }: Props) {
           <DeliveryPromise available={item.available} />
           {main && <AddToCart oem={item.oem} code={main.code} slug={item.slug} title={title} price={main.pvp} />}
           {wa && <WhatsAppButton href={wa} label="Cotizar solo este por WhatsApp" full />}
+
+          {compat.length > 0 && (
+            <section aria-labelledby="por-anio">
+              <h2 id="por-anio" className="mb-2 font-display text-xl font-bold uppercase tracking-wide">Compatibilidad por año</h2>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[20rem] text-left text-sm">
+                  <thead className="text-muted">
+                    <tr>
+                      <th scope="col" className="py-1.5 pr-3 font-semibold">Vehículo</th>
+                      <th scope="col" className="py-1.5 pr-3 font-semibold">Motor</th>
+                      <th scope="col" className="py-1.5 font-semibold">Años</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {compat.map((r, i) => (
+                      <tr key={i} className="border-t border-line">
+                        <td className="py-1.5 pr-3">{r.brand} {r.model}</td>
+                        <td className="py-1.5 pr-3">{r.engine || "—"}</td>
+                        <td className="py-1.5">{yearsText(r)}{r.verified ? "" : " *"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {compat.some((r) => !r.verified) && (
+                <p className="mt-1 text-sm text-muted">* Por confirmar: te confirmamos el año exacto al cotizar.</p>
+              )}
+            </section>
+          )}
 
           {vehicles.length > 0 && (
             <section aria-labelledby="compatibles">

@@ -1,10 +1,12 @@
 import Link from "next/link";
 import type { CatalogHit } from "@/lib/api";
+import type { CompatRow } from "@/lib/compat-match";
 import { displayTitle, money, partRef, priceRange } from "@/lib/format";
 import { Availability } from "./Availability";
 import { PartImage } from "./PartImage";
+import { CardFit } from "./VehicleFit";
 
-export function ProductCard({ item }: { item: CatalogHit }) {
+export function ProductCard({ item, compat }: { item: CatalogHit; compat?: CompatRow[] }) {
   const title = displayTitle(item.title);
   const ref = partRef(item.oem, item.codes?.[0]);
   const vehicles = [...item.models.slice(0, 3)];
@@ -39,17 +41,18 @@ export function ProductCard({ item }: { item: CatalogHit }) {
             )}
           </div>
           <Availability available={item.available} stock={item.stock} />
+          <CardFit compat={compat} />
         </div>
       </Link>
     </li>
   );
 }
 
-export function ProductGrid({ items }: { items: CatalogHit[] }) {
+export function ProductGrid({ items, compat = {} }: { items: CatalogHit[]; compat?: Record<string, CompatRow[]> }) {
   return (
     <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
       {items.map((item) => (
-        <ProductCard key={item.slug} item={item} />
+        <ProductCard key={item.slug} item={item} compat={compat[item.slug]} />
       ))}
     </ul>
   );
