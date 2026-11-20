@@ -14,6 +14,27 @@ public class SheetLoaderTests
     }
 
     [Fact]
+    public void Compat_tab_keeps_only_rows_marked_si_and_splits_brands()
+    {
+        var rows = new List<IReadOnlyList<string>>
+        {
+            new[] { "OEM", "Producto (solo referencia)", "Marca", "Modelo", "Motor", "Año desde", "Año hasta", "Usar" },
+            new[] { "96180071", "Manguera Aveo", "Chevrolet", "Aveo Family", "1.5", "2009", "2019", "Sí" },
+            new[] { "96180071", "Manguera Aveo", "Chevrolet", "Optra", "1.8", "2012", "2016", "" },        // pendiente
+            new[] { "96180071", "Manguera Aveo", "Chevrolet", "Sail", "1.4", "2012", "2016", "No" },      // rechazada
+            new[] { "1161065J03", "Base motor", "Chevrolet / Suzuki", "Grand Vitara SZ", "2.0", "2017", "2008", "si" }, // años al revés
+            new[] { "8'97947'087'1", "Buje", "Chevrolet", "D-Max RT50", "3.0", "", "", "SI" },          // sin años
+        };
+        var res = new SheetLoadResult();
+        SheetLoader.LoadCompat(rows, res);
+        Assert.Equal(4, res.Compat.Count);
+        Assert.Contains(res.Compat, c => c.Model == "Aveo Family" && c.YearFrom == 2009 && c.YearTo == 2019);
+        Assert.Contains(res.Compat, c => c.Brand == "Suzuki" && c.YearFrom == 2008 && c.YearTo == 2017);
+        Assert.Contains(res.Compat, c => c.OemNorm == "8'97947'087'1" && c.YearFrom == null);
+        Assert.DoesNotContain(res.Compat, c => c.Model is "Optra" or "Sail");
+    }
+
+    [Fact]
     public void Master_reads_by_header_name_and_skips_cost()
     {
         var rows = WithPreamble(

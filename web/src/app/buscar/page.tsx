@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ProductGrid } from "@/components/ProductCard";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { searchCatalog } from "@/lib/api";
-import { compatForHits } from "@/lib/compat";
+import { rowsFromRanges } from "@/lib/compat-match";
 import { isRealCategory, sentenceCase, vehicleLabel } from "@/lib/format";
 import { askLink } from "@/lib/whatsapp";
 import { photoCredit, vehiclePhoto } from "@/lib/vehicle-photos";
@@ -155,7 +155,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       {result.total === 0 ? (
         <NoResults query={p.q} vehicle={vehicle} />
       ) : (
-        <ProductGrid items={result.items} compat={compatForHits(result.items)} />
+        <ProductGrid items={result.items} compat={Object.fromEntries(result.items.map((h) => [h.slug, rowsFromRanges(h.yearRanges)]))} />
       )}
 
       {result.totalPages > 1 && (

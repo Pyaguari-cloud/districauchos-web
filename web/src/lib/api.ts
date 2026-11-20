@@ -44,7 +44,7 @@ export type CatalogPage = {
 export type Variant = { code: string; isVch: boolean; pvp: number; precioMayor: number | null; available: boolean; stock: number };
 export type Vehicle = { brand: string; model: string | null };
 /** source: "descripcion" (inventario del cliente) u "hoja" (compatibilidades verificadas). */
-export type VehicleYears = { brand: string; model: string; from: number; to: number; source: string };
+export type VehicleYears = { brand: string; model: string; from: number; to: number; source: string; version?: string; engine?: string };
 
 export type Item = {
   slug: string;

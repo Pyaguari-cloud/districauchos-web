@@ -124,6 +124,12 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
                 source    text NOT NULL,
                 PRIMARY KEY (oem_norm, brand, model, year_from, year_to, source)
             );
+            -- Fase 5: versión y motor de la hoja de compatibilidades (pueden repetirse años por versión).
+            ALTER TABLE product_vehicle_years ADD COLUMN IF NOT EXISTS version text NOT NULL DEFAULT '';
+            ALTER TABLE product_vehicle_years ADD COLUMN IF NOT EXISTS engine  text NOT NULL DEFAULT '';
+            ALTER TABLE product_vehicle_years DROP CONSTRAINT IF EXISTS product_vehicle_years_pkey;
+            CREATE UNIQUE INDEX IF NOT EXISTS ux_product_vehicle_years
+                ON product_vehicle_years (oem_norm, brand, model, version, engine, year_from, year_to, source);
             """);
         await cmd.ExecuteNonQueryAsync(ct);
     }
@@ -237,7 +243,7 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
         }
 
         await using (var w = await conn.BeginBinaryImportAsync(
-            "COPY product_vehicle_years (oem_norm, brand, model, year_from, year_to, source) FROM STDIN (FORMAT BINARY)", ct))
+            "COPY product_vehicle_years (oem_norm, brand, model, year_from, year_to, source, version, engine) FROM STDIN (FORMAT BINARY)", ct))
         {
             foreach (var y in catalog.VehicleYears)
             {
@@ -248,6 +254,8 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
                 await w.WriteAsync(y.YearFrom, ct);
                 await w.WriteAsync(y.YearTo, ct);
                 await w.WriteAsync(y.Source, ct);
+                await w.WriteAsync(y.Version, ct);
+                await w.WriteAsync(y.Engine, ct);
             }
             await w.CompleteAsync(ct);
         }

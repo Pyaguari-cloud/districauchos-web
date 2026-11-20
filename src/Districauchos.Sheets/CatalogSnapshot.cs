@@ -23,7 +23,7 @@ public sealed record CatalogSnapshot(
         var categories = CategoryClassifier.Load(settings.CategoriesJsonPath);
 
         var sheets = await new SheetLoader(source, settings).LoadAsync(ct);
-        var catalog = new CatalogBuilder(pricing, extractor, categories: categories, titles: TitleCase.From(dict)).Build(sheets.Master, sheets.Stock, overrides);
+        var catalog = new CatalogBuilder(pricing, extractor, categories: categories, titles: TitleCase.From(dict)).Build(sheets.Master, sheets.Stock, overrides, sheets.Compat);
         return new CatalogSnapshot(sheets, catalog, dict.Version, categories.Version);
     }
 }

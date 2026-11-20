@@ -62,6 +62,12 @@ public sealed record CatalogItem(
 public sealed record ProductVehicle(string OemNorm, string Brand, string Model);
 
 /// <summary>Años de un vehículo para un repuesto. Source: "descripcion" (inventario) u "hoja" (compatibilidades verificadas).</summary>
-public sealed record ProductVehicleYears(string OemNorm, string Brand, string Model, int YearFrom, int YearTo, string Source);
+public sealed record ProductVehicleYears(
+    string OemNorm, string Brand, string Model, int YearFrom, int YearTo, string Source,
+    /// <summary>Versión como la escribió la hoja ("Aveo Family", "D-Max RT50"); vacío si viene de la descripción.</summary>
+    string Version = "", string Engine = "");
+
+/// <summary>Fila de la pestaña "Compatibilidades" del cliente marcada Usar = Sí.</summary>
+public sealed record CompatSheetRow(string OemNorm, string Brand, string Model, string Engine, int? YearFrom, int? YearTo, int SourceRow);
 
 public sealed record SyncWarning(string Code, string Message, string? Source = null, int? Row = null);

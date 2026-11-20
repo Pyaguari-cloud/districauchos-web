@@ -9,7 +9,6 @@ import { PartImage } from "@/components/PartImage";
 import { VehicleFit } from "@/components/VehicleFit";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { getItem, type Vehicle } from "@/lib/api";
-import { compatFor } from "@/lib/compat";
 import { rowsFromYears, yearsText } from "@/lib/compat-match";
 import { displayTitle, money, partRef, priceRange, sentenceCase, vehicleLabel } from "@/lib/format";
 import { quoteOneLink } from "@/lib/whatsapp";
@@ -42,7 +41,7 @@ export default async function ItemPage({ params }: Props) {
 
   const title = displayTitle(item.title);
   const vehicles = groupVehicles(item.vehicles);
-  const compat = [...rowsFromYears(item.years), ...compatFor(item.oem, item.oemAliases)];
+  const compat = rowsFromYears(item.years);
   // La principal es la primera variante (disponible y más barata), la misma que usa la cotización.
   const main = item.variants[0];
   const ref = partRef(item.oem, main?.code);
@@ -132,7 +131,7 @@ export default async function ItemPage({ params }: Props) {
                   <tbody>
                     {compat.map((r, i) => (
                       <tr key={i} className="border-t border-line">
-                        <td className="py-1.5 pr-3">{r.brand} {r.model}</td>
+                        <td className="py-1.5 pr-3">{r.brand} {r.label ?? r.model}</td>
                         <td className="py-1.5 pr-3">{r.engine || "—"}</td>
                         <td className="py-1.5">{yearsText(r)}{r.verified ? "" : " *"}</td>
                       </tr>

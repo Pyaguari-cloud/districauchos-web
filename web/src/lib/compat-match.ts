@@ -1,13 +1,20 @@
 /** Lógica compartida (servidor y navegador): ¿una fila de compatibilidad le sirve a "Mi vehículo"? */
 export type CompatRow = {
   brand: string; model: string; engine: string; from: number | null; to: number | null; verified: boolean;
-  /** "descripcion" = lo escribió el cliente en su inventario. */
+  /** "descripcion" = lo escribió el cliente en su inventario; "hoja" = pestaña Compatibilidades verificada. */
   source?: string;
+  /** Versión para mostrar ("Aveo Family"); el filtro usa `model` (el del garaje). */
+  label?: string;
 };
 
 /** Años leídos de la descripción (ficha). Los escribió el propio cliente: cuentan como confirmados. */
-export const rowsFromYears = (years: { brand: string; model: string; from: number; to: number; source: string }[] = []): CompatRow[] =>
-  years.map((y) => ({ brand: y.brand, model: y.model, engine: "", from: y.from, to: y.to, verified: true, source: y.source }));
+export const rowsFromYears = (
+  years: { brand: string; model: string; from: number; to: number; source: string; version?: string; engine?: string }[] = [],
+): CompatRow[] =>
+  years.map((y) => ({
+    brand: y.brand, model: y.model, engine: y.engine ?? "", from: y.from, to: y.to, verified: true, source: y.source,
+    label: y.version || undefined,
+  }));
 
 /** Lo mismo desde las tarjetas del buscador ("Marca|Modelo|desde|hasta"). */
 export const rowsFromRanges = (ranges: string[] = []): CompatRow[] =>
@@ -64,4 +71,4 @@ export function yearRanges(rows: CompatRow[]) {
   return t.length > 1 ? `${t.slice(0, -1).join(", ")} y ${t[t.length - 1]}` : (t[0] ?? "");
 }
 
-export const rowText = (r: CompatRow) => [r.model, r.engine, yearsText(r)].filter(Boolean).join(" · ");
+export const rowText = (r: CompatRow) => [r.label ?? r.model, r.engine, yearsText(r)].filter(Boolean).join(" · ");

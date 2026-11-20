@@ -79,8 +79,11 @@ CREATE TABLE IF NOT EXISTS product_vehicle_years (
     year_from int  NOT NULL,
     year_to   int  NOT NULL,
     source    text NOT NULL,
-    PRIMARY KEY (oem_norm, brand, model, year_from, year_to, source)
+    version   text NOT NULL DEFAULT '',
+    engine    text NOT NULL DEFAULT ''
 );
+CREATE UNIQUE INDEX IF NOT EXISTS ux_product_vehicle_years
+    ON product_vehicle_years (oem_norm, brand, model, version, engine, year_from, year_to, source);
 
 -- Mantenida a mano / importada del Excel de precios sugeridos (pregunta 12.1). La sync no la borra.
 CREATE TABLE IF NOT EXISTS price_overrides (

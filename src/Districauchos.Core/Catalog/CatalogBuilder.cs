@@ -30,6 +30,8 @@ public sealed class CatalogBuildStats
     public int ItemsAvailable { get; set; }
     public int ItemsVch { get; set; }
     public int ItemsWithVehicle { get; set; }
+    /// <summary>Filas de la pestaña Compatibilidades aplicadas (Usar = Sí, OEM y modelo reconocidos).</summary>
+    public int CompatRowsApplied { get; set; }
     public int StockRowsUnmatched { get; set; }
     public int NegativeStockRows { get; set; }
 }
@@ -60,7 +62,8 @@ public sealed class CatalogBuilder(
     public CatalogBuildResult Build(
         IEnumerable<MasterRow> masterRows,
         IEnumerable<StockRow> stockRows,
-        IReadOnlyDictionary<string, PriceOverride>? overrides = null)
+        IReadOnlyDictionary<string, PriceOverride>? overrides = null,
+        IReadOnlyList<CompatSheetRow>? compat = null)
     {
         overrides ??= new Dictionary<string, PriceOverride>();
         var result = new CatalogBuildResult();
@@ -141,6 +144,8 @@ public sealed class CatalogBuilder(
             result.Variants.AddRange(variants);
             AddVehicles(item, rows, result);
         }
+
+        ApplyCompat(compat ?? [], result);
 
         stats.CatalogItems = result.Items.Count;
         stats.ItemsWithVariants = result.Items.Count(i => i.Codes.Count > 1);
@@ -232,6 +237,50 @@ public sealed class CatalogBuilder(
         foreach (var ((key, _), stock) in perLocation)
             totals[key] = totals.GetValueOrDefault(key) + Math.Max(0, stock);
         return totals;
+    }
+
+    /// <summary>
+    /// Pestaña "Compatibilidades" (verificada): agrega el vehículo si la descripción no lo decía y sus años.
+    /// El modelo de la hoja ("Aveo Family", "D-Max RT50") se lleva al del diccionario (Aveo, D-Max) para el filtro,
+    /// y se guarda tal cual como versión para mostrarlo en la ficha.
+    /// </summary>
+    private void ApplyCompat(IReadOnlyList<CompatSheetRow> compat, CatalogBuildResult result)
+    {
+        if (compat.Count == 0) return;
+        var items = result.Items.Select(i => i.OemNorm).ToHashSet(StringComparer.Ordinal);
+        // Google Sheets puede convertir "0930025028" en número y quitar el cero: segunda oportunidad sin ceros.
+        var byTrimmed = result.Items.Where(i => !CatalogKey.IsCode(i.OemNorm))
+            .GroupBy(i => i.OemNorm.TrimStart('0')).Where(g => g.Count() == 1).ToDictionary(g => g.Key, g => g.First().OemNorm);
+        var vehiclesSet = result.Vehicles.Select(v => (v.OemNorm, v.Brand, v.Model)).ToHashSet();
+        var yearsSet = result.VehicleYears.ToHashSet();
+        var maxYear = DateTime.UtcNow.Year + 1;
+        var unknownOem = new List<CompatSheetRow>();
+        var unknownModel = new List<CompatSheetRow>();
+
+        foreach (var row in compat)
+        {
+            var oem = items.Contains(row.OemNorm) ? row.OemNorm : byTrimmed.GetValueOrDefault(row.OemNorm.TrimStart('0'));
+            if (oem is null) { unknownOem.Add(row); continue; }
+            var matches = vehicles.Extract($"{row.Brand} {row.Model}").Matches.Where(m => m.Model is not null).ToList();
+            var models = matches.Where(m => string.Equals(m.Brand, row.Brand, StringComparison.OrdinalIgnoreCase))
+                .Select(m => m.Model!).Distinct().ToList();
+            if (models.Count == 0) { unknownModel.Add(row); continue; }
+            result.Stats.CompatRowsApplied++;
+            foreach (var model in models)
+                foreach (var m in matches.Where(x => x.Model == model))
+                {
+                    if (vehiclesSet.Add((oem, m.Brand, model))) result.Vehicles.Add(new ProductVehicle(oem, m.Brand, model));
+                    if (row.YearFrom is not { } from) continue;
+                    var y = new ProductVehicleYears(oem, m.Brand, model, from, row.YearTo ?? maxYear, "hoja", row.Model, row.Engine);
+                    if (yearsSet.Add(y)) result.VehicleYears.Add(y);
+                }
+        }
+        var withVehicle = result.Vehicles.Select(v => v.OemNorm).ToHashSet(StringComparer.Ordinal);
+        result.WithoutVehicle.RemoveAll(w => withVehicle.Contains(w.OemNorm));
+        if (unknownOem.Count > 0)
+            result.Warnings.Add(new("compat_oem_unknown", $"{unknownOem.Count} filas con OEM que no está en el catálogo, ej.: {unknownOem[0].OemNorm}", "Compatibilidades", unknownOem[0].SourceRow));
+        if (unknownModel.Count > 0)
+            result.Warnings.Add(new("compat_model_unknown", $"{unknownModel.Count} filas con un modelo que no está en el diccionario, ej.: {unknownModel[0].Brand} {unknownModel[0].Model}", "Compatibilidades", unknownModel[0].SourceRow));
     }
 
     private void AddVehicles(CatalogItem item, List<MasterRow> rows, CatalogBuildResult result)

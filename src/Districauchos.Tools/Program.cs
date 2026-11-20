@@ -5,7 +5,7 @@ using Districauchos.Sheets;
 using Microsoft.Extensions.Configuration;
 
 // Uso:
-//   dotnet run --project src/Districauchos.Tools -- vehicles-report [--out out/]
+//   dotnet run --project src/Districauchos.Tools -- vehicles-report [--out out/] [--compat-file <csv>]
 //   dotnet run --project src/Districauchos.Tools -- import-prices --file "<excel>.xlsx" [--apply]
 //     (sin --apply solo genera el reporte; con --apply guarda en price_overrides y pide sincronizar)
 // Lee las hojas (o LOCAL_CSV_DIR) sin escribir nada y genera los CSV para que el cliente revise.
@@ -41,7 +41,9 @@ switch (command)
 async Task VehiclesReport()
 {
     Directory.CreateDirectory(outDir);
-    var source = SheetSourceFactory.Create(settings);
+    ISheetSource source = SheetSourceFactory.Create(settings);
+    // --compat-file: simula la pestaña "Compatibilidades" con un CSV antes de que el cliente la cree.
+    if (ArgValue("--compat-file") is { } compatFile) source = new CompatFileSource(source, compatFile);
     var snap = await CatalogSnapshot.BuildAsync(source, settings);
     var cat = snap.Catalog;
     var stamp = DateTime.Now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
@@ -61,10 +63,10 @@ async Task VehiclesReport()
             .Select(v => new[] { v.OemNorm, titles[v.OemNorm], v.Brand, v.Model == "" ? "(solo marca)" : v.Model }));
 
     // 1c) Años leídos de la descripción (para revisar que se lean bien)
-    WriteCsv($"anios_detectados_{stamp}.csv", ["OEM", "Descripcion", "Marca", "Modelo", "Desde", "Hasta"],
+    WriteCsv($"anios_detectados_{stamp}.csv", ["OEM", "Descripcion", "Marca", "Modelo", "Desde", "Hasta", "Origen", "Version"],
         cat.VehicleYears.OrderBy(v => v.Brand).ThenBy(v => v.Model).ThenBy(v => v.YearFrom)
             .Select(v => new[] { v.OemNorm, titles[v.OemNorm], v.Brand, v.Model,
-                v.YearFrom.ToString(CultureInfo.InvariantCulture), v.YearTo.ToString(CultureInfo.InvariantCulture) }));
+                v.YearFrom.ToString(CultureInfo.InvariantCulture), v.YearTo.ToString(CultureInfo.InvariantCulture), v.Source, v.Version }));
 
     // 2) Fichas sin vehículo detectado
     WriteCsv($"sin_vehiculo_{stamp}.csv", ["OEM", "Codigo", "Descripcion"],
@@ -109,7 +111,8 @@ async Task VehiclesReport()
         .AppendLine($"  Importadora VCH:                {s.ItemsVch}")
         .AppendLine($"  Con vehículo detectado:         {s.ItemsWithVehicle}")
         .AppendLine($"  Sin vehículo detectado:         {cat.WithoutVehicle.Count}")
-        .AppendLine($"  Con años en la descripción:     {cat.VehicleYears.Select(v => v.OemNorm).Distinct().Count()}")
+        .AppendLine($"  Con años (descripción u hoja):  {cat.VehicleYears.Select(v => v.OemNorm).Distinct().Count()}")
+        .AppendLine($"  Filas de Compatibilidades usadas: {s.CompatRowsApplied}")
         .AppendLine()
         .AppendLine($"Filas de stock negativas:         {s.NegativeStockRows}")
         .AppendLine($"Filas de stock con código que no existe en el maestro: {s.StockRowsUnmatched}")
@@ -268,4 +271,13 @@ static class DotEnvExtensions
         }
         return b.AddInMemoryCollection(values);
     }
+}
+
+/// <summary>Lee todo de la fuente real, salvo la pestaña Compatibilidades, que sale de un CSV local.</summary>
+sealed class CompatFileSource(ISheetSource inner, string csvPath) : ISheetSource
+{
+    public async Task<IReadOnlyList<IReadOnlyList<string>>> ReadTabAsync(string spreadsheetId, string tab, CancellationToken ct = default) =>
+        tab == SheetLoader.TabCompat
+            ? CsvSheetSource.Parse(await File.ReadAllTextAsync(csvPath, ct))
+            : await inner.ReadTabAsync(spreadsheetId, tab, ct);
 }

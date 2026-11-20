@@ -8,6 +8,7 @@ public sealed class SheetLoadResult
 {
     public List<MasterRow> Master { get; } = [];
     public List<StockRow> Stock { get; } = [];
+    public List<CompatSheetRow> Compat { get; } = [];
     public List<SyncWarning> Warnings { get; } = [];
     /// <summary>Filas de datos leídas por pestaña (para sync_runs.rows_read).</summary>
     public Dictionary<string, int> RowsRead { get; } = new(StringComparer.Ordinal);
@@ -24,6 +25,8 @@ public sealed class SheetLoader(ISheetSource source, AppSettings settings)
     public const string TabCusubamba = "InventarioCusubamba";
     public const string TabMaldonado = "InventarioMaldonado";
     public const string TabBodega = "Maestro Bodega";
+    /// <summary>Opcional, en la hoja principal: compatibilidades verificadas por el vendedor (fase 5).</summary>
+    public const string TabCompat = "Compatibilidades";
 
     public async Task<SheetLoadResult> LoadAsync(CancellationToken ct = default)
     {
@@ -37,7 +40,64 @@ public sealed class SheetLoader(ISheetSource source, AppSettings settings)
         LoadStore(await source.ReadTabAsync(principal, TabCusubamba, ct), TabCusubamba, StockLocation.Cusubamba, result);
         LoadStore(await source.ReadTabAsync(maldonado, TabMaldonado, ct), TabMaldonado, StockLocation.Maldonado, result);
         LoadBodega(await source.ReadTabAsync(bodega, TabBodega, ct), result);
+        await LoadCompatAsync(principal, result, ct);
         return result;
+    }
+
+    /// <summary>La pestaña es opcional: si no existe (o no se puede leer), la sincronización sigue igual con un aviso.</summary>
+    private async Task LoadCompatAsync(string spreadsheetId, SheetLoadResult result, CancellationToken ct)
+    {
+        IReadOnlyList<IReadOnlyList<string>> rows;
+        try { rows = await source.ReadTabAsync(spreadsheetId, TabCompat, ct); }
+        catch (Exception e) when (e is not OperationCanceledException)
+        {
+            result.Warnings.Add(new("compat_tab_missing", $"No se leyó la pestaña '{TabCompat}' (opcional): {e.Message.Split('\n')[0]}", TabCompat));
+            return;
+        }
+        LoadCompat(rows, result);
+    }
+
+    internal static void LoadCompat(IReadOnlyList<IReadOnlyList<string>> rows, SheetLoadResult result)
+    {
+        if (rows.Count == 0) return;
+        HeaderTable h;
+        try { h = HeaderTable.Locate(rows, "OEM", preferredRowIndex: 0); }
+        catch (InvalidDataException) { result.Warnings.Add(new("compat_no_header", "La pestaña no tiene la columna OEM", TabCompat)); return; }
+        var cOem = h.Find("OEM");
+        var cBrand = h.Find("Marca");
+        var cModel = h.Find("Modelo");
+        var cEngine = h.Find("Motor");
+        var cFrom = h.Find("Año desde", "Ano desde", "Desde");
+        var cTo = h.Find("Año hasta", "Ano hasta", "Hasta");
+        var cUse = h.Find("Usar", "Verificado");
+        MissingColumns(result, TabCompat, ("Marca", cBrand), ("Modelo", cModel), ("Usar", cUse));
+        if (cBrand is null || cModel is null || cUse is null) return;
+
+        var read = 0;
+        for (var i = h.HeaderRowIndex + 1; i < rows.Count; i++)
+        {
+            var row = rows[i];
+            if (row.All(TextNorm.IsEmpty)) continue;
+            read++;
+            // Solo lo que el vendedor (o la revisión automática) marcó "Sí".
+            var use = TextNorm.StripAccents(HeaderTable.Cell(row, cUse) ?? "").Trim().ToLowerInvariant();
+            if (!use.StartsWith('s')) continue;
+            var oem = TextNorm.NormalizeOem(HeaderTable.Cell(row, cOem));
+            var model = TextNorm.Clean(HeaderTable.Cell(row, cModel));
+            if (oem is null || model is null) continue;
+            int? Year(int? col)
+            {
+                var v = TextNorm.Clean(HeaderTable.Cell(row, col));
+                return v is not null && v.Length == 4 && int.TryParse(v, out var y) && y is >= 1960 and <= 2100 ? y : null;
+            }
+            var from = Year(cFrom);
+            var to = Year(cTo);
+            if (from is not null && to is not null && to < from) (from, to) = (to, from);
+            // "Chevrolet / Suzuki" = una fila por marca.
+            foreach (var brand in (TextNorm.Clean(HeaderTable.Cell(row, cBrand)) ?? "").Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+                result.Compat.Add(new(oem, brand, model, TextNorm.Clean(HeaderTable.Cell(row, cEngine)) ?? "", from, to, i + 1));
+        }
+        result.RowsRead[TabCompat] = read;
     }
 
     /// <summary>

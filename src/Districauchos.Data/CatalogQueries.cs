@@ -7,7 +7,7 @@ namespace Districauchos.Data;
 // 2026-11-19), pero solo el total de todos los locales.
 public sealed record VariantDto(string Code, bool IsVch, decimal Pvp, decimal? PrecioMayor, bool Available, decimal Stock);
 public sealed record VehicleDto(string Brand, string? Model);
-public sealed record VehicleYearsDto(string Brand, string Model, int From, int To, string Source);
+public sealed record VehicleYearsDto(string Brand, string Model, int From, int To, string Source, string Version, string Engine);
 public sealed record ItemDto(
     string Slug, string Oem, IReadOnlyList<string> OemAliases, string Title, string Description,
     string? Category, string? Subcategory, bool IsVch, decimal PvpMin, decimal PvpMax, decimal? MayorMin,
@@ -70,12 +70,12 @@ public sealed class CatalogQueries(NpgsqlDataSource db)
 
         var years = new List<VehicleYearsDto>();
         await using (var cmd = new NpgsqlCommand(
-            "SELECT brand, model, year_from, year_to, source FROM product_vehicle_years WHERE oem_norm = $1 ORDER BY brand, model, year_from", conn))
+            "SELECT brand, model, year_from, year_to, source, version, engine FROM product_vehicle_years WHERE oem_norm = $1 ORDER BY brand, model, year_from, version", conn))
         {
             cmd.Parameters.Add(new() { Value = oem });
             await using var r = await cmd.ExecuteReaderAsync(ct);
             while (await r.ReadAsync(ct))
-                years.Add(new(r.GetString(0), r.GetString(1), r.GetInt32(2), r.GetInt32(3), r.GetString(4)));
+                years.Add(new(r.GetString(0), r.GetString(1), r.GetInt32(2), r.GetInt32(3), r.GetString(4), r.GetString(5), r.GetString(6)));
         }
 
         return item with { Variants = variants, Vehicles = vehicles, Years = years };

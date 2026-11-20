@@ -159,6 +159,30 @@ public class CatalogBuilderTests
     private readonly CatalogBuilder _b = new(new PricingRules(), Fixtures.Extractor());
 
     [Fact]
+    public void Compat_sheet_adds_vehicles_and_years_with_version()
+    {
+        var r = _b.Build(
+            [Fixtures.Master("A1", "MANGUERA AVEO", 5m, "96180071"), Fixtures.Master("A2", "BUJE SIN CARRO", 5m, "0930025028")],
+            [],
+            compat:
+            [
+                new CompatSheetRow("96180071", "Chevrolet", "Aveo Family", "1.5", 2009, 2019, 2),
+                new CompatSheetRow("96180071", "Chevrolet", "D-Max RT50", "3.0", 2014, null, 3),   // carro que la descripción no decía
+                new CompatSheetRow("930025028", "Kia", "Rio", "", 2011, 2017, 4),               // Sheets le quitó el cero
+                new CompatSheetRow("NOEXISTE", "Chevrolet", "Aveo", "", 2010, 2012, 5),
+                new CompatSheetRow("96180071", "Chevrolet", "Modelo raro", "", 2010, 2012, 6),
+            ]);
+        Assert.Contains(new ProductVehicle("96180071", "Chevrolet", "D-Max"), r.Vehicles);
+        Assert.Contains(r.VehicleYears, y => y.OemNorm == "96180071" && y.Model == "Aveo" && y.Version == "Aveo Family" && y.YearFrom == 2009 && y.Source == "hoja");
+        Assert.Contains(r.VehicleYears, y => y.Model == "D-Max" && y.YearFrom == 2014 && y.YearTo >= 2026);
+        Assert.Contains(r.VehicleYears, y => y.OemNorm == "0930025028" && y.Model == "Rio");
+        Assert.DoesNotContain(r.WithoutVehicle, w => w.OemNorm == "0930025028");
+        Assert.Equal(3, r.Stats.CompatRowsApplied);
+        Assert.Contains(r.Warnings, w => w.Code == "compat_oem_unknown");
+        Assert.Contains(r.Warnings, w => w.Code == "compat_model_unknown");
+    }
+
+    [Fact]
     public void Excludes_generic_no_description_and_no_price()
     {
         var r = _b.Build([
