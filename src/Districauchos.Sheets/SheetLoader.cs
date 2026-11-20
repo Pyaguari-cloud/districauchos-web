@@ -40,6 +40,29 @@ public sealed class SheetLoader(ISheetSource source, AppSettings settings)
         return result;
     }
 
+    /// <summary>
+    /// Solo las 4 pestañas de stock, en paralelo (revisión al pagar). No lee el maestro ni precios.
+    /// </summary>
+    public async Task<IReadOnlyList<StockRow>> LoadStockAsync(CancellationToken ct = default)
+    {
+        var principal = Require(settings.SheetIdPrincipal, "SHEET_ID_PRINCIPAL");
+        var maldonado = Require(settings.SheetIdMaldonado, "SHEET_ID_MALDONADO");
+        var bodega = Require(settings.SheetIdBodega, "SHEET_ID_BODEGA");
+
+        var tabiazo = source.ReadTabAsync(principal, TabTabiazo, ct);
+        var cusubamba = source.ReadTabAsync(principal, TabCusubamba, ct);
+        var mal = source.ReadTabAsync(maldonado, TabMaldonado, ct);
+        var bod = source.ReadTabAsync(bodega, TabBodega, ct);
+        await Task.WhenAll(tabiazo, cusubamba, mal, bod);
+
+        var result = new SheetLoadResult();
+        LoadStore(await tabiazo, TabTabiazo, StockLocation.Tabiazo, result);
+        LoadStore(await cusubamba, TabCusubamba, StockLocation.Cusubamba, result);
+        LoadStore(await mal, TabMaldonado, StockLocation.Maldonado, result);
+        LoadBodega(await bod, result);
+        return result.Stock;
+    }
+
     private string Require(string? value, string name) =>
         !string.IsNullOrWhiteSpace(value) || settings.LocalCsvDir is not null
             ? value ?? "local"

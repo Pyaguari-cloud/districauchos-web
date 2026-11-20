@@ -12,7 +12,7 @@ const str = (v: unknown, max: number) => (typeof v === "string" ? v.slice(0, max
 export async function POST(req: Request) {
   const text = await req.text();
   if (text.length > MAX_BODY) return NextResponse.json({ error: "Pedido demasiado grande" }, { status: 413 });
-  let b: { items?: unknown; vehicle?: unknown; delivery?: unknown; customer?: Record<string, unknown> };
+  let b: { items?: unknown; vehicle?: unknown; delivery?: unknown; customer?: Record<string, unknown>; acceptBackorder?: unknown };
   try {
     b = JSON.parse(text);
   } catch {
@@ -36,16 +36,19 @@ export async function POST(req: Request) {
     res = await fetch(`${API_URL}/api/orders`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items, vehicle: str(b.vehicle, 80), delivery: str(b.delivery, 20), customer }),
+      body: JSON.stringify({ items, vehicle: str(b.vehicle, 80), delivery: str(b.delivery, 20), customer, acceptBackorder: b.acceptBackorder === true }),
       cache: "no-store",
     });
   } catch {
     return NextResponse.json({ error: "No pudimos procesar el pedido. Inténtalo de nuevo." }, { status: 502 });
   }
   if (res.status === 404) return NextResponse.json({ error: "El pago en línea no está disponible." }, { status: 404 });
-  const data = (await res.json().catch(() => ({}))) as { payUrl?: string; error?: string; fields?: Record<string, string> };
+  const data = (await res.json().catch(() => ({}))) as { payUrl?: string; error?: string; fields?: Record<string, string>; stockChanged?: boolean };
   if (res.ok && typeof data.payUrl === "string" && /^https?:\/\//.test(data.payUrl)) {
     return NextResponse.json({ payUrl: data.payUrl }, { headers: { "Cache-Control": "no-store" } });
   }
-  return NextResponse.json({ error: data.error ?? "No pudimos procesar el pedido.", fields: data.fields ?? {} }, { status: res.ok ? 502 : res.status });
+  return NextResponse.json(
+    { error: data.error ?? "No pudimos procesar el pedido.", fields: data.fields ?? {}, stockChanged: data.stockChanged === true },
+    { status: res.ok ? 502 : res.status },
+  );
 }

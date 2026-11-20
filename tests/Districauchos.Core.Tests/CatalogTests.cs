@@ -220,6 +220,22 @@ public class CatalogBuilderTests
     }
 
     [Fact]
+    public void Positive_totals_for_checkout_use_the_same_rule_as_the_catalog()
+    {
+        StockRow[] stock =
+        [
+            new("14000", StockLocation.Maldonado, -6, null, 7), new("14000", StockLocation.Tabiazo, 4, null, 7),
+            new("074130790858", StockLocation.Bodega, 2, null, 8), new("74130790858", StockLocation.Cusubamba, 1, null, 9),
+        ];
+        var totals = CatalogBuilder.PositiveTotals(stock);
+        Assert.Equal(4m, totals["14000"]);
+        Assert.Equal(3m, totals["74130790858"]); // ceros a la izquierda: mismo producto
+
+        var catalog = _b.Build([Fixtures.Master("14000", "BASE CABINA", 11m, "8980513280")], stock);
+        Assert.Equal(catalog.Items[0].Stock, totals["14000"]);
+    }
+
+    [Fact]
     public void Matches_stock_codes_ignoring_leading_zeros()
     {
         var r = _b.Build([Fixtures.Master("074130790858", "ACEITE", 20m, "OEM1")],

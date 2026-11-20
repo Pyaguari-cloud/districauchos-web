@@ -30,7 +30,10 @@ var app = builder.Build();
 // La API lee columnas nuevas (stock); se aseguran aquí también por si arranca antes que el Worker.
 await new CatalogRepository(app.Services.GetRequiredService<Npgsql.NpgsqlDataSource>()).EnsureSchemaAsync(CancellationToken.None);
 if (OrderEndpoints.Enabled(settings))
+{
     await app.Services.GetRequiredService<OrderRepository>().EnsureSchemaAsync(CancellationToken.None);
+    await app.Services.GetRequiredService<StockCheckRepository>().EnsureSchemaAsync(CancellationToken.None);
+}
 
 // Caché corta en Cloudflare/navegador: los datos cambian como mucho cada 60 min.
 app.Use(async (ctx, next) =>

@@ -209,6 +209,24 @@ public sealed class CatalogBuilder(
             if (s.AbcClass is not null) abcByCode.TryAdd(key, s.AbcClass.ToUpperInvariant());
         }
 
+        return SumPositive(perLocation);
+    }
+
+    /// <summary>
+    /// Misma regla que el catálogo, para la revisión de stock al pagar: total por código (clave
+    /// <see cref="TextNorm.CodeMatchKey"/>) = Σ max(0, stock del local).
+    /// </summary>
+    public static Dictionary<string, decimal> PositiveTotals(IEnumerable<StockRow> stockRows)
+    {
+        var perLocation = new Dictionary<(string Key, StockLocation Loc), decimal>();
+        foreach (var s in stockRows)
+            if (TextNorm.CodeMatchKey(s.CodeNorm) is { } key)
+                perLocation[(key, s.Location)] = perLocation.GetValueOrDefault((key, s.Location)) + s.Stock;
+        return SumPositive(perLocation);
+    }
+
+    private static Dictionary<string, decimal> SumPositive(Dictionary<(string Key, StockLocation Loc), decimal> perLocation)
+    {
         var totals = new Dictionary<string, decimal>(StringComparer.Ordinal);
         foreach (var ((key, _), stock) in perLocation)
             totals[key] = totals.GetValueOrDefault(key) + Math.Max(0, stock);

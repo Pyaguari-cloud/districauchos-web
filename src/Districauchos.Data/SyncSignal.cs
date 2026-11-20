@@ -17,7 +17,11 @@ public static class SyncSignal
     }
 
     /// <summary>Escucha avisos y llama a <paramref name="onRequest"/>. Se reconecta si se cae la conexión.</summary>
-    public static async Task ListenAsync(NpgsqlDataSource db, Action onRequest, Action<Exception> onError, CancellationToken ct)
+    public static Task ListenAsync(NpgsqlDataSource db, Action onRequest, Action<Exception> onError, CancellationToken ct) =>
+        ListenAsync(db, Channel, onRequest, onError, ct);
+
+    /// <summary>Igual, en otro canal (p. ej. <see cref="StockCheckRepository.Channel"/>).</summary>
+    public static async Task ListenAsync(NpgsqlDataSource db, string channel, Action onRequest, Action<Exception> onError, CancellationToken ct)
     {
         while (!ct.IsCancellationRequested)
         {
@@ -25,7 +29,7 @@ public static class SyncSignal
             {
                 await using var conn = await db.OpenConnectionAsync(ct);
                 conn.Notification += (_, _) => onRequest();
-                await using (var cmd = new NpgsqlCommand($"LISTEN {Channel}", conn))
+                await using (var cmd = new NpgsqlCommand($"LISTEN {channel}", conn))
                     await cmd.ExecuteNonQueryAsync(ct);
                 while (!ct.IsCancellationRequested)
                     await conn.WaitAsync(ct);

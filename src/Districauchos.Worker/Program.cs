@@ -14,6 +14,8 @@ builder.Services.AddSingleton(_ => CatalogRepository.CreateDataSource(
 builder.Services.AddSingleton<CatalogRepository>();
 builder.Services.AddSingleton(_ => MeiliClient.Create(settings));
 builder.Services.AddSingleton<ProductIndex>();
+builder.Services.AddSingleton<StockCheckRepository>();
 builder.Services.AddHostedService<SyncBackgroundService>();
+builder.Services.AddHostedService<StockCheckService>();
 
 builder.Build().Run();

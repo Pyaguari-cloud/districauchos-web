@@ -31,6 +31,8 @@ export function CheckoutForm({ backorderDays }: { backorderDays: number }) {
   const [formError, setFormError] = useState<string | null>(null);
   const [acceptBackorder, setAcceptBackorder] = useState(false);
   const [sending, setSending] = useState(false);
+  // Sube cuando el servidor avisa que el stock cambió al pagar: vuelve a pedir la cotización.
+  const [refresh, setRefresh] = useState(0);
 
   const payloadItems = items.map(({ oem, code, qty }) => ({ oem, code, qty }));
   const itemsKey = JSON.stringify(payloadItems);
@@ -47,7 +49,7 @@ export function CheckoutForm({ backorderDays }: { backorderDays: number }) {
       .catch(() => { /* se reintenta al cambiar algo */ });
     return () => ctrl.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- itemsKey resume payloadItems
-  }, [itemsKey, delivery]);
+  }, [itemsKey, delivery, refresh]);
 
   if (items.length === 0 || delivery === "none") {
     return (
@@ -82,13 +84,18 @@ export function CheckoutForm({ backorderDays }: { backorderDays: number }) {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           items: payloadItems, delivery, vehicle: vehicleText(vehicle) || null,
-          customer: f,
+          customer: f, acceptBackorder,
         }),
       });
-      const data = (await res.json().catch(() => ({}))) as { payUrl?: string; error?: string; fields?: Record<string, string> };
+      const data = (await res.json().catch(() => ({}))) as { payUrl?: string; error?: string; fields?: Record<string, string>; stockChanged?: boolean };
       if (res.ok && data.payUrl) {
         window.location.assign(data.payUrl); // página de pago de PayPhone
         return;
+      }
+      if (data.stockChanged) {
+        // Se revisó el stock al pagar y cambió: se muestra el resumen nuevo y se vuelve a pedir la aceptación.
+        setRefresh((n) => n + 1);
+        setAcceptBackorder(false);
       }
       setErrors(data.fields ?? {});
       setFormError(data.error ?? "No pudimos procesar el pedido. Inténtalo de nuevo.");
@@ -210,7 +217,7 @@ export function CheckoutForm({ backorderDays }: { backorderDays: number }) {
           type="submit" disabled={sending || !quote || quote.missing.length > 0}
           className="inline-flex min-h-12 w-full items-center justify-center rounded-lg bg-brand-yellow px-5 font-display text-lg font-bold uppercase tracking-wide text-brand-black hover:bg-brand-yellow-dark disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {sending ? "Conectando con PayPhone…" : `Pagar ${quote ? money(quote.grandTotal) : ""} con PayPhone`}
+          {sending ? "Revisando stock y conectando…" : `Pagar ${quote ? money(quote.grandTotal) : ""} con PayPhone`}
         </button>
         <p className="text-sm text-muted">
           Pagas en la página segura de PayPhone con tarjeta de crédito, débito o la app PayPhone. Nosotros no vemos ni

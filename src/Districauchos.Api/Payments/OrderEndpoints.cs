@@ -7,7 +7,8 @@ using Districauchos.Data;
 namespace Districauchos.Api.Payments;
 
 public sealed record OrderItemInput(string? Oem, string? Code, int Qty);
-public sealed record CreateOrderRequest(List<OrderItemInput>? Items, string? Vehicle, string? Delivery, CustomerInput? Customer);
+public sealed record CreateOrderRequest(
+    List<OrderItemInput>? Items, string? Vehicle, string? Delivery, CustomerInput? Customer, bool AcceptBackorder = false);
 public sealed record ConfirmOrderRequest(long Id, string? ClientTransactionId);
 
 /// <summary>
@@ -18,9 +19,13 @@ public static class OrderEndpoints
 {
     public static bool Enabled(AppSettings s) => s.PaymentsMode is "payphone" or "fake";
 
+    /// <summary>Cuánto espera el comprador la revisión de stock al pagar antes de seguir con la última sync.</summary>
+    private static readonly TimeSpan StockCheckTimeout = TimeSpan.FromSeconds(8);
+
     public static void AddPayments(this WebApplicationBuilder builder, AppSettings s)
     {
         builder.Services.AddSingleton<OrderRepository>();
+        builder.Services.AddSingleton<StockCheckRepository>();
         builder.Services.AddSingleton<OrderNotifier>();
         switch (s.PaymentsMode)
         {
@@ -49,7 +54,7 @@ public static class OrderEndpoints
 
         app.MapPost("/api/orders", async (
             CreateOrderRequest req, QuoteCalculator calc, CatalogQueries queries, OrderRepository orders,
-            IPaymentGateway gateway, ILoggerFactory lf, CancellationToken ct) =>
+            StockCheckRepository stockChecks, IPaymentGateway gateway, ILoggerFactory lf, CancellationToken ct) =>
         {
             var log = lf.CreateLogger("Orders");
             if (!Enum.TryParse<Delivery>(req.Delivery, ignoreCase: true, out var delivery) || !Enum.IsDefined(delivery) || delivery == Delivery.None)
@@ -73,6 +78,30 @@ public static class OrderEndpoints
 
             var (customer, errors) = CustomerValidator.Validate(req.Customer ?? new(null, null, null, null, null, null, null, null), delivery);
             if (customer is null) return Results.Json(new { error = "Revisa los datos marcados.", fields = errors }, statusCode: 400);
+
+            // Revisión de stock en el momento de pagar: el Worker relee las pestañas de stock (la sync es cada
+            // 10 min). Si Google no responde a tiempo se sigue con la última sincronización: no se frena la venta.
+            if (await stockChecks.RequestAndWaitAsync(quote.Lines.Select(l => l.Code).ToList(), StockCheckTimeout, ct))
+            {
+                var before = quote;
+                quote = calc.Calculate(lines, await queries.GetQuoteVariantsAsync(lines.Select(l => l.Oem).Distinct().ToList(), ct), vehicle, delivery);
+                if (quote.Missing.Count > 0 || quote.Lines.Count == 0)
+                    return Problem("Algunos repuestos ya no están en el catálogo. Quítalos del carrito para continuar.");
+                var dropped = quote.Lines.Where(n => before.Lines.FirstOrDefault(o => o.Oem == n.Oem && o.Code == n.Code) is { } o && n.InStock < o.InStock).ToList();
+                if (dropped.Count > 0 || (quote.Lines.Any(l => l.Backorder) && !req.AcceptBackorder))
+                {
+                    log.LogInformation("Pedido detenido: el stock cambió al pagar ({Count} líneas)", dropped.Count);
+                    return Results.Json(new
+                    {
+                        error = "El stock cambió mientras comprabas. Revisa tu pedido: " + string.Join("; ", (dropped.Count > 0 ? dropped : quote.Lines.Where(l => l.Backorder))
+                            .Select(l => l.InStock > 0 ? $"{l.Title}: quedan {l.InStock}, el resto bajo pedido" : $"{l.Title}: ahora es bajo pedido")) + ".",
+                        stockChanged = true,
+                    }, statusCode: 409);
+                }
+            }
+            else log.LogWarning("Revisión de stock al pagar sin respuesta a tiempo; se usa la última sincronización");
+            if (s.BackorderDays == 0 && quote.Lines.Any(l => l.Backorder))
+                return Problem("Hay repuestos sin stock en el carrito. Quítalos o cotízalos por WhatsApp.");
 
             var orderLines = quote.Lines.Select(l => new OrderLine(
                 l.Oem, l.Code, l.Title, l.Qty, l.UnitPrice, l.LineTotal, l.MayorApplied, l.Backorder, l.ShowCode, l.InStock)).ToList();

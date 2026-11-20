@@ -140,6 +140,14 @@ public sealed class ProductIndex(MeiliClient meili)
         await meili.RunTaskAsync(HttpMethod.Delete, $"indexes/{TmpUid}", null, ct);
     }
 
+    /// <summary>Revisión de stock al pagar: actualiza solo cantidad y disponibilidad de esas fichas.</summary>
+    public Task UpdateStockAsync(IEnumerable<(string Slug, decimal Stock, bool Available)> items, CancellationToken ct)
+    {
+        var docs = items.Select(i => new { id = i.Slug, stock = i.Stock, available = i.Available, available_rank = i.Available ? 1 : 0 }).ToList();
+        return docs.Count == 0 ? Task.CompletedTask
+            : meili.RunTaskAsync(HttpMethod.Put, $"indexes/{Uid}/documents", docs, ct, TimeSpan.FromSeconds(30), isDocuments: true);
+    }
+
     public sealed record Query(
         string? Q, string? Brand, string? Model, string? Category, string? Subcategory,
         bool? Available, int Page = 1, int PageSize = 24, bool? IsVch = null);
