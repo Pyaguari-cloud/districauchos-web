@@ -10,10 +10,10 @@ export function StoreCard({ store, compact = false }: { store: Store; compact?: 
         <Image
           src={store.photo}
           alt={`Fachada del local ${store.name} de ${negocio.name}`}
-          width={800}
-          height={500}
+          width={408}
+          height={255}
           sizes="(min-width: 768px) 33vw, 100vw"
-          className="-mx-4 -mt-4 aspect-[8/5] w-[calc(100%+2rem)] max-w-none rounded-t-xl object-cover"
+          className="-mx-4 -mt-4 aspect-[8/5] w-[calc(100%+2rem)] max-w-none rounded-t-xl object-cover object-top"
         />
       )}
       <div>

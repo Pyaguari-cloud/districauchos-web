@@ -20,7 +20,7 @@ export type Store = {
   /** Coordenadas del pin en el mapa de /locales (sacadas del enlace de Maps del cliente, 2026-11-20). */
   lat: number;
   lng: number;
-  /** Foto de la fachada en /public/locales/ (fotos propias del cliente). Sin foto, la tarjeta no muestra imagen. */
+  /** Foto de la fachada en /public/locales/ (fotos propias del cliente, tomadas al abrir los locales; confirmado 2026-11-20). Sin foto, la tarjeta no muestra imagen. */
   photo?: string;
 };
 
@@ -80,6 +80,7 @@ export const negocio = {
       mapsUrl: "https://maps.app.goo.gl/zg47QN4bQJ8vh9fP8",
       lat: -0.2657561,
       lng: -78.551073,
+      photo: "/locales/tabiazo.jpg",
       hours: WEEK,
     },
     {
@@ -92,6 +93,7 @@ export const negocio = {
       mapsUrl: "https://maps.app.goo.gl/yFZzpAPsMmkUTU5R6",
       lat: -0.2740233,
       lng: -78.5451066,
+      photo: "/locales/cusubamba.jpg",
       hours: [...WEEK, { days: ["Su"], label: "Domingo", opens: "08:00", closes: "15:00" }],
     },
     {
@@ -104,6 +106,7 @@ export const negocio = {
       mapsUrl: "https://maps.app.goo.gl/FgnGkScW5f6F85Jd6",
       lat: -0.3052964,
       lng: -78.543233,
+      photo: "/locales/maldonado.jpg",
       hours: WEEK,
     },
   ] satisfies Store[],
