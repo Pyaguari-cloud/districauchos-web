@@ -18,7 +18,8 @@ builder.Services.AddSingleton<CatalogQueries>();
 builder.Services.AddSingleton(_ => MeiliClient.Create(settings));
 builder.Services.AddSingleton<ProductIndex>();
 builder.Services.AddSingleton(new QuoteCalculator(
-    new PricingRules(settings.MayorDescuento, settings.MayorUmbral), nationalShipping: settings.EnvioNacional));
+    new PricingRules(settings.MayorDescuento, settings.MayorUmbral), nationalShipping: settings.EnvioNacional,
+    galapagosShipping: settings.EnvioGalapagos));
 builder.AddPayments(settings);
 builder.Services.ConfigureHttpJsonOptions(o =>
 {

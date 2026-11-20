@@ -12,4 +12,4 @@ export type QuoteResponse = {
   whatsappUrl: string | null;
 };
 
-export type Delivery = "none" | "pickup" | "quito" | "national";
+export type Delivery = "none" | "pickup" | "quito" | "national" | "galapagos";

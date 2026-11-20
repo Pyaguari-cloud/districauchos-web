@@ -82,7 +82,7 @@ public class QuoteTests
         var r = _q.Calculate([new("96180071", null, 33)], Catalog, delivery: Delivery.National); // 33 × 6 = 198 < 200
         Assert.False(r.MayorApplied);
         Assert.Equal((330.00m, 5.00m, 335.00m), (r.Total, r.Shipping, r.GrandTotal));
-        Assert.Contains("Entrega: envío nacional por cooperativa (+$5.00)\nTotal con envío: $335.00", r.Message);
+        Assert.Contains("Entrega: envío nacional por cooperativa o Servientrega (+$5.00)\nTotal con envío: $335.00", r.Message);
     }
 
     [Theory]
@@ -134,5 +134,14 @@ public class QuoteTests
 
         var full = _q.Calculate([new("X", null, 3)], cat).Lines.Single();
         Assert.False(full.Backorder);
+    }
+
+    [Fact]
+    public void Galapagos_adds_its_own_shipping_fee()
+    {
+        var r = _q.Calculate([new("96180071", null, 2)], Catalog, delivery: Delivery.Galapagos);
+        Assert.Equal(80m, r.Shipping);
+        Assert.Equal(r.Total + 80m, r.GrandTotal);
+        Assert.Contains("Galápagos por avión (+$80.00)", r.Message);
     }
 }

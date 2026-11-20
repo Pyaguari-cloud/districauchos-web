@@ -40,6 +40,8 @@ const faq: Faq[] = [
       <ul className="list-disc space-y-1 pl-5">
         <li><strong>{shipping.quito}.</strong></li>
         <li>{shipping.national.text}.</li>
+        <li>{shipping.galapagos.text}.</li>
+        <li>{shipping.dispatch}.</li>
         <li>{shipping.international}.</li>
       </ul>
     ),

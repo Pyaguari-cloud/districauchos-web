@@ -8,7 +8,8 @@ namespace Districauchos.Core.Pricing;
 public sealed record QuoteRequestLine(string Oem, string? Code, int Qty);
 
 /// <summary>Cómo recibe el pedido (respuesta del cliente 2026-11-18: Quito gratis, nacional +$5 por cooperativa).</summary>
-public enum Delivery { None, Pickup, Quito, National }
+/// <summary>Galapagos va al final para no cambiar los valores guardados de los anteriores.</summary>
+public enum Delivery { None, Pickup, Quito, National, Galapagos }
 
 /// <summary>Datos de catálogo de una variante, tal como están publicados.</summary>
 public sealed record QuoteVariant(
@@ -35,7 +36,8 @@ public sealed record Quote(
 /// Cotización del carrito (brief §6.4 y §6.7). La calcula siempre el servidor con los precios publicados:
 /// el navegador solo manda OEM, variante y cantidad.
 /// </summary>
-public sealed class QuoteCalculator(PricingRules pricing, string site = "districauchosvch.com", decimal nationalShipping = 5m)
+public sealed class QuoteCalculator(
+    PricingRules pricing, string site = "districauchosvch.com", decimal nationalShipping = 5m, decimal galapagosShipping = 80m)
 {
     public const int MaxLines = 50;
     public const int MaxQty = 999;
@@ -85,7 +87,12 @@ public sealed class QuoteCalculator(PricingRules pricing, string site = "distric
         var falta = hasVch ? pricing.FaltaParaMayor(baseMayor) : 0m;
         var mayorApplied = lines.Any(l => l.MayorApplied);
         // El envío no cuenta para el umbral del por mayor.
-        var shipping = delivery == Delivery.National && lines.Count > 0 ? nationalShipping : 0m;
+        var shipping = lines.Count == 0 ? 0m : delivery switch
+        {
+            Delivery.National => nationalShipping,
+            Delivery.Galapagos => galapagosShipping, // por avión (cliente, 2026-11-19)
+            _ => 0m,
+        };
 
         return new Quote(lines, missing, subtotalPvp, total, hasVch, mayorApplied, falta, subtotalPvp - total,
             pricing.MayorUmbral, baseMayor, delivery, shipping, total + shipping,
@@ -114,7 +121,11 @@ public sealed class QuoteCalculator(PricingRules pricing, string site = "distric
             case Delivery.Pickup: sb.Append("Entrega: retiro en local\n"); break;
             case Delivery.Quito: sb.Append("Entrega: envío dentro de Quito (sin costo)\n"); break;
             case Delivery.National:
-                sb.Append($"Entrega: envío nacional por cooperativa (+{Money(shipping)})\n");
+                sb.Append($"Entrega: envío nacional por cooperativa o Servientrega (+{Money(shipping)})\n");
+                sb.Append($"Total con envío: {Money(total + shipping)}\n");
+                break;
+            case Delivery.Galapagos:
+                sb.Append($"Entrega: envío a Galápagos por avión (+{Money(shipping)})\n");
                 sb.Append($"Total con envío: {Money(total + shipping)}\n");
                 break;
         }

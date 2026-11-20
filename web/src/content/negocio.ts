@@ -43,8 +43,12 @@ export const negocio = {
   /** Confirmado por el cliente (2026-11-18). */
   shipping: {
     quito: "Gratis dentro de Quito",
-    national: { fee: 5, text: "A todo el Ecuador por cooperativa, con recargo de $5" },
-    international: "Envíos internacionales: consúltanos por WhatsApp",
+    national: { fee: 5, text: "A todo el Ecuador por cooperativa o Servientrega, con recargo de $5 (llega en 24 a 48 horas)" },
+    /** Cliente, 2026-11-19: por avión, unos 3 días, recargo de $80. Debe coincidir con ENVIO_GALAPAGOS de la API. */
+    galapagos: { fee: 80, text: "A Galápagos por avión, con recargo de $80 (llega en unos 3 días)" },
+    international: "Envíos al exterior: consúltanos por WhatsApp",
+    /** Cliente, 2026-11-19. */
+    dispatch: "Despachamos el mismo día los pedidos de lunes a viernes hasta las 5 de la tarde. Domingos y feriados no se despacha",
   },
   /** Confirmado por el cliente (2026-11-18). Todas las cotizaciones van al WhatsApp de Cusubamba. */
   payments: {

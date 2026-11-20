@@ -86,6 +86,6 @@ public class OrderTests
         Assert.Contains("[BAJO PEDIDO ~4 días]", text);
         Assert.Contains("TOTAL PAGADO: $39.00", text);
         Assert.Contains("Cédula: 1710034065", text);
-        Assert.Contains("Envío nacional por cooperativa a Ambato", text);
+        Assert.Contains("Envío nacional por cooperativa o Servientrega a Ambato", text);
     }
 }

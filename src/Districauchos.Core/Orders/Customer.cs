@@ -64,12 +64,12 @@ public static partial class CustomerValidator
         if (!Email().IsMatch(email)) errors["email"] = "Escribe un correo válido.";
 
         string? address = null, city = null;
-        if (delivery is Delivery.Quito or Delivery.National)
+        if (delivery is Delivery.Quito or Delivery.National or Delivery.Galapagos)
         {
             address = Clean(input.Address, 200);
             if (address.Length < 5) errors["address"] = "Escribe la dirección de entrega.";
         }
-        if (delivery == Delivery.National)
+        if (delivery is Delivery.National or Delivery.Galapagos)
         {
             city = Clean(input.City, 60);
             if (city.Length < 2) errors["city"] = "Escribe la ciudad de destino.";

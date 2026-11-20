@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useCart } from "@/lib/cart";
-import { DELIVERY_OPTIONS, deliveryStore } from "@/lib/delivery";
+import { DELIVERY_OPTIONS, deliveryStore, shippingLabel } from "@/lib/delivery";
+import { estimate, etaText } from "@/lib/eta";
+import { useNow } from "@/lib/use-now";
 import { money } from "@/lib/format";
 import type { QuoteResponse } from "@/lib/quote";
 import { useMyVehicle, vehicleText } from "@/lib/vehicle";
@@ -24,6 +26,7 @@ const DOC_TYPES = [
 export function CheckoutForm({ backorderDays }: { backorderDays: number }) {
   const items = useCart();
   const delivery = deliveryStore.use();
+  const now = useNow();
   const vehicle = useMyVehicle();
   const [quote, setQuote] = useState<QuoteResponse | null>(null);
   const [f, setF] = useState<Fields>(EMPTY);
@@ -63,7 +66,8 @@ export function CheckoutForm({ backorderDays }: { backorderDays: number }) {
   }
 
   const hasBackorder = !!quote?.lines.some((l) => l.backorder);
-  const needsAddress = delivery === "quito" || delivery === "national";
+  const needsAddress = delivery !== "pickup";
+  const farAway = delivery === "national" || delivery === "galapagos";
   const deliveryLabel = DELIVERY_OPTIONS.find((o) => o.value === delivery)?.label;
 
   const set = (k: keyof Fields) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
@@ -157,8 +161,8 @@ export function CheckoutForm({ backorderDays }: { backorderDays: number }) {
           <legend className="px-1 font-display text-xl font-bold uppercase tracking-wide">Entrega: {deliveryLabel}</legend>
           {needsAddress ? (
             <>
-              {delivery === "national" && field("city", "Ciudad de destino", { autoComplete: "address-level2", required: true })}
-              {field("address", delivery === "national" ? "Dirección o cooperativa de preferencia" : "Dirección de entrega en Quito", {
+              {farAway && field("city", delivery === "galapagos" ? "Isla y ciudad (ej. Santa Cruz, Puerto Ayora)" : "Ciudad de destino", { autoComplete: "address-level2", required: true })}
+              {field("address", delivery === "national" ? "Dirección, o cooperativa / Servientrega de preferencia" : delivery === "galapagos" ? "Dirección de entrega" : "Dirección de entrega en Quito", {
                 autoComplete: "street-address", required: true,
               })}
             </>
@@ -197,7 +201,12 @@ export function CheckoutForm({ backorderDays }: { backorderDays: number }) {
           <div className="flex flex-col gap-1 border-t border-line pt-3">
             {quote.mayorApplied && <p className="text-sm font-semibold text-ok">✓ Precio al por mayor aplicado</p>}
             {quote.shipping > 0 && (
-              <p className="flex justify-between"><span>Envío nacional</span><span>{money(quote.shipping)}</span></p>
+              <p className="flex justify-between"><span>{shippingLabel(delivery)}</span><span>{money(quote.shipping)}</span></p>
+            )}
+            {now && (
+              <p className="text-sm font-semibold text-ok">
+                {etaText(delivery, estimate(delivery, now, quote.lines.some((l) => l.backorder) ? backorderDays : 0))} (estimado)
+              </p>
             )}
             <p className="flex items-baseline justify-between">
               <span className="font-display text-lg font-bold uppercase tracking-wide">Total</span>

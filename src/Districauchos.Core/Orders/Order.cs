@@ -47,7 +47,8 @@ public static class OrderText
     {
         Delivery.Pickup => "Retiro en local",
         Delivery.Quito => "Envío dentro de Quito (sin costo)",
-        Delivery.National => $"Envío nacional por cooperativa a {city}",
+        Delivery.National => $"Envío nacional por cooperativa o Servientrega a {city}",
+        Delivery.Galapagos => $"Envío a Galápagos por avión a {city}",
         _ => "Sin definir",
     };
 

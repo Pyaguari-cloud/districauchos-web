@@ -28,7 +28,7 @@ export async function POST(req: Request) {
       }))
     : [];
   const vehicle = typeof b.vehicle === "string" ? b.vehicle.slice(0, 80) : null;
-  const delivery = typeof b.delivery === "string" && ["pickup", "quito", "national"].includes(b.delivery) ? b.delivery : null;
+  const delivery = typeof b.delivery === "string" && ["pickup", "quito", "national", "galapagos"].includes(b.delivery) ? b.delivery : null;
 
   const res = await fetch(`${API_URL}/api/quote/preview`, {
     method: "POST",

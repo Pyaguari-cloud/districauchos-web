@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import { AddToCart } from "@/components/AddToCart";
 import { Availability } from "@/components/Availability";
+import { DeliveryPromise } from "@/components/DeliveryPromise";
 import { PartImage } from "@/components/PartImage";
 import { VehicleFit } from "@/components/VehicleFit";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
@@ -109,6 +110,7 @@ export default async function ItemPage({ params }: Props) {
             )}
           </div>
 
+          <DeliveryPromise available={item.available} />
           {main && <AddToCart oem={item.oem} code={main.code} slug={item.slug} title={title} price={main.pvp} />}
           {wa && <WhatsAppButton href={wa} label="Cotizar solo este por WhatsApp" full />}
 

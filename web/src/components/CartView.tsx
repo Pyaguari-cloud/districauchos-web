@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { QuoteResponse } from "@/lib/quote";
 import { cart, useCart, type CartItem } from "@/lib/cart";
-import { DELIVERY_OPTIONS, deliveryStore } from "@/lib/delivery";
+import { DELIVERY_OPTIONS, deliveryStore, shippingLabel } from "@/lib/delivery";
+import { estimate, etaText } from "@/lib/eta";
+import { useNow } from "@/lib/use-now";
 import { isCodeKey, money, partRef } from "@/lib/format";
 import { useMyVehicle, vehicleText } from "@/lib/vehicle";
 import { QtyStepper } from "./AddToCart";
@@ -20,6 +22,7 @@ export function CartView({ payments, canceled = false }: { payments: PaymentsInf
   const items = useCart();
   const vehicle = useMyVehicle();
   const delivery = deliveryStore.use();
+  const now = useNow();
   const [state, setState] = useState<State>({ status: "idle" });
 
   const payload = JSON.stringify({
@@ -132,14 +135,22 @@ export function CartView({ payments, canceled = false }: { payments: PaymentsInf
           {DELIVERY_OPTIONS.map((o) => (
             <label key={o.value} className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-line px-3 has-[:checked]:border-brand-black has-[:checked]:bg-surface">
               <input type="radio" name="entrega" value={o.value} checked={delivery === o.value} onChange={() => deliveryStore.set(o.value)} className="h-5 w-5 accent-brand-black" />
-              <span className="flex-1">{o.label}</span>
+              <span className="flex flex-1 flex-col">
+                {o.label}
+                {/* Fecha estimada como Amazon (se calcula en el navegador con la hora de Ecuador). */}
+                {now && (
+                  <span className="text-sm font-semibold text-ok">
+                    {etaText(o.value, estimate(o.value, now, q?.lines.some((l) => l.backorder) ? payments.backorderDays : 0))}
+                  </span>
+                )}
+              </span>
               <span className="text-sm text-muted">{o.note}</span>
             </label>
           ))}
         </fieldset>
         {q && q.shipping > 0 && (
           <div className="flex items-baseline justify-between border-t border-line pt-3">
-            <span>Envío nacional</span><span>{money(q.shipping)}</span>
+            <span>{shippingLabel(delivery)}</span><span>{money(q.shipping)}</span>
           </div>
         )}
         {q && q.shipping > 0 && (

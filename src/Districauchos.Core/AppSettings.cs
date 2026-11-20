@@ -20,6 +20,7 @@ public sealed record AppSettings
     public string VehiclesJsonPath { get; init; } = "data/vehicles.json";
     public string CategoriesJsonPath { get; init; } = "data/categories.json";
     public decimal EnvioNacional { get; init; } = 5m;
+    public decimal EnvioGalapagos { get; init; } = 80m;
     public string MeiliUrl { get; init; } = "http://localhost:7700";
 
     // ---- Pagos en línea (PayPhone, Botón de Pagos por redirección) ----
@@ -64,6 +65,7 @@ public sealed record AppSettings
         MayorDescuento = Dec(c["MAYOR_DESCUENTO"], 0.40m),
         MayorUmbral = Dec(c["MAYOR_UMBRAL"], 200m),
         EnvioNacional = Dec(c["ENVIO_NACIONAL"], 5m),
+        EnvioGalapagos = Dec(c["ENVIO_GALAPAGOS"], 80m),
         SyncIntervalMinutes = int.TryParse(c["SYNC_INTERVAL_MINUTES"], out var m) ? m : 60,
         DatabaseUrl = c["DATABASE_URL"],
         AdminToken = c["ADMIN_TOKEN"],
