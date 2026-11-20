@@ -187,6 +187,12 @@ Probar con el simulador:
 - "Como Amazon" (guardar el carro): ya existe sin cuenta (localStorage, hasta 5). No se hará login. Posible mejora: hacer más visible que quedó guardado.
 - Cantidades: se mantiene la regla de no mostrarlas (competencia; la hoja no es en tiempo real y hasta tiene existencias negativas). Opción a consultar: etiqueta "Últimas unidades" sin número.
 
+**Nuevos pedidos del cliente (2026-11-19, "como Amazon"; la compra de prueba de $1 queda para el final)**
+1. Mostrar la **cantidad** (suma de todos los locales y bodega; si es ≤ 0, los mensajes de siempre). Cambia la regla §2.2 por decisión del cliente; las ubicaciones siguen ocultas.
+2. **Tiempo de entrega** estilo Amazon: Quito el mismo día; fuera de Pichincha 24–48 h. Faltan datos: hora de corte, días, transportista.
+3. **Cuentas de usuario.** Propuesta: sin contraseñas (código al correo), compra como invitado se mantiene.
+4. **Imagen del vehículo** elegido en "Mi garaje". Propuesta: siluetas propias por tipo de carrocería (las fotos de internet tienen derechos de autor).
+
 **Repositorio**
 - GitHub **privado**: `https://github.com/Pyaguari-cloud/districauchos-web`, rama `main`.
 - Subido el 2026-11-19. El `git push` lo hace el usuario con `! git push`.
