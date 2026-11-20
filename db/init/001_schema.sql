@@ -72,6 +72,16 @@ CREATE TABLE IF NOT EXISTS product_vehicles (
 );
 CREATE INDEX IF NOT EXISTS ix_product_vehicles_brand_model ON product_vehicles (brand, model);
 
+CREATE TABLE IF NOT EXISTS product_vehicle_years (
+    oem_norm  text NOT NULL REFERENCES catalog_items (oem_norm) ON DELETE CASCADE,
+    brand     text NOT NULL,
+    model     text NOT NULL,
+    year_from int  NOT NULL,
+    year_to   int  NOT NULL,
+    source    text NOT NULL,
+    PRIMARY KEY (oem_norm, brand, model, year_from, year_to, source)
+);
+
 -- Mantenida a mano / importada del Excel de precios sugeridos (pregunta 12.1). La sync no la borra.
 CREATE TABLE IF NOT EXISTS price_overrides (
     oem_norm      text PRIMARY KEY,

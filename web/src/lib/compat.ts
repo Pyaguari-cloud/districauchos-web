@@ -1,6 +1,6 @@
 import "server-only";
 import { readFileSync, statSync } from "node:fs";
-import type { CompatRow } from "./compat-match";
+import { rowsFromRanges, type CompatRow } from "./compat-match";
 
 /**
  * Compatibilidades por OEM (marca, modelo, motor, años), de la hoja que revisa el vendedor.
@@ -63,11 +63,11 @@ export function compatFor(oem: string, aliases: string[] = []): CompatRow[] {
   return out;
 }
 
-/** Para las tarjetas de búsqueda: slug -> filas. */
-export function compatForHits(hits: { slug: string; oem: string }[]): Record<string, CompatRow[]> {
+/** Para las tarjetas de búsqueda: slug -> filas (años de la descripción + hoja de prueba). */
+export function compatForHits(hits: { slug: string; oem: string; yearRanges?: string[] }[]): Record<string, CompatRow[]> {
   const out: Record<string, CompatRow[]> = {};
   for (const h of hits) {
-    const rows = h.oem ? compatFor(h.oem) : [];
+    const rows = [...rowsFromRanges(h.yearRanges), ...(h.oem ? compatFor(h.oem) : [])];
     if (rows.length) out[h.slug] = rows;
   }
   return out;

@@ -60,6 +60,12 @@ async Task VehiclesReport()
         cat.Vehicles.OrderBy(v => v.Brand).ThenBy(v => v.Model).ThenBy(v => v.OemNorm)
             .Select(v => new[] { v.OemNorm, titles[v.OemNorm], v.Brand, v.Model == "" ? "(solo marca)" : v.Model }));
 
+    // 1c) Años leídos de la descripción (para revisar que se lean bien)
+    WriteCsv($"anios_detectados_{stamp}.csv", ["OEM", "Descripcion", "Marca", "Modelo", "Desde", "Hasta"],
+        cat.VehicleYears.OrderBy(v => v.Brand).ThenBy(v => v.Model).ThenBy(v => v.YearFrom)
+            .Select(v => new[] { v.OemNorm, titles[v.OemNorm], v.Brand, v.Model,
+                v.YearFrom.ToString(CultureInfo.InvariantCulture), v.YearTo.ToString(CultureInfo.InvariantCulture) }));
+
     // 2) Fichas sin vehículo detectado
     WriteCsv($"sin_vehiculo_{stamp}.csv", ["OEM", "Codigo", "Descripcion"],
         cat.WithoutVehicle.OrderBy(w => w.Description).Select(w => new[] { w.OemNorm, w.Code, w.Description }));
@@ -103,6 +109,7 @@ async Task VehiclesReport()
         .AppendLine($"  Importadora VCH:                {s.ItemsVch}")
         .AppendLine($"  Con vehículo detectado:         {s.ItemsWithVehicle}")
         .AppendLine($"  Sin vehículo detectado:         {cat.WithoutVehicle.Count}")
+        .AppendLine($"  Con años en la descripción:     {cat.VehicleYears.Select(v => v.OemNorm).Distinct().Count()}")
         .AppendLine()
         .AppendLine($"Filas de stock negativas:         {s.NegativeStockRows}")
         .AppendLine($"Filas de stock con código que no existe en el maestro: {s.StockRowsUnmatched}")

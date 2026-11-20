@@ -88,7 +88,9 @@ export const vehicleText = (v: MyVehicle | GarageVehicle) =>
   v ? [v.brand, v.model, v.year ?? null].filter(Boolean).join(" ") : "";
 
 /** Enlace a los repuestos de ese vehículo. */
-export const vehicleSearchHref = (v: { brand: string; model: string | null }, extra: Record<string, string> = {}) => {
-  const q = new URLSearchParams({ marca: v.brand, ...(v.model ? { modelo: v.model } : {}), ...extra });
+export const vehicleSearchHref = (v: { brand: string; model: string | null; year?: number | null }, extra: Record<string, string> = {}) => {
+  const q = new URLSearchParams({
+    marca: v.brand, ...(v.model ? { modelo: v.model } : {}), ...(v.model && v.year ? { anio: String(v.year) } : {}), ...extra,
+  });
   return `/buscar?${q}`;
 };

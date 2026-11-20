@@ -9,9 +9,10 @@ import { isRealCategory, sentenceCase, vehicleLabel } from "@/lib/format";
 import { askLink } from "@/lib/whatsapp";
 import { photoCredit, vehiclePhoto } from "@/lib/vehicle-photos";
 
-type Params = { q?: string; marca?: string; modelo?: string; categoria?: string; disponible?: string; importado?: string; pagina?: string };
+type Params = { q?: string; marca?: string; modelo?: string; anio?: string; categoria?: string; disponible?: string; importado?: string; pagina?: string };
 
 const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v)?.trim() || undefined;
+const yearParam = (v: string | undefined) => (v && /^\d{4}$/.test(v) && +v >= 1960 && +v <= 2100 ? v : undefined);
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<Params> }): Promise<Metadata> {
   const p = await searchParams;
@@ -26,6 +27,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     q: one(raw.q),
     marca: one(raw.marca),
     modelo: one(raw.modelo),
+    anio: yearParam(one(raw.anio)),
     categoria: one(raw.categoria),
     disponible: one(raw.disponible) === "1",
     importado: one(raw.importado) === "1",
@@ -40,7 +42,8 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     page: p.pagina,
     pageSize: 24,
   };
-  const forVehicle = await searchCatalog({ ...base, brand: p.marca, model: p.marca ? p.modelo : undefined });
+  const year = p.marca && p.modelo && p.anio ? Number(p.anio) : undefined;
+  const forVehicle = await searchCatalog({ ...base, brand: p.marca, model: p.marca ? p.modelo : undefined, year });
   // "Mi garaje" no debe esconder repuestos: si con el vehículo no hay nada, se muestran los de todos los
   // vehículos y se avisa (caso real: buscaron "alza cabina dmax" con un Aveo guardado y salía vacío).
   const vehicleFallback = forVehicle.total === 0 && !!p.marca && !!p.q;
@@ -55,7 +58,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     return `/buscar?${next}`;
   };
 
-  const vehicle = p.marca ? vehicleLabel(p.marca, p.modelo ?? null) : undefined;
+  const vehicle = p.marca ? [vehicleLabel(p.marca, p.modelo ?? null), year].filter(Boolean).join(" ") : undefined;
   const photo = p.marca && !vehicleFallback ? vehiclePhoto(p.marca, p.modelo) : null;
   const heading = p.q ? `“${p.q}”` : p.categoria ? sentenceCase(p.categoria) : p.importado ? "Importación directa" : vehicle ?? "Todos los repuestos";
   const brands = Object.entries(result.facets.brands ?? {}).sort((a, b) => b[1] - a[1]).slice(0, 12);
@@ -92,6 +95,12 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             en cada repuesto para qué carro es, o pregúntanos por WhatsApp.
           </p>
         )}
+        {year && !vehicleFallback && result.total > 0 && (
+          <p className="mt-2 max-w-3xl text-sm text-muted">
+            Ocultamos los repuestos que sabemos que son de otros años. Los que no tienen años registrados sí aparecen:
+            confirma el año al cotizar.
+          </p>
+        )}
         {result.relaxed && result.total > 0 && (
           <p className="mt-2 rounded-lg bg-ask-bg px-3 py-2 text-ask">
             No encontramos repuestos con todas esas palabras. Te mostramos resultados parecidos.
@@ -109,7 +118,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
       {(p.marca || p.categoria || p.disponible || p.importado) && (
         <ul className="flex flex-wrap gap-2" aria-label="Filtros activos">
-          {p.marca && !vehicleFallback && <Chip label={vehicle!} href={href({ marca: undefined, modelo: undefined })} />}
+          {p.marca && !vehicleFallback && <Chip label={vehicle!} href={href({ marca: undefined, modelo: undefined, anio: undefined })} />}
           {p.categoria && <Chip label={sentenceCase(p.categoria)} href={href({ categoria: undefined })} />}
           {p.disponible && <Chip label="Solo disponibles" href={href({ disponible: undefined })} />}
           {p.importado && <Chip label="Importación directa" href={href({ importado: undefined })} />}

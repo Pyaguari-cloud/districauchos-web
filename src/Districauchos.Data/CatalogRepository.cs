@@ -114,6 +114,16 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
         await using var cmd = db.CreateCommand("""
             ALTER TABLE catalog_items    ADD COLUMN IF NOT EXISTS stock numeric(12,2) NOT NULL DEFAULT 0;
             ALTER TABLE catalog_variants ADD COLUMN IF NOT EXISTS stock numeric(12,2) NOT NULL DEFAULT 0;
+            -- Años por vehículo (2026-11-20): de la descripción y, después, de la hoja de compatibilidades.
+            CREATE TABLE IF NOT EXISTS product_vehicle_years (
+                oem_norm  text NOT NULL REFERENCES catalog_items (oem_norm) ON DELETE CASCADE,
+                brand     text NOT NULL,
+                model     text NOT NULL,
+                year_from int  NOT NULL,
+                year_to   int  NOT NULL,
+                source    text NOT NULL,
+                PRIMARY KEY (oem_norm, brand, model, year_from, year_to, source)
+            );
             """);
         await cmd.ExecuteNonQueryAsync(ct);
     }
@@ -128,7 +138,7 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
         await using var tx = await conn.BeginTransactionAsync(ct);
 
         await using (var truncate = new NpgsqlCommand(
-            "TRUNCATE product_vehicles, catalog_variants, catalog_items, stock_raw, products_raw", conn, tx))
+            "TRUNCATE product_vehicle_years, product_vehicles, catalog_variants, catalog_items, stock_raw, products_raw", conn, tx))
             await truncate.ExecuteNonQueryAsync(ct);
 
         await using (var w = await conn.BeginBinaryImportAsync(
@@ -222,6 +232,22 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
                 await w.WriteAsync(pv.OemNorm, ct);
                 await w.WriteAsync(pv.Brand, ct);
                 await w.WriteAsync(pv.Model, ct);
+            }
+            await w.CompleteAsync(ct);
+        }
+
+        await using (var w = await conn.BeginBinaryImportAsync(
+            "COPY product_vehicle_years (oem_norm, brand, model, year_from, year_to, source) FROM STDIN (FORMAT BINARY)", ct))
+        {
+            foreach (var y in catalog.VehicleYears)
+            {
+                await w.StartRowAsync(ct);
+                await w.WriteAsync(y.OemNorm, ct);
+                await w.WriteAsync(y.Brand, ct);
+                await w.WriteAsync(y.Model, ct);
+                await w.WriteAsync(y.YearFrom, ct);
+                await w.WriteAsync(y.YearTo, ct);
+                await w.WriteAsync(y.Source, ct);
             }
             await w.CompleteAsync(ct);
         }

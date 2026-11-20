@@ -10,6 +10,7 @@ export function VehicleFields() {
     <>
       <input type="hidden" name="marca" value={v.brand} />
       {v.model && <input type="hidden" name="modelo" value={v.model} />}
+      {v.model && v.year && <input type="hidden" name="anio" value={v.year} />}
     </>
   );
 }

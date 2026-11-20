@@ -39,6 +39,7 @@ public sealed class CatalogBuildResult
     public List<CatalogItem> Items { get; } = [];
     public List<CatalogVariant> Variants { get; } = [];
     public List<ProductVehicle> Vehicles { get; } = [];
+    public List<ProductVehicleYears> VehicleYears { get; } = [];
     public List<ProductWithoutVehicle> WithoutVehicle { get; } = [];
     public Dictionary<string, int> AmbiguousModels { get; } = new(StringComparer.Ordinal);
     public List<CategoryAssignment> CategoryAssignments { get; } = [];
@@ -236,8 +237,11 @@ public sealed class CatalogBuilder(
     private void AddVehicles(CatalogItem item, List<MasterRow> rows, CatalogBuildResult result)
     {
         var found = new HashSet<VehicleMatch>();
+        var years = new HashSet<VehicleYears>();
+        var maxYear = DateTime.UtcNow.Year + 1;
         foreach (var r in rows)
         {
+            years.UnionWith(vehicles.ExtractYears(r.Description, maxYear));
             var ex = vehicles.Extract(r.Description);
             found.UnionWith(ex.Matches);
             foreach (var amb in ex.AmbiguousModels)
@@ -251,5 +255,7 @@ public sealed class CatalogBuilder(
         }
         foreach (var m in found.OrderBy(m => m.Brand).ThenBy(m => m.Model))
             result.Vehicles.Add(new ProductVehicle(item.OemNorm, m.Brand, m.Model ?? ""));
+        foreach (var y in years.OrderBy(y => y.Brand).ThenBy(y => y.Model).ThenBy(y => y.From))
+            result.VehicleYears.Add(new ProductVehicleYears(item.OemNorm, y.Brand, y.Model, y.From, y.To, "descripcion"));
     }
 }

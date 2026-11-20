@@ -8,6 +8,16 @@ namespace Districauchos.Core.Tests;
 
 public class SearchTests
 {
+    [Fact]
+    public void Fit_keys_list_known_years_or_a_wildcard_when_there_are_none()
+    {
+        var keys = ProductIndex.FitKeys(
+            [new ProductVehicle("X", "Chevrolet", "Aveo"), new ProductVehicle("X", "Chevrolet", "Spark"), new ProductVehicle("X", "Kia", "")],
+            [new ProductVehicleYears("X", "Chevrolet", "Aveo", 2007, 2009, "descripcion"),
+             new ProductVehicleYears("X", "Chevrolet", "Aveo", 2009, 2010, "descripcion")]);
+        Assert.Equal(["Chevrolet|Aveo|2007", "Chevrolet|Aveo|2008", "Chevrolet|Aveo|2009", "Chevrolet|Aveo|2010", "Chevrolet|Spark|*"], keys);
+    }
+
     private static CatalogBuildResult Catalog() =>
         new CatalogBuilder(new PricingRules(), Fixtures.Extractor()).Build(
             [

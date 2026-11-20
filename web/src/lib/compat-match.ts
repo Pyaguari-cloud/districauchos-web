@@ -1,5 +1,22 @@
 /** Lógica compartida (servidor y navegador): ¿una fila de compatibilidad le sirve a "Mi vehículo"? */
-export type CompatRow = { brand: string; model: string; engine: string; from: number | null; to: number | null; verified: boolean };
+export type CompatRow = {
+  brand: string; model: string; engine: string; from: number | null; to: number | null; verified: boolean;
+  /** "descripcion" = lo escribió el cliente en su inventario. */
+  source?: string;
+};
+
+/** Años leídos de la descripción (ficha). Los escribió el propio cliente: cuentan como confirmados. */
+export const rowsFromYears = (years: { brand: string; model: string; from: number; to: number; source: string }[] = []): CompatRow[] =>
+  years.map((y) => ({ brand: y.brand, model: y.model, engine: "", from: y.from, to: y.to, verified: true, source: y.source }));
+
+/** Lo mismo desde las tarjetas del buscador ("Marca|Modelo|desde|hasta"). */
+export const rowsFromRanges = (ranges: string[] = []): CompatRow[] =>
+  ranges.flatMap((r) => {
+    const [brand, model, from, to] = r.split("|");
+    return brand && model && from && to
+      ? [{ brand, model, engine: "", from: Number(from), to: Number(to), verified: true, source: "descripcion" }]
+      : [];
+  });
 
 const n = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 

@@ -18,6 +18,14 @@ public sealed record SearchDocument(
     IReadOnlyList<string> Models,
     /// <summary>"Marca|Modelo" para filtrar por combinación exacta (Chevrolet|Aveo).</summary>
     IReadOnlyList<string> Vehicles,
+    /// <summary>
+    /// Para filtrar por año: "Marca|Modelo|2007" por cada año conocido y "Marca|Modelo|*" si de ese vehículo
+    /// no hay años. Buscar "Aveo 2007" = fit IN [Chevrolet|Aveo|2007, Chevrolet|Aveo|*]: solo se ocultan
+    /// los repuestos que sabemos que son de otros años.
+    /// </summary>
+    IReadOnlyList<string> Fit,
+    /// <summary>"Marca|Modelo|desde|hasta" para mostrar en las tarjetas.</summary>
+    IReadOnlyList<string> YearRanges,
     string? Category,
     string? Subcategory,
     bool Available,
@@ -42,9 +50,11 @@ public sealed class ProductIndex(MeiliClient meili)
     public static IReadOnlyList<SearchDocument> BuildDocuments(CatalogBuildResult catalog)
     {
         var vehicles = catalog.Vehicles.ToLookup(v => v.OemNorm);
+        var years = catalog.VehicleYears.ToLookup(v => v.OemNorm);
         return catalog.Items.Select(i =>
         {
             var v = vehicles[i.OemNorm].ToList();
+            var y = years[i.OemNorm].ToList();
             return new SearchDocument(
                 Id: i.Slug,
                 Slug: i.Slug,
@@ -58,6 +68,8 @@ public sealed class ProductIndex(MeiliClient meili)
                 Brands: v.Select(x => x.Brand).Distinct().ToList(),
                 Models: v.Where(x => x.Model != "").Select(x => x.Model).Distinct().ToList(),
                 Vehicles: v.Where(x => x.Model != "").Select(x => $"{x.Brand}|{x.Model}").Distinct().ToList(),
+                Fit: FitKeys(v, y),
+                YearRanges: y.Select(x => $"{x.Brand}|{x.Model}|{x.YearFrom}|{x.YearTo}").Distinct().ToList(),
                 Category: i.Category,
                 Subcategory: i.Subcategory,
                 Available: i.Available,
@@ -74,13 +86,27 @@ public sealed class ProductIndex(MeiliClient meili)
         }).ToList();
     }
 
+    internal static List<string> FitKeys(
+        IReadOnlyList<Districauchos.Core.Model.ProductVehicle> vehicles, IReadOnlyList<Districauchos.Core.Model.ProductVehicleYears> years)
+    {
+        var keys = new List<string>();
+        foreach (var veh in vehicles.Where(x => x.Model != "").Select(x => (x.Brand, x.Model)).Distinct())
+        {
+            var mine = years.Where(x => x.Brand == veh.Brand && x.Model == veh.Model).ToList();
+            if (mine.Count == 0) { keys.Add($"{veh.Brand}|{veh.Model}|*"); continue; }
+            keys.AddRange(mine.SelectMany(x => Enumerable.Range(x.YearFrom, x.YearTo - x.YearFrom + 1))
+                .Distinct().Select(year => $"{veh.Brand}|{veh.Model}|{year}"));
+        }
+        return keys;
+    }
+
     internal static object Settings => new
     {
         searchableAttributes = new[]
         {
             "title", "oem", "oem_aliases", "codes", "alt_codes", "models", "brands", "category", "subcategory", "description",
         },
-        filterableAttributes = new[] { "brands", "models", "vehicles", "category", "subcategory", "available", "is_vch", "abc_class" },
+        filterableAttributes = new[] { "brands", "models", "vehicles", "fit", "category", "subcategory", "available", "is_vch", "abc_class" },
         sortableAttributes = new[] { "pvp_min", "abc_rank", "vch_rank", "title" },
         // Relevancia primero; luego clase A > B > C; luego disponibles primero (brief §6.6).
         rankingRules = new[] { "words", "typo", "proximity", "attribute", "sort", "exactness", "vch_rank:desc", "abc_rank:asc", "available_rank:desc" },
@@ -150,7 +176,7 @@ public sealed class ProductIndex(MeiliClient meili)
 
     public sealed record Query(
         string? Q, string? Brand, string? Model, string? Category, string? Subcategory,
-        bool? Available, int Page = 1, int PageSize = 24, bool? IsVch = null);
+        bool? Available, int Page = 1, int PageSize = 24, bool? IsVch = null, int? Year = null);
 
     /// <summary>
     /// Exige todas las palabras ("manguera aveo" = mangueras de Aveo, no todo lo que diga "aveo").
@@ -188,7 +214,9 @@ public sealed class ProductIndex(MeiliClient meili)
         var filters = new List<string>();
         if (!string.IsNullOrWhiteSpace(query.Brand)) filters.Add($"brands = {Quote(query.Brand)}");
         if (!string.IsNullOrWhiteSpace(query.Brand) && !string.IsNullOrWhiteSpace(query.Model))
-            filters.Add($"vehicles = {Quote($"{query.Brand}|{query.Model}")}");
+            filters.Add(query.Year is { } year
+                ? $"fit IN [{Quote($"{query.Brand}|{query.Model}|{year}")}, {Quote($"{query.Brand}|{query.Model}|*")}]"
+                : $"vehicles = {Quote($"{query.Brand}|{query.Model}")}");
         if (!string.IsNullOrWhiteSpace(query.Category)) filters.Add($"category = {Quote(query.Category)}");
         if (!string.IsNullOrWhiteSpace(query.Subcategory)) filters.Add($"subcategory = {Quote(query.Subcategory)}");
         if (query.Available is { } a) filters.Add($"available = {(a ? "true" : "false")}");
@@ -205,7 +233,7 @@ public sealed class ProductIndex(MeiliClient meili)
             ["attributesToRetrieve"] = new[]
             {
                 "slug", "title", "oem", "codes", "brands", "models", "category", "subcategory",
-                "available", "is_vch", "abc_class", "pvp_min", "pvp_max", "mayor_min", "image", "stock",
+                "available", "is_vch", "abc_class", "pvp_min", "pvp_max", "mayor_min", "image", "stock", "year_ranges",
             },
         };
         // Sin texto de búsqueda: primero importación directa (pedido del cliente), luego clase A.

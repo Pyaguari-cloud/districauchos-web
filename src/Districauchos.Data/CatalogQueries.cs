@@ -7,11 +7,13 @@ namespace Districauchos.Data;
 // 2026-11-19), pero solo el total de todos los locales.
 public sealed record VariantDto(string Code, bool IsVch, decimal Pvp, decimal? PrecioMayor, bool Available, decimal Stock);
 public sealed record VehicleDto(string Brand, string? Model);
+public sealed record VehicleYearsDto(string Brand, string Model, int From, int To, string Source);
 public sealed record ItemDto(
     string Slug, string Oem, IReadOnlyList<string> OemAliases, string Title, string Description,
     string? Category, string? Subcategory, bool IsVch, decimal PvpMin, decimal PvpMax, decimal? MayorMin,
     bool Available, string? AbcClass, string? Image, DateTimeOffset UpdatedAt,
-    IReadOnlyList<VariantDto> Variants, IReadOnlyList<VehicleDto> Vehicles, decimal Stock);
+    IReadOnlyList<VariantDto> Variants, IReadOnlyList<VehicleDto> Vehicles, decimal Stock,
+    IReadOnlyList<VehicleYearsDto>? Years = null);
 public sealed record ModelCount(string Name, int Count);
 public sealed record BrandDto(string Brand, int Count, IReadOnlyList<ModelCount> Models);
 public sealed record SubcategoryCount(string Name, int Count);
@@ -66,7 +68,17 @@ public sealed class CatalogQueries(NpgsqlDataSource db)
                 vehicles.Add(new(r.GetString(0), r.GetString(1) is { Length: > 0 } m ? m : null));
         }
 
-        return item with { Variants = variants, Vehicles = vehicles };
+        var years = new List<VehicleYearsDto>();
+        await using (var cmd = new NpgsqlCommand(
+            "SELECT brand, model, year_from, year_to, source FROM product_vehicle_years WHERE oem_norm = $1 ORDER BY brand, model, year_from", conn))
+        {
+            cmd.Parameters.Add(new() { Value = oem });
+            await using var r = await cmd.ExecuteReaderAsync(ct);
+            while (await r.ReadAsync(ct))
+                years.Add(new(r.GetString(0), r.GetString(1), r.GetInt32(2), r.GetInt32(3), r.GetString(4)));
+        }
+
+        return item with { Variants = variants, Vehicles = vehicles, Years = years };
     }
 
     /// <summary>Marcas y modelos para el selector de vehículo (cuántas fichas tiene cada uno).</summary>

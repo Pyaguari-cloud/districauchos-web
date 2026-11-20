@@ -29,6 +29,50 @@ public class VehicleExtractorTests
 {
     private readonly VehicleExtractor _x = Fixtures.Extractor();
 
+    private IReadOnlyList<(string, int, int)> Years(string d) =>
+        _x.ExtractYears(d, 2027).Select(y => ($"{y.Brand} {y.Model}", y.From, y.To)).ToList();
+
+    [Theory]
+    [InlineData("Manguera radiador inferior Aveo 1.4 07/12", 2007, 2012)]
+    [InlineData("Base motor Aveo 1.5 03 - 11", 2003, 2011)]
+    [InlineData("Tapa aceite D-Max 2.5 11-15", 2011, 2015)]
+    [InlineData("Buje mesa D-Max(05/12) motores 2.4", 2005, 2012)]
+    [InlineData("Plato suspension Kia Rio 11- 15 lado derecho", 2011, 2015)]
+    [InlineData("Bomba agua Aveo 2004-2008", 2004, 2008)]
+    [InlineData("Caucho paquete Aveo 85/98", 1985, 1998)]
+    public void Reads_year_ranges_after_the_model(string d, int from, int to) =>
+        Assert.Contains(Years(d), y => y.Item2 == from && y.Item3 == to);
+
+    [Theory]
+    [InlineData("Buje mesa (40X16X41) Aveo")]           // medida
+    [InlineData("Manguera Aveo 1.4-1.6CC")]            // cilindradas
+    [InlineData("Bocin Aveo 40/16/41")]                // medida con barras
+    [InlineData("Manguera Aveo 2008")]                 // año suelto: no se toma
+    [InlineData("Manguera 07/12 sin modelo")]          // sin vehículo antes
+    [InlineData("Base Aveo 30/45")]                    // 2030 no existe todavía y 1945 es muy viejo
+    public void Ignores_things_that_are_not_year_ranges(string d) => Assert.Empty(Years(d));
+
+    [Fact]
+    public void Years_go_to_every_model_since_the_last_range()
+    {
+        Assert.Equal(
+            new[] { ("Chevrolet Aveo", 2011, 2017), ("Kia Rio", 2011, 2017) }.ToHashSet(),
+            Years("Base motor Aveo/Rio 11/17").ToHashSet());
+        Assert.Equal(
+            new[] { ("Chevrolet Aveo", 2005, 2012), ("Chevrolet D-Max", 2013, 2023) }.ToHashSet(),
+            Years("Buje Aveo 05/12 - D-Max 13/23").ToHashSet());
+        // Un segundo rango sin modelo nuevo antes también es del último modelo (no se pierde 2005–2012).
+        Assert.Equal(
+            new[] { ("Chevrolet D-Max", 2012, 2014), ("Chevrolet D-Max", 2005, 2012) }.ToHashSet(),
+            Years("Empaque D-Max 2.7 12-14 SR5 2.7 05-12").ToHashSet());
+    }
+
+    [Fact]
+    public void Shared_models_take_the_brands_of_the_normal_extraction() =>
+        Assert.Equal(
+            new[] { ("Chevrolet Vitara", 1990, 2005), ("Suzuki Vitara", 1990, 2005) }.ToHashSet(),
+            Years("Bomba agua Vitara 90/05").ToHashSet());
+
     [Fact]
     public void Model_without_brand_infers_brand()
     {

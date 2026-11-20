@@ -28,6 +28,8 @@ export type CatalogHit = {
   image: string | null;
   /** Unidades totales de todos los locales (0 = bajo pedido). */
   stock: number;
+  /** "Marca|Modelo|desde|hasta" (años leídos de la descripción). */
+  yearRanges?: string[];
 };
 
 export type CatalogPage = {
@@ -41,6 +43,8 @@ export type CatalogPage = {
 
 export type Variant = { code: string; isVch: boolean; pvp: number; precioMayor: number | null; available: boolean; stock: number };
 export type Vehicle = { brand: string; model: string | null };
+/** source: "descripcion" (inventario del cliente) u "hoja" (compatibilidades verificadas). */
+export type VehicleYears = { brand: string; model: string; from: number; to: number; source: string };
 
 export type Item = {
   slug: string;
@@ -61,6 +65,7 @@ export type Item = {
   variants: Variant[];
   vehicles: Vehicle[];
   stock: number;
+  years?: VehicleYears[];
 };
 
 export type Brand = { brand: string; count: number; models: { name: string; count: number }[] };
@@ -77,6 +82,8 @@ export type CatalogQuery = {
   vch?: boolean;
   page?: number;
   pageSize?: number;
+  /** Solo con marca y modelo: oculta lo que sabemos que es de otros años. */
+  year?: number;
 };
 
 async function get<T>(path: string, revalidate = REVALIDATE_SECONDS): Promise<T> {

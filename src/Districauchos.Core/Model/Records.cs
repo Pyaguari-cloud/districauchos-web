@@ -61,4 +61,7 @@ public sealed record CatalogItem(
 
 public sealed record ProductVehicle(string OemNorm, string Brand, string Model);
 
+/// <summary>Años de un vehículo para un repuesto. Source: "descripcion" (inventario) u "hoja" (compatibilidades verificadas).</summary>
+public sealed record ProductVehicleYears(string OemNorm, string Brand, string Model, int YearFrom, int YearTo, string Source);
+
 public sealed record SyncWarning(string Code, string Message, string? Source = null, int? Row = null);

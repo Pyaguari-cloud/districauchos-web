@@ -10,7 +10,7 @@ import { VehicleFit } from "@/components/VehicleFit";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { getItem, type Vehicle } from "@/lib/api";
 import { compatFor } from "@/lib/compat";
-import { yearsText } from "@/lib/compat-match";
+import { rowsFromYears, yearsText } from "@/lib/compat-match";
 import { displayTitle, money, partRef, priceRange, sentenceCase, vehicleLabel } from "@/lib/format";
 import { quoteOneLink } from "@/lib/whatsapp";
 
@@ -42,7 +42,7 @@ export default async function ItemPage({ params }: Props) {
 
   const title = displayTitle(item.title);
   const vehicles = groupVehicles(item.vehicles);
-  const compat = compatFor(item.oem, item.oemAliases);
+  const compat = [...rowsFromYears(item.years), ...compatFor(item.oem, item.oemAliases)];
   // La principal es la primera variante (disponible y más barata), la misma que usa la cotización.
   const main = item.variants[0];
   const ref = partRef(item.oem, main?.code);

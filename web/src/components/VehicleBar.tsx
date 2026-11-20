@@ -37,6 +37,7 @@ export function VehicleBar({ options }: { options: VehicleOption[] }) {
     q.delete("pagina");
     if (v) q.set("marca", v.brand); else q.delete("marca");
     if (v?.model) q.set("modelo", v.model); else q.delete("modelo");
+    if (v?.model && v.year) q.set("anio", String(v.year)); else q.delete("anio");
     router.push(`/buscar?${q}`);
   }
 
@@ -103,7 +104,7 @@ export function VehicleBar({ options }: { options: VehicleOption[] }) {
                 const id = e.target.value === NONE ? null : e.target.value;
                 garage.activate(id);
                 const v = g.vehicles.find((x) => x.id === id);
-                applyToSearch(v ? { brand: v.brand, model: v.model } : null);
+                applyToSearch(v ? { brand: v.brand, model: v.model, year: v.year } : null);
               }}
             >
               {g.vehicles.map((v) => <option key={v.id} value={v.id}>{vehicleText(v)}</option>)}
