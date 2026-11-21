@@ -13,7 +13,9 @@ public class ProductImagesTests
     [InlineData("8'94408'840'1", "8944088401")]
     [InlineData("48815-42090", "4881542090")]
     [InlineData("ur5634470b", "UR5634470B")]
-    [InlineData("COD:ABC123", null)]
+    [InlineData("COD:ABC123", "ABC123")]
+    [InlineData("COD:dh'40", "DH40")]
+    [InlineData("COD:'", null)]
     public void Key_keeps_only_letters_and_digits(string oem, string? expected) =>
         Assert.Equal(expected, ProductImages.Key(oem));
 
@@ -26,12 +28,12 @@ public class ProductImagesTests
 
         var n = ProductImages.Attach(catalog, photos);
 
-        Assert.Equal(3, n);
+        Assert.Equal(4, n);
         Assert.Equal("/fotos/8944088401.webp?v=10", catalog.Items[0].Image);
         Assert.Equal("/fotos/8944088401.webp?v=10", catalog.Items[1].Image);
         Assert.Equal("/fotos/4881542090.webp?v=20", catalog.Items[2].Image);
         Assert.Null(catalog.Items[3].Image);
-        Assert.Null(catalog.Items[4].Image);
-        Assert.Equal(3, catalog.Stats.ItemsWithImage);
+        Assert.Equal("/fotos/X1.webp?v=30", catalog.Items[4].Image);
+        Assert.Equal(4, catalog.Stats.ItemsWithImage);
     }
 }

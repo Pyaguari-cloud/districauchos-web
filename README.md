@@ -72,6 +72,17 @@ docker-compose.yml          db, search, worker, api (+ web con --profile web), r
    con el correo de la cuenta **solo como lector**.
 3. Pruebas: `dotnet test`
 
+### Fotos de productos
+
+- **Carpeta de Drive del cliente (automático):** `DRIVE_FOLDER_FOTOS` = ID de la carpeta (lo que va después de
+  `/folders/` en el enlace), compartida con la cuenta de servicio como **lector**, y la API de Google Drive activada
+  en el proyecto de Google Cloud. El Worker la revisa cada `DRIVE_PHOTOS_INTERVAL_MINUTES` (5): baja lo nuevo o
+  cambiado, lo procesa (`PhotoProcessor`: igual que el script de abajo) a `/app/drive/fotos` (volumen `fotos_drive`),
+  quita lo que borren en Drive y sincroniza. Nombre del archivo = OEM, o el código del local si no tiene OEM.
+  Formatos JPG, PNG o WebP (HEIC no). Problemas en el log: `docker logs districauchos-worker-1 | grep "Foto de Drive"`.
+- **A mano:** `node web/scripts/fotos-productos.mjs <carpeta>` → `media/productos/` → `./deploy.sh --fotos`.
+- Si la misma foto está en los dos lados, gana la de Drive (Worker y Caddy usan el mismo orden).
+
 ### Entregable semana 1: reporte de vehículos
 
 ```bash

@@ -17,5 +17,6 @@ builder.Services.AddSingleton<ProductIndex>();
 builder.Services.AddSingleton<StockCheckRepository>();
 builder.Services.AddHostedService<SyncBackgroundService>();
 builder.Services.AddHostedService<StockCheckService>();
+builder.Services.AddHostedService<DrivePhotoService>();
 
 builder.Build().Run();

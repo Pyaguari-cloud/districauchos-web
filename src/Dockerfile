@@ -14,5 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends libgssapi-krb5-
 ENV DOTNET_ENTRY=${PROJECT}.dll
 WORKDIR /app
 COPY --from=build /app ./
+# Fotos bajadas de Drive (volumen fotos_drive): el volumen nuevo copia este dueño, así el Worker puede escribir.
+RUN mkdir -p /app/drive/fotos && chown -R app:app /app/drive
 USER app
 ENTRYPOINT ["sh", "-c", "exec dotnet $DOTNET_ENTRY"]

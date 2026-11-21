@@ -57,6 +57,12 @@ public sealed record AppSettings
     /// <summary>Carpeta media/ (fotos de productos en media/productos).</summary>
     public string MediaDir { get; init; } = "media";
 
+    /// <summary>Fotos bajadas de la carpeta de Drive (DRIVE_FOLDER_FOTOS): {DrivePhotosDir}/fotos/CLAVE.webp + estado.json.</summary>
+    public string DrivePhotosDir { get; init; } = "media/drive";
+
+    /// <summary>Cada cuánto se revisa la carpeta de Drive (minutos). Si hay cambios, se sincroniza enseguida.</summary>
+    public int DrivePhotosIntervalMinutes { get; init; } = 5;
+
     public static AppSettings From(IConfiguration c) => new()
     {
         GoogleServiceAccountJsonPath = c["GOOGLE_SERVICE_ACCOUNT_JSON_PATH"],
@@ -92,6 +98,8 @@ public sealed record AppSettings
         StockColumnOccurrence = int.TryParse(c["STOCK_COLUMN_OCCURRENCE"], out var o) && o is 1 or 2 ? o : 1,
         LocalCsvDir = c["LOCAL_CSV_DIR"],
         MediaDir = c["MEDIA_DIR"] ?? "media",
+        DrivePhotosDir = c["DRIVE_PHOTOS_DIR"] ?? "media/drive",
+        DrivePhotosIntervalMinutes = int.TryParse(c["DRIVE_PHOTOS_INTERVAL_MINUTES"], out var dm) && dm > 0 ? dm : 5,
     };
 
     private static decimal Dec(string? v, decimal fallback) =>

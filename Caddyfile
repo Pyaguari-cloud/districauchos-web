@@ -21,10 +21,12 @@
 		Permissions-Policy "camera=(), microphone=(), geolocation=()"
 	}
 
-	# Fotos de productos (media/productos en el servidor, se suben con ./deploy.sh --fotos).
+	# Fotos de productos. Primero las de la carpeta de Drive del cliente (las baja el worker a /srv/drive/fotos),
+	# si no, las subidas con ./deploy.sh --fotos (media/productos). El worker usa el mismo orden al asignarlas.
 	# La URL lleva ?v=fecha del archivo, así que se pueden guardar en caché mucho tiempo.
 	handle_path /fotos/* {
-		root * /srv/fotos
+		root * /srv
+		try_files /drive/fotos{path} /fotos{path}
 		header Cache-Control "public, max-age=2592000"
 		file_server
 	}

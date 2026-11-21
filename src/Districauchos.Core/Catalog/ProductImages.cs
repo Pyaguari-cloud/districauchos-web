@@ -6,7 +6,8 @@ namespace Districauchos.Core.Catalog;
 /// Fotos de productos: archivos <c>{CLAVE}.webp</c> en <c>MEDIA_DIR/productos</c> (no van a git; se suben con
 /// <c>deploy.sh --fotos</c>). CLAVE = OEM en mayúsculas solo con letras y números, así <c>8'94408'840'1</c>,
 /// <c>8944088401</c> y <c>89440-88401</c> comparten foto. Se asignan en cada sincronización (la tabla se reescribe),
-/// y Caddy las sirve en <c>/fotos/</c>. Ficha sin OEM (<c>COD:</c>) no lleva foto por ahora.
+/// y Caddy las sirve en <c>/fotos/</c>. Ficha sin OEM (<c>COD:DH'40</c>): la clave sale del código del local (<c>DH40</c>).
+/// Las fotos de la carpeta de Drive del cliente (<c>DrivePhotoSync</c>) van en otra carpeta y tienen prioridad.
 /// </summary>
 public static class ProductImages
 {
@@ -14,7 +15,7 @@ public static class ProductImages
 
     public static string? Key(string oem)
     {
-        if (oem.StartsWith(CatalogKey.CodePrefix, StringComparison.Ordinal)) return null;
+        if (CatalogKey.IsCode(oem)) oem = oem[CatalogKey.CodePrefix.Length..];
         var key = new string(oem.Where(char.IsAsciiLetterOrDigit).ToArray()).ToUpperInvariant();
         return key.Length == 0 ? null : key;
     }
@@ -28,6 +29,15 @@ public static class ProductImages
                 f => Path.GetFileNameWithoutExtension(f).ToUpperInvariant(),
                 f => new DateTimeOffset(File.GetLastWriteTimeUtc(f)).ToUnixTimeSeconds(),
                 StringComparer.Ordinal);
+    }
+
+    /// <summary>Varias carpetas: si una clave está en dos, gana la última (Drive va al final).</summary>
+    public static IReadOnlyDictionary<string, long> Scan(params string[] dirs)
+    {
+        var all = new Dictionary<string, long>(StringComparer.Ordinal);
+        foreach (var dir in dirs)
+            foreach (var (k, v) in Scan(dir)) all[k] = v;
+        return all;
     }
 
     /// <summary>Pone la foto a cada ficha cuyo OEM (o alias) tenga archivo. Devuelve cuántas quedaron con foto.</summary>

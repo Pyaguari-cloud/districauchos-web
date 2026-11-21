@@ -13,11 +13,13 @@ services:
       - caddy_data:/data        # certificados HTTPS: no borrar
       - caddy_config:/config
       - ./media/productos:/srv/fotos:ro   # fotos de productos (./deploy.sh --fotos)
+      - fotos_drive:/srv/drive:ro         # fotos de la carpeta de Drive (las baja el worker; tienen prioridad)
     depends_on: [web]
     mem_limit: 128m
     restart: unless-stopped
     networks: [districauchos_net]
 
 volumes:
+  fotos_drive:
   caddy_data:
   caddy_config:

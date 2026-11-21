@@ -49,9 +49,11 @@ services:
       VEHICLES_JSON_PATH: /app/data/vehicles.json
       CATEGORIES_JSON_PATH: /app/data/categories.json
       MEILI_URL: http://search:7700
+      DRIVE_PHOTOS_DIR: /app/drive
     volumes:
       - ./data:/app/data:ro
       - ./media:/app/media
+      - fotos_drive:/app/drive   # fotos copiadas de la carpeta de Drive del cliente (DRIVE_FOLDER_FOTOS)
     secrets: [google-sa.json]
     depends_on:
       db: { condition: service_healthy }
@@ -99,6 +101,7 @@ secrets:
 volumes:
   districauchos_pg:
   districauchos_meili:
+  fotos_drive:
 
 networks:
   districauchos_net:
