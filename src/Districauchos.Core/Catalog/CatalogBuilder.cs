@@ -32,6 +32,7 @@ public sealed class CatalogBuildStats
     public int ItemsWithVehicle { get; set; }
     /// <summary>Filas de la pestaña Compatibilidades aplicadas (Usar = Sí, OEM y modelo reconocidos).</summary>
     public int CompatRowsApplied { get; set; }
+    public int ItemsWithImage { get; set; }
     public int StockRowsUnmatched { get; set; }
     public int NegativeStockRows { get; set; }
 }

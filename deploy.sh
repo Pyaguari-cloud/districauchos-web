@@ -2,6 +2,7 @@
 # Publica la versión actual en el servidor (Git Bash / Linux / macOS).
 #   ./deploy.sh            construye aquí, sube solo las imágenes que cambiaron y reinicia
 #   ./deploy.sh --files    solo sube archivos de configuración (compose, Caddyfile, data/) y reinicia
+#   ./deploy.sh --fotos    solo sube media/productos/*.webp (fotos de productos) y reinicia el worker (las asigna al sincronizar)
 # Construye en esta computadora: el servidor (2 GB) no compila. No sube .env ni secrets/ (eso es aparte, una vez).
 set -euo pipefail
 
@@ -12,6 +13,15 @@ IMAGES=(districauchos-api districauchos-worker districauchos-web)
 SSH=(ssh -i "$KEY" -o IdentitiesOnly=yes "$HOST")
 
 cd "$(dirname "$0")"
+if [[ "${1:-}" == "--fotos" ]]; then
+  n=$(ls media/productos/*.webp 2>/dev/null | wc -l)
+  [[ $n -gt 0 ]] || { echo "No hay fotos en media/productos/" >&2; exit 1; }
+  echo "Subiendo $n fotos de productos…"
+  # Reemplaza la carpeta completa: una foto borrada aquí también desaparece de la página.
+  tar -C media -c productos | "${SSH[@]}" "mkdir -p $DIR/media && rm -rf $DIR/media/productos.new && mkdir $DIR/media/productos.new && tar -x -C $DIR/media/productos.new --strip-components=1 && rm -rf $DIR/media/productos.old && (mv $DIR/media/productos $DIR/media/productos.old 2>/dev/null || true) && mv $DIR/media/productos.new $DIR/media/productos && rm -rf $DIR/media/productos.old && cd $DIR && docker compose restart worker caddy >/dev/null"
+  echo "Listo: el worker sincroniza al arrancar y asigna las fotos (ver: docker logs districauchos-worker-1 | grep 'con foto')."
+  exit 0
+fi
 if [[ -n "$(git status --porcelain)" ]]; then
   echo "Hay cambios sin commit. Haz commit antes de publicar (así el servidor = una versión del repo)." >&2
   exit 1

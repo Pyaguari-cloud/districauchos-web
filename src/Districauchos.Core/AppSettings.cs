@@ -54,6 +54,9 @@ public sealed record AppSettings
     /// <summary>Si se define, lee CSV locales (exportados de las hojas) en vez de Google Sheets.</summary>
     public string? LocalCsvDir { get; init; }
 
+    /// <summary>Carpeta media/ (fotos de productos en media/productos).</summary>
+    public string MediaDir { get; init; } = "media";
+
     public static AppSettings From(IConfiguration c) => new()
     {
         GoogleServiceAccountJsonPath = c["GOOGLE_SERVICE_ACCOUNT_JSON_PATH"],
@@ -88,6 +91,7 @@ public sealed record AppSettings
         MeiliMasterKey = c["MEILI_MASTER_KEY"],
         StockColumnOccurrence = int.TryParse(c["STOCK_COLUMN_OCCURRENCE"], out var o) && o is 1 or 2 ? o : 1,
         LocalCsvDir = c["LOCAL_CSV_DIR"],
+        MediaDir = c["MEDIA_DIR"] ?? "media",
     };
 
     private static decimal Dec(string? v, decimal fallback) =>

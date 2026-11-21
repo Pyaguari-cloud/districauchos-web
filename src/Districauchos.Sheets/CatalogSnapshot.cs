@@ -24,6 +24,7 @@ public sealed record CatalogSnapshot(
 
         var sheets = await new SheetLoader(source, settings).LoadAsync(ct);
         var catalog = new CatalogBuilder(pricing, extractor, categories: categories, titles: TitleCase.From(dict)).Build(sheets.Master, sheets.Stock, overrides, sheets.Compat);
+        ProductImages.Attach(catalog, ProductImages.Scan(Path.Combine(settings.MediaDir, "productos")));
         return new CatalogSnapshot(sheets, catalog, dict.Version, categories.Version);
     }
 }

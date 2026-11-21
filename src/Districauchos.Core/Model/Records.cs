@@ -57,7 +57,9 @@ public sealed record CatalogItem(
     IReadOnlyList<string> Codes,
     IReadOnlyList<string> AltCodes,
     /// <summary>Suma de las unidades de sus variantes (nunca por local: las ubicaciones no se publican).</summary>
-    decimal Stock = 0);
+    decimal Stock = 0,
+    /// <summary>URL de la foto (/fotos/CLAVE.webp?v=…) o null; la pone <see cref="Catalog.ProductImages"/>.</summary>
+    string? Image = null);
 
 public sealed record ProductVehicle(string OemNorm, string Brand, string Model);
 

@@ -185,7 +185,7 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
         }
 
         await using (var w = await conn.BeginBinaryImportAsync(
-            "COPY catalog_items (oem_norm, slug, title, description, category, subcategory, is_vch, pvp_min, pvp_max, mayor_min, available, stock, abc_class, oem_aliases, codes, alt_codes, updated_at) FROM STDIN (FORMAT BINARY)", ct))
+            "COPY catalog_items (oem_norm, slug, title, description, category, subcategory, is_vch, pvp_min, pvp_max, mayor_min, available, stock, abc_class, oem_aliases, codes, alt_codes, image_path, updated_at) FROM STDIN (FORMAT BINARY)", ct))
         {
             foreach (var i in catalog.Items)
             {
@@ -206,6 +206,7 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
                 await w.WriteAsync(i.OemAliases.ToArray(), NpgsqlDbType.Array | NpgsqlDbType.Text, ct);
                 await w.WriteAsync(i.Codes.ToArray(), NpgsqlDbType.Array | NpgsqlDbType.Text, ct);
                 await w.WriteAsync(i.AltCodes.ToArray(), NpgsqlDbType.Array | NpgsqlDbType.Text, ct);
+                await WriteNullable(w, i.Image, NpgsqlDbType.Text, ct);
                 await w.WriteAsync(now, NpgsqlDbType.TimestampTz, ct);
             }
             await w.CompleteAsync(ct);

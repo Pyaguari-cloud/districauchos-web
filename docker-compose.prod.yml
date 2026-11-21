@@ -12,6 +12,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data        # certificados HTTPS: no borrar
       - caddy_config:/config
+      - ./media/productos:/srv/fotos:ro   # fotos de productos (./deploy.sh --fotos)
     depends_on: [web]
     mem_limit: 128m
     restart: unless-stopped

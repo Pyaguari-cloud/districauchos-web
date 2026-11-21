@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${title} (${ref.label} ${ref.value})`,
     description,
     alternates: { canonical: `/repuesto/${item.slug}` },
-    openGraph: { title, description, url: `/repuesto/${item.slug}` },
+    openGraph: { title, description, url: `/repuesto/${item.slug}`, ...(item.image ? { images: [item.image] } : {}) },
   };
 }
 
@@ -61,7 +61,8 @@ export default async function ItemPage({ params }: Props) {
     sku: ref.value,
     category: item.category ?? undefined,
     brand: { "@type": "Brand", name: "Districauchos" },
-    ...(item.image ? { image: item.image } : {}),
+    // Google pide URL absoluta.
+    ...(item.image ? { image: new URL(item.image, process.env.SITE_URL ?? "https://districauchosvch.com").href } : {}),
   };
 
   return (

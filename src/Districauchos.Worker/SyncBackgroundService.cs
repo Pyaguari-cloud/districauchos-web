@@ -85,8 +85,8 @@ public sealed class SyncBackgroundService(
                 snapshot.AllWarnings, null, ct);
 
             var st = snapshot.Catalog.Stats;
-            log.LogInformation("Sync {RunId} ok: {Items} fichas ({Available} disponibles), {Vehicles} con vehículo, {Warnings} advertencias",
-                runId, st.CatalogItems, st.ItemsAvailable, st.ItemsWithVehicle, snapshot.AllWarnings.Count());
+            log.LogInformation("Sync {RunId} ok: {Items} fichas ({Available} disponibles), {Vehicles} con vehículo, {Images} con foto, {Warnings} advertencias",
+                runId, st.CatalogItems, st.ItemsAvailable, st.ItemsWithVehicle, st.ItemsWithImage, snapshot.AllWarnings.Count());
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {

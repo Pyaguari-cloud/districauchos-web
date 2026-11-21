@@ -81,7 +81,7 @@ public sealed class ProductIndex(MeiliClient meili)
                 PvpMin: i.PvpMin,
                 PvpMax: i.PvpMax,
                 MayorMin: i.MayorMin,
-                Image: null, // semana 2: fotos desde Drive
+                Image: i.Image,
                 Stock: i.Stock);
         }).ToList();
     }
