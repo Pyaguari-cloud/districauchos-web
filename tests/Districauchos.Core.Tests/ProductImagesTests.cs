@@ -20,6 +20,23 @@ public class ProductImagesTests
         Assert.Equal(expected, ProductImages.Key(oem));
 
     [Fact]
+    public void Attach_uses_codes_only_for_items_without_oem()
+    {
+        var catalog = new CatalogBuildResult();
+        catalog.Items.AddRange([
+            new CatalogItem("COD:DB001", [], "db001", "T", "", null, null, true, 1, 1, null, true, "A", ["DB001"], ["C2058"]),
+            new CatalogItem("96180071", [], "x", "T", "", null, null, true, 1, 1, null, true, "A", ["X'1"], []),
+            new CatalogItem("93378096", [], "y", "T", "", null, null, true, 1, 1, null, true, "A", ["Y1"], ["Y2"]),
+        ]);
+        var photos = new Dictionary<string, long> { ["C2058"] = 1, ["X1"] = 2, ["93378096"] = 3, ["Y1"] = 4 };
+
+        Assert.Equal(2, ProductImages.Attach(catalog, photos));
+        Assert.Equal("/fotos/C2058.webp?v=1", catalog.Items[0].Image);
+        Assert.Null(catalog.Items[1].Image); // con OEM no se usa el código del local
+        Assert.Equal("/fotos/93378096.webp?v=3", catalog.Items[2].Image);
+    }
+
+    [Fact]
     public void Attach_matches_oem_or_alias_and_counts()
     {
         var catalog = new CatalogBuildResult();

@@ -7,6 +7,7 @@ namespace Districauchos.Core.Catalog;
 /// <c>deploy.sh --fotos</c>). CLAVE = OEM en mayúsculas solo con letras y números, así <c>8'94408'840'1</c>,
 /// <c>8944088401</c> y <c>89440-88401</c> comparten foto. Se asignan en cada sincronización (la tabla se reescribe),
 /// y Caddy las sirve en <c>/fotos/</c>. Ficha sin OEM (<c>COD:DH'40</c>): la clave sale del código del local (<c>DH40</c>).
+/// Sin OEM también sirve el código alterno (<c>C2058</c>).
 /// Las fotos de la carpeta de Drive del cliente (<c>DrivePhotoSync</c>) van en otra carpeta y tienen prioridad.
 /// </summary>
 public static class ProductImages
@@ -40,7 +41,7 @@ public static class ProductImages
         return all;
     }
 
-    /// <summary>Pone la foto a cada ficha cuyo OEM (o alias) tenga archivo. Devuelve cuántas quedaron con foto.</summary>
+    /// <summary>Pone la foto a cada ficha cuyo OEM (o alias; sin OEM, su código o código alterno) tenga archivo. Devuelve cuántas quedaron con foto.</summary>
     public static int Attach(CatalogBuildResult catalog, IReadOnlyDictionary<string, long> photos)
     {
         if (photos.Count == 0) return 0;
@@ -48,7 +49,12 @@ public static class ProductImages
         for (var i = 0; i < catalog.Items.Count; i++)
         {
             var item = catalog.Items[i];
-            var key = item.OemAliases.Prepend(item.OemNorm).Select(Key)
+            // Con OEM, solo el OEM: el código del local a veces es el OEM de OTRO producto (MD797 tiene código HPA0001PR).
+            // Sin OEM: el código del local o el código alterno (DB001 / C2058).
+            var names = CatalogKey.IsCode(item.OemNorm)
+                ? item.Codes.Prepend(item.OemNorm).Concat(item.AltCodes)
+                : item.OemAliases.Prepend(item.OemNorm);
+            var key = names.Select(Key)
                 .FirstOrDefault(k => k is not null && photos.ContainsKey(k));
             if (key is null) continue;
             catalog.Items[i] = item with { Image = $"{UrlPrefix}{key}.webp?v={photos[key]}" };
