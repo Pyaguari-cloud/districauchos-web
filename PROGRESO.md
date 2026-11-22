@@ -115,7 +115,7 @@ Probar con el simulador:
 
 ## 6. Dónde nos quedamos (2026-11-22)
 
-**Sesión 2026-11-22 (en local, falta publicar):**
+**Sesión 2026-11-22 (✅ publicado, sync 386):**
 - **Inicio con imágenes, como Mansuera** (pedido del cliente, capturas `out/capturas/categorias.jpeg` y `marcas mansuera.jpeg`).
   - *Marcas:* cuadritos con logo, nombre y cantidad (18 marcas). Logos en `web/public/marcas/` y lista en
     `web/src/content/marcas.ts`: Simple Icons (CC0, pintados con el color de la marca) + Chery y GWM de Wikimedia
@@ -125,7 +125,8 @@ Probar con el simulador:
     "Ver N productos". La foto sale sola de un repuesto con foto de esa categoría (disponible, VCH, clase A y más
     stock primero, en `GetCategoriesAsync`). El cliente puede elegirla subiendo a la carpeta de Drive
     `CAT-{categoría}.jpg` (ej. `CAT-Filtros.jpg`; tildes y mayúsculas no importan) → tabla `category_images`.
-    Hoy **Filtros** sale sin foto (ningún filtro tiene foto).
+    Sin ninguna foto todavía: Filtros (sale en el inicio), Lubricantes, Eléctricos, Perfiles, Cables, Válvulas y
+    Rodamientos → pedir al cliente `CAT-Filtros.jpg` primero.
   - `ProductImages.Key` ahora quita tildes (para `CAT-Válvulas`). 201 pruebas.
 
 ## Antes (2026-11-21)
