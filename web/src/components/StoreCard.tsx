@@ -1,8 +1,9 @@
 import Image from "next/image";
-import { fullAddress, mapsLink, negocio, phoneDisplay, storeWhatsApp, type Store } from "@/content/negocio";
+import { fullAddress, mapsLink, negocio, phoneDisplay, reviewLink, storeWhatsApp, type Store } from "@/content/negocio";
 
 /** Tarjeta de un local: dirección, horario y botones grandes (≥ 44 px) para llamar, escribir y llegar. */
 export function StoreCard({ store, compact = false }: { store: Store; compact?: boolean }) {
+  const review = reviewLink(store);
   const btn = "inline-flex min-h-11 flex-1 items-center justify-center whitespace-nowrap rounded-lg px-3 font-display font-bold uppercase tracking-wide";
   return (
     <article className="flex flex-col gap-3 rounded-xl border border-line bg-white p-4" aria-labelledby={`local-${store.id}`}>
@@ -42,7 +43,14 @@ export function StoreCard({ store, compact = false }: { store: Store; compact?: 
           Cómo llegar
         </a>
       </div>
-      <p className="text-sm text-muted">Tel. {phoneDisplay(store.phone)}</p>
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-sm">
+        <p className="text-muted">Tel. {phoneDisplay(store.phone)}</p>
+        {review && (
+          <a href={review} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-1 font-semibold underline underline-offset-4 hover:text-brand-red" aria-label={`Escribir una reseña en Google del local ${store.name}`}>
+            <span aria-hidden="true" className="text-brand-yellow-dark">★</span> Déjanos tu reseña
+          </a>
+        )}
+      </div>
     </article>
   );
 }

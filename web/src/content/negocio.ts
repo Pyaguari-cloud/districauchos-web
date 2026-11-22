@@ -20,6 +20,8 @@ export type Store = {
   /** Coordenadas del pin en el mapa de /locales (sacadas del enlace de Maps del cliente, 2026-11-20). */
   lat: number;
   lng: number;
+  /** Place ID de Google del local (sacado del enlace de Maps, 2026-11-22): enlace directo para escribir una reseña. */
+  googlePlaceId?: string;
   /** Foto de la fachada en /public/locales/ (fotos propias del cliente, tomadas al abrir los locales; confirmado 2026-11-20). Sin foto, la tarjeta no muestra imagen. */
   photo?: string;
 };
@@ -78,6 +80,7 @@ export const negocio = {
       postalCode: "170606",
       phone: "593986151793",
       mapsUrl: "https://maps.app.goo.gl/zg47QN4bQJ8vh9fP8",
+      googlePlaceId: "ChIJ65yNMNuY1ZERVZTNhkZMbns",
       lat: -0.2657561,
       lng: -78.551073,
       photo: "/locales/tabiazo.jpg",
@@ -91,6 +94,7 @@ export const negocio = {
       postalCode: "170606",
       phone: "593985595439",
       mapsUrl: "https://maps.app.goo.gl/yFZzpAPsMmkUTU5R6",
+      googlePlaceId: "ChIJA6wMGOCZ1ZER-wDrM-5fnnQ",
       lat: -0.2740233,
       lng: -78.5451066,
       photo: "/locales/cusubamba.jpg",
@@ -104,6 +108,7 @@ export const negocio = {
       postalCode: "170146",
       phone: "593999541922",
       mapsUrl: "https://maps.app.goo.gl/FgnGkScW5f6F85Jd6",
+      googlePlaceId: "ChIJDf1_4o6j1ZER-fgrjBa0vAk",
       lat: -0.3052964,
       lng: -78.543233,
       photo: "/locales/maldonado.jpg",
@@ -115,6 +120,9 @@ export const negocio = {
 export const fullAddress = (s: Store) => `${s.address}, ${negocio.city} ${s.postalCode}, Ecuador`;
 export const mapsLink = (s: Store) =>
   s.mapsUrl ?? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${negocio.name} ${fullAddress(s)}`)}`;
+/** Abre directo la ventana de "escribir reseña" de Google para ese local. */
+export const reviewLink = (s: Store) =>
+  s.googlePlaceId ? `https://search.google.com/local/writereview?placeid=${s.googlePlaceId}` : null;
 export const phoneDisplay = (p: string) => `+${p.slice(0, 3)} ${p.slice(3, 5)} ${p.slice(5, 8)} ${p.slice(8)}`;
 export const storeWhatsApp = (s: Store) =>
   `https://wa.me/${s.phone}?text=${encodeURIComponent(`Hola, les escribo desde la página web (local ${s.name}).`)}`;

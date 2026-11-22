@@ -128,6 +128,17 @@ Probar con el simulador:
     Sin ninguna foto todavía: Filtros (sale en el inicio), Lubricantes, Eléctricos, Perfiles, Cables, Válvulas y
     Rodamientos → pedir al cliente `CAT-Filtros.jpg` primero.
   - `ProductImages.Key` ahora quita tildes (para `CAT-Válvulas`). 201 pruebas.
+- **Reseñas de Google** (pedido del cliente: poner las buenas en la página). Revisados los 3 perfiles de Maps:
+  Tabiazo 4,0★ (4), Cusubamba 5,0★ (2, sin texto), Maldonado 4,0★ (4). Solo 3 buenas con texto, muy cortas, y una
+  **de 1★ de hace 3 semanas** (buje equivocado, devolución pendiente) que sale primera en Tabiazo y Maldonado →
+  **no se armó la sección todavía**; se le recomendó al cliente responderla. En su lugar, para juntar reseñas:
+  - `googlePlaceId` por local en `negocio.ts` (sacado del enlace de Maps) y `reviewLink()`; enlace
+    "★ Déjanos tu reseña" en cada `StoreCard` (inicio y /locales). Los 3 enlaces se probaron: abren el local correcto.
+  - `out/resenas/` (no va a git): `ENLACES-RESENAS.txt` para WhatsApp, `qr-*.png` y `tarjeta-resena-*.png`
+    (1200×1650, para imprimir en el mostrador).
+  - Cuando haya 8–10 reseñas buenas con texto: sección "Lo que dicen nuestros clientes" (elegidas a mano, texto
+    sin cambiar, nombre + inicial, calificación real de Google y "Ver todas"). **Sin** datos estructurados de
+    reseñas (Google no acepta reseñas puestas por el mismo negocio).
 
 ## Antes (2026-11-21)
 
@@ -277,6 +288,8 @@ Objetivo: el cliente pone su carro y año (ej. Aveo 2007) y ve los repuestos que
 - [ ] Desactivar la aplicación PayPhone vieja (tipo API) después de la compra de prueba.
 - [ ] Cancelar el plan WordPress.com Personal ($9/mes) **antes del 9-dic-2026**, sin tocar el dominio (que se renueva el 10-dic).
 - [ ] Revisar en el celular real antes del lanzamiento.
+
+- [ ] **Reseñas en la página**: esperar 8–10 buenas con texto (ver §6, 2026-11-22). Revisar de vez en cuando los 3 perfiles.
 
 **Ideas para después**
 - Medidas y fotos del PDF de importación. No se extrajeron porque el texto del PDF mezcla datos entre productos.
