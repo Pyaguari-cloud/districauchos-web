@@ -1,4 +1,5 @@
 using Districauchos.Core.Model;
+using Districauchos.Core.Text;
 
 namespace Districauchos.Core.Catalog;
 
@@ -17,7 +18,7 @@ public static class ProductImages
     public static string? Key(string oem)
     {
         if (CatalogKey.IsCode(oem)) oem = oem[CatalogKey.CodePrefix.Length..];
-        var key = new string(oem.Where(char.IsAsciiLetterOrDigit).ToArray()).ToUpperInvariant();
+        var key = new string(TextNorm.StripAccents(oem).Where(char.IsAsciiLetterOrDigit).ToArray()).ToUpperInvariant();
         return key.Length == 0 ? null : key;
     }
 
@@ -62,5 +63,24 @@ public static class ProductImages
         }
         catalog.Stats.ItemsWithImage = count;
         return count;
+    }
+
+    /// <summary>
+    /// Foto elegida a mano para una categoría del inicio: archivo <c>CAT-{nombre}</c> (ej. <c>CAT-Mangueras.jpg</c>,
+    /// <c>CAT-Bases de motor y caja.jpg</c>; tildes, espacios y mayúsculas no importan).
+    /// </summary>
+    public static string CategoryKey(string category) =>
+        "CAT" + new string(TextNorm.StripAccents(category).Where(char.IsAsciiLetterOrDigit).ToArray()).ToUpperInvariant();
+
+    /// <summary>Categoría → foto elegida a mano. Las que no tengan, la API les pone la de uno de sus repuestos.</summary>
+    public static int AttachCategories(CatalogBuildResult catalog, IReadOnlyDictionary<string, long> photos)
+    {
+        catalog.CategoryImages.Clear();
+        foreach (var category in catalog.Items.Select(i => i.Category).OfType<string>().Distinct())
+        {
+            var key = CategoryKey(category);
+            if (photos.TryGetValue(key, out var v)) catalog.CategoryImages[category] = $"{UrlPrefix}{key}.webp?v={v}";
+        }
+        return catalog.CategoryImages.Count;
     }
 }

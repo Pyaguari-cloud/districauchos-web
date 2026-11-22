@@ -139,6 +139,11 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
                 source   text NOT NULL,
                 PRIMARY KEY (oem_norm, brand, model, engine)
             );
+            -- Foto elegida a mano para una categoría del inicio (CAT-*.jpg, 2026-11-22).
+            CREATE TABLE IF NOT EXISTS category_images (
+                category text PRIMARY KEY,
+                image    text NOT NULL
+            );
             """);
         await cmd.ExecuteNonQueryAsync(ct);
     }
@@ -153,7 +158,7 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
         await using var tx = await conn.BeginTransactionAsync(ct);
 
         await using (var truncate = new NpgsqlCommand(
-            "TRUNCATE product_vehicle_engines, product_vehicle_years, product_vehicles, catalog_variants, catalog_items, stock_raw, products_raw", conn, tx))
+            "TRUNCATE category_images, product_vehicle_engines, product_vehicle_years, product_vehicles, catalog_variants, catalog_items, stock_raw, products_raw", conn, tx))
             await truncate.ExecuteNonQueryAsync(ct);
 
         await using (var w = await conn.BeginBinaryImportAsync(
@@ -283,6 +288,14 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
                 await w.WriteAsync(e.Source, ct);
             }
             await w.CompleteAsync(ct);
+        }
+
+        foreach (var (category, image) in catalog.CategoryImages)
+        {
+            await using var ins = new NpgsqlCommand("INSERT INTO category_images (category, image) VALUES ($1, $2)", conn, tx);
+            ins.Parameters.Add(new() { Value = category });
+            ins.Parameters.Add(new() { Value = image });
+            await ins.ExecuteNonQueryAsync(ct);
         }
 
         await tx.CommitAsync(ct);

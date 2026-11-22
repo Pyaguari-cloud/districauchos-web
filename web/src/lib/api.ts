@@ -69,7 +69,8 @@ export type Item = {
 };
 
 export type Brand = { brand: string; count: number; models: { name: string; count: number; engines?: string[] }[] };
-export type Category = { name: string; count: number; subcategories: { name: string; count: number }[] };
+/** image: la elegida a mano (CAT-*.jpg en Drive) o la de uno de sus repuestos con foto. */
+export type Category = { name: string; count: number; subcategories: { name: string; count: number }[]; image?: string | null };
 
 export type CatalogQuery = {
   q?: string;

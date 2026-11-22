@@ -95,6 +95,12 @@ CREATE TABLE IF NOT EXISTS product_vehicle_engines (
     PRIMARY KEY (oem_norm, brand, model, engine)
 );
 
+-- Foto elegida a mano para una categoría del inicio (archivo CAT-{categoría} en Drive o media/productos).
+CREATE TABLE IF NOT EXISTS category_images (
+    category text PRIMARY KEY,
+    image    text NOT NULL
+);
+
 -- Mantenida a mano / importada del Excel de precios sugeridos (pregunta 12.1). La sync no la borra.
 CREATE TABLE IF NOT EXISTS price_overrides (
     oem_norm      text PRIMARY KEY,

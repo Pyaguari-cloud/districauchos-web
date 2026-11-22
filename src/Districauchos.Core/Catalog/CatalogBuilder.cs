@@ -47,6 +47,8 @@ public sealed class CatalogBuildResult
     public List<ProductWithoutVehicle> WithoutVehicle { get; } = [];
     public Dictionary<string, int> AmbiguousModels { get; } = new(StringComparer.Ordinal);
     public List<CategoryAssignment> CategoryAssignments { get; } = [];
+    /// <summary>Categoría → foto elegida a mano (CAT-*.jpg en Drive o media/productos).</summary>
+    public Dictionary<string, string> CategoryImages { get; } = new(StringComparer.Ordinal);
     public List<SyncWarning> Warnings { get; } = [];
     public CatalogBuildStats Stats { get; } = new();
 }

@@ -16,6 +16,7 @@ public class ProductImagesTests
     [InlineData("COD:ABC123", "ABC123")]
     [InlineData("COD:dh'40", "DH40")]
     [InlineData("COD:'", null)]
+    [InlineData("CAT-Válvulas", "CATVALVULAS")]
     public void Key_keeps_only_letters_and_digits(string oem, string? expected) =>
         Assert.Equal(expected, ProductImages.Key(oem));
 
@@ -52,5 +53,28 @@ public class ProductImagesTests
         Assert.Null(catalog.Items[3].Image);
         Assert.Equal("/fotos/X1.webp?v=30", catalog.Items[4].Image);
         Assert.Equal(4, catalog.Stats.ItemsWithImage);
+    }
+
+    [Theory]
+    [InlineData("Mangueras", "CATMANGUERAS")]
+    [InlineData("Bases de motor y caja", "CATBASESDEMOTORYCAJA")]
+    [InlineData("Soportes de cardán y cabina", "CATSOPORTESDECARDANYCABINA")]
+    public void CategoryKey_matches_file_names_like_CAT_dash_name(string category, string expected) =>
+        Assert.Equal(expected, ProductImages.CategoryKey(category));
+
+    [Fact]
+    public void AttachCategories_uses_only_hand_picked_photos()
+    {
+        var catalog = new CatalogBuildResult();
+        catalog.Items.AddRange([
+            new CatalogItem("1", [], "a", "T", "", "Válvulas", null, true, 1, 1, null, true, "A", [], []),
+            new CatalogItem("2", [], "b", "T", "", "Mangueras", null, true, 1, 1, null, true, "A", [], []),
+        ]);
+        // "CAT-Válvulas.jpg" en Drive → CATVALVULAS.webp
+        var photos = new Dictionary<string, long> { ["CATVALVULAS"] = 7, ["2"] = 1 };
+
+        Assert.Equal(1, ProductImages.AttachCategories(catalog, photos));
+        Assert.Equal("/fotos/CATVALVULAS.webp?v=7", catalog.CategoryImages["Válvulas"]);
+        Assert.False(catalog.CategoryImages.ContainsKey("Mangueras"));
     }
 }

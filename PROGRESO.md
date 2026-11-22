@@ -3,7 +3,7 @@
 Bitácora para retomar el trabajo en cualquier momento. **Leer primero esto**; el detalle técnico está en
 `README.md` y `web/README.md`, y el encargo original en `BRIEF-districauchos-etapa1.md` (privado, solo local).
 
-Última actualización: 2026-11-21
+Última actualización: 2026-11-22
 
 ---
 
@@ -113,7 +113,22 @@ Modos (`PAYMENTS_MODE`):
 Probar con el simulador:
 `SITE_URL=http://localhost:3000 PAYMENTS_MODE=fake docker compose --profile web up -d --build api web`
 
-## 6. Dónde nos quedamos (2026-11-21)
+## 6. Dónde nos quedamos (2026-11-22)
+
+**Sesión 2026-11-22 (en local, falta publicar):**
+- **Inicio con imágenes, como Mansuera** (pedido del cliente, capturas `out/capturas/categorias.jpeg` y `marcas mansuera.jpeg`).
+  - *Marcas:* cuadritos con logo, nombre y cantidad (18 marcas). Logos en `web/public/marcas/` y lista en
+    `web/src/content/marcas.ts`: Simple Icons (CC0, pintados con el color de la marca) + Chery y GWM de Wikimedia
+    (dominio público). Sin logo salen con su nombre: Daewoo y Datsun (Wikimedia bloqueó la descarga automática). El
+    cliente pidió **sin** la leyenda de "marcas de sus dueños".
+  - *Categorías:* tarjeta 4:3 con foto, nombre, ejemplos escritos a mano (`categoryExamples` en `marcas.ts`) y
+    "Ver N productos". La foto sale sola de un repuesto con foto de esa categoría (disponible, VCH, clase A y más
+    stock primero, en `GetCategoriesAsync`). El cliente puede elegirla subiendo a la carpeta de Drive
+    `CAT-{categoría}.jpg` (ej. `CAT-Filtros.jpg`; tildes y mayúsculas no importan) → tabla `category_images`.
+    Hoy **Filtros** sale sin foto (ningún filtro tiene foto).
+  - `ProductImages.Key` ahora quita tildes (para `CAT-Válvulas`). 201 pruebas.
+
+## Antes (2026-11-21)
 
 **Sesión 2026-11-21 (todo publicado y en GitHub hasta 66640ca):**
 - **Fotos de productos:** 380 fichas con foto. Tandas 1 y 2 subidas a mano (`media/productos`, `./deploy.sh --fotos`).

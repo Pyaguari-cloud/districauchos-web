@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import { HowItWorks } from "@/components/HowItWorks";
+import { PartImage } from "@/components/PartImage";
+import { brandLogo, categoryExamples } from "@/content/marcas";
 import { ProductGrid } from "@/components/ProductCard";
 import { StoreCard } from "@/components/StoreCard";
 import { negocio } from "@/content/negocio";
@@ -55,34 +57,56 @@ export default async function HomePage() {
 
       <section aria-labelledby="marcas">
         <h2 id="marcas" className="mb-3 font-display text-2xl font-bold uppercase tracking-wide">Busca por marca</h2>
-        <ul className="flex flex-wrap gap-2">
-          {brands.slice(0, 14).map((b) => (
-            <li key={b.brand}>
-              <Link
-                href={`/buscar?marca=${encodeURIComponent(b.brand)}`}
-                className="inline-flex min-h-11 items-center gap-2 rounded-full border border-line bg-white px-4 font-semibold hover:border-gray-500"
-              >
-                {b.brand} <span className="text-sm font-normal text-muted">{b.count}</span>
-              </Link>
-            </li>
-          ))}
+        <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-6">
+          {brands.slice(0, 18).map((b) => {
+            const logo = brandLogo(b.brand);
+            return (
+              <li key={b.brand}>
+                <Link
+                  href={`/buscar?marca=${encodeURIComponent(b.brand)}`}
+                  className="flex h-full flex-col items-center justify-center gap-2 rounded-xl border border-line bg-white px-2 py-3 text-center transition hover:border-gray-500 hover:shadow-sm sm:py-4"
+                >
+                  <span className="flex h-12 w-full items-center justify-center sm:h-14">
+                    {logo ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- SVG pequeño y estático
+                      <img src={logo} alt="" loading="lazy" className="max-h-full max-w-[80%] object-contain" />
+                    ) : (
+                      <span className="font-display text-lg font-bold uppercase leading-tight tracking-wide text-gray-700">{b.brand}</span>
+                    )}
+                  </span>
+                  <span className="text-sm font-semibold leading-tight">
+                    {b.brand} <span className="block text-xs font-normal text-muted">{b.count} repuestos</span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </section>
 
       <section aria-labelledby="categorias">
         <h2 id="categorias" className="mb-3 font-display text-2xl font-bold uppercase tracking-wide">Categorías</h2>
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {categories.filter((c) => isRealCategory(c.name)).slice(0, 12).map((c) => (
-            <li key={c.name}>
-              <Link
-                href={`/buscar?categoria=${encodeURIComponent(c.name)}`}
-                className="flex min-h-16 min-w-0 flex-col items-start justify-center gap-0.5 rounded-xl border border-line bg-white px-3 py-3 font-semibold hover:border-gray-500 sm:flex-row sm:items-center sm:justify-between sm:gap-2 sm:px-4"
-              >
-                <span className="min-w-0 break-words">{sentenceCase(c.name)}</span>
-                <span className="text-sm font-normal text-muted">{c.count}</span>
-              </Link>
-            </li>
-          ))}
+          {categories.filter((c) => isRealCategory(c.name)).slice(0, 12).map((c) => {
+            const examples = categoryExamples(c.name);
+            return (
+              <li key={c.name}>
+                <Link
+                  href={`/buscar?categoria=${encodeURIComponent(c.name)}`}
+                  className="group flex h-full flex-col overflow-hidden rounded-xl border border-line bg-white transition hover:border-gray-500 hover:shadow-sm"
+                >
+                  <span className="block p-2 pb-0"><PartImage image={c.image ?? null} category={c.name} title={sentenceCase(c.name)} wide /></span>
+                  <span className="flex flex-1 flex-col gap-1 p-3">
+                    <span className="font-display text-lg font-bold uppercase leading-tight tracking-wide">{sentenceCase(c.name)}</span>
+                    {examples && <span className="text-sm text-muted">{examples}</span>}
+                    <span className="mt-auto pt-1 text-sm font-semibold text-brand-red">
+                      Ver {c.count} productos <span aria-hidden="true" className="inline-block transition group-hover:translate-x-0.5">→</span>
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </section>
 

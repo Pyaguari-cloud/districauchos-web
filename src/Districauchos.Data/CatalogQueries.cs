@@ -18,7 +18,8 @@ public sealed record ItemDto(
 public sealed record ModelCount(string Name, int Count, IReadOnlyList<string>? Engines = null);
 public sealed record BrandDto(string Brand, int Count, IReadOnlyList<ModelCount> Models);
 public sealed record SubcategoryCount(string Name, int Count);
-public sealed record CategoryDto(string Name, int Count, IReadOnlyList<SubcategoryCount> Subcategories);
+/// <summary>Image: la elegida a mano (CAT-*.jpg) o la de uno de sus repuestos con foto.</summary>
+public sealed record CategoryDto(string Name, int Count, IReadOnlyList<SubcategoryCount> Subcategories, string? Image = null);
 public sealed record SlugDto(string Slug, DateTimeOffset UpdatedAt);
 public sealed record SyncStatusDto(DateTimeOffset StartedAt, DateTimeOffset? FinishedAt, string Status, int? Published);
 
@@ -135,9 +136,23 @@ public sealed class CatalogQueries(NpgsqlDataSource db)
             while (await r.ReadAsync(ct))
                 rows.Add((r.GetString(0), r.GetString(1), (int)r.GetInt64(2)));
 
+        // Foto: la elegida a mano; si no, la de un repuesto con foto (disponible, VCH, clase A y más stock primero).
+        await using var imgCmd = db.CreateCommand("""
+            SELECT c.category, coalesce(ci.image, c.image_path) FROM (
+                SELECT DISTINCT ON (category) category, image_path FROM catalog_items
+                WHERE category IS NOT NULL AND image_path IS NOT NULL
+                ORDER BY category, available DESC, is_vch DESC, abc_class NULLS LAST, stock DESC, oem_norm
+            ) c FULL JOIN category_images ci USING (category)
+            """);
+        var images = new Dictionary<string, string>(StringComparer.Ordinal);
+        await using (var r = await imgCmd.ExecuteReaderAsync(ct))
+            while (await r.ReadAsync(ct))
+                if (!r.IsDBNull(0) && !r.IsDBNull(1)) images[r.GetString(0)] = r.GetString(1);
+
         return rows.GroupBy(x => x.Cat)
             .Select(g => new CategoryDto(g.Key, g.Sum(x => x.Count),
-                g.Where(x => x.Sub != "").Select(x => new SubcategoryCount(x.Sub, x.Count)).ToList()))
+                g.Where(x => x.Sub != "").Select(x => new SubcategoryCount(x.Sub, x.Count)).ToList(),
+                images.GetValueOrDefault(g.Key)))
             .OrderByDescending(c => c.Count)
             .ToList();
     }
