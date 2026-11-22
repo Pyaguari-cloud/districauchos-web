@@ -119,7 +119,7 @@ Probar con el simulador:
 - **Inicio con imágenes, como Mansuera** (pedido del cliente, capturas `out/capturas/categorias.jpeg` y `marcas mansuera.jpeg`).
   - *Marcas:* cuadritos con logo, nombre y cantidad (18 marcas). Logos en `web/public/marcas/` y lista en
     `web/src/content/marcas.ts`: Simple Icons (CC0, pintados con el color de la marca) + Chery y GWM de Wikimedia
-    (dominio público). Sin logo salen con su nombre: Daewoo y Datsun (Wikimedia bloqueó la descarga automática). El
+    (dominio público). Daewoo y Datsun los mandó el cliente (`daewoo.webp`, `datsun.webp`); las demás marcas sin logo salen con su nombre. El
     cliente pidió **sin** la leyenda de "marcas de sus dueños".
   - *Categorías:* tarjeta 4:3 con foto, nombre, ejemplos escritos a mano (`categoryExamples` en `marcas.ts`) y
     "Ver N productos". La foto sale sola de un repuesto con foto de esa categoría (disponible, VCH, clase A y más

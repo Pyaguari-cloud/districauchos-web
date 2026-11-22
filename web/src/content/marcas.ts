@@ -1,7 +1,8 @@
 /**
  * Logos de las marcas de vehículo para "Busca por marca" (pedido del cliente 2026-11-22, como Mansuera).
  * Archivos en public/marcas/. Fuentes: Simple Icons (CC0, coloreados con el color de cada marca) y
- * Wikimedia Commons (dominio público: Chery, GWM). Las marcas sin logo se muestran con su nombre.
+ * Wikimedia Commons (dominio público: Chery, GWM). Daewoo y Datsun los consiguió el cliente (WebP).
+ * Las marcas sin logo se muestran con su nombre.
  */
 const logos: Record<string, string> = {
   chevrolet: "chevrolet",
@@ -13,23 +14,25 @@ const logos: Record<string, string> = {
   suzuki: "suzuki",
   renault: "renault",
   ford: "ford",
+  daewoo: "daewoo.webp",
   mitsubishi: "mitsubishi",
   volkswagen: "volkswagen",
   fiat: "fiat",
   chery: "chery",
   peugeot: "peugeot",
   "great wall": "greatwall",
+  datsun: "datsun.webp",
   "mercedes-benz": "mercedes",
   honda: "honda",
   skoda: "skoda",
   citroen: "citroen",
 };
 
-const fold = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
+const fold = (s: string) => s.normalize("NFD").replace(/\p{M}/gu, "").trim().toLowerCase();
 
 export function brandLogo(brand: string): string | null {
   const file = logos[fold(brand)];
-  return file ? `/marcas/${file}.svg` : null;
+  return file ? `/marcas/${file.includes(".") ? file : `${file}.svg`}` : null;
 }
 
 /** Texto corto debajo de cada categoría en el inicio (como Mansuera: "Plumas, Químicos, Repuestos"). */
