@@ -130,6 +130,15 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
             ALTER TABLE product_vehicle_years DROP CONSTRAINT IF EXISTS product_vehicle_years_pkey;
             CREATE UNIQUE INDEX IF NOT EXISTS ux_product_vehicle_years
                 ON product_vehicle_years (oem_norm, brand, model, version, engine, year_from, year_to, source);
+            -- Cilindraje por vehículo (2026-11-21): filtro "Cilindraje" de la barra de vehículo.
+            CREATE TABLE IF NOT EXISTS product_vehicle_engines (
+                oem_norm text NOT NULL REFERENCES catalog_items (oem_norm) ON DELETE CASCADE,
+                brand    text NOT NULL,
+                model    text NOT NULL,
+                engine   text NOT NULL,
+                source   text NOT NULL,
+                PRIMARY KEY (oem_norm, brand, model, engine)
+            );
             """);
         await cmd.ExecuteNonQueryAsync(ct);
     }
@@ -144,7 +153,7 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
         await using var tx = await conn.BeginTransactionAsync(ct);
 
         await using (var truncate = new NpgsqlCommand(
-            "TRUNCATE product_vehicle_years, product_vehicles, catalog_variants, catalog_items, stock_raw, products_raw", conn, tx))
+            "TRUNCATE product_vehicle_engines, product_vehicle_years, product_vehicles, catalog_variants, catalog_items, stock_raw, products_raw", conn, tx))
             await truncate.ExecuteNonQueryAsync(ct);
 
         await using (var w = await conn.BeginBinaryImportAsync(
@@ -257,6 +266,21 @@ public sealed class CatalogRepository(NpgsqlDataSource db)
                 await w.WriteAsync(y.Source, ct);
                 await w.WriteAsync(y.Version, ct);
                 await w.WriteAsync(y.Engine, ct);
+            }
+            await w.CompleteAsync(ct);
+        }
+
+        await using (var w = await conn.BeginBinaryImportAsync(
+            "COPY product_vehicle_engines (oem_norm, brand, model, engine, source) FROM STDIN (FORMAT BINARY)", ct))
+        {
+            foreach (var e in catalog.VehicleEngines)
+            {
+                await w.StartRowAsync(ct);
+                await w.WriteAsync(e.OemNorm, ct);
+                await w.WriteAsync(e.Brand, ct);
+                await w.WriteAsync(e.Model, ct);
+                await w.WriteAsync(e.Engine, ct);
+                await w.WriteAsync(e.Source, ct);
             }
             await w.CompleteAsync(ct);
         }

@@ -24,6 +24,8 @@ public sealed record SearchDocument(
     /// los repuestos que sabemos que son de otros años.
     /// </summary>
     IReadOnlyList<string> Fit,
+    /// <summary>Igual que <see cref="Fit"/> pero con el cilindraje: "Chevrolet|Aveo|1.4" o "Chevrolet|Aveo|*".</summary>
+    IReadOnlyList<string> EngineFit,
     /// <summary>"Marca|Modelo|desde|hasta" para mostrar en las tarjetas.</summary>
     IReadOnlyList<string> YearRanges,
     string? Category,
@@ -51,6 +53,7 @@ public sealed class ProductIndex(MeiliClient meili)
     {
         var vehicles = catalog.Vehicles.ToLookup(v => v.OemNorm);
         var years = catalog.VehicleYears.ToLookup(v => v.OemNorm);
+        var engines = catalog.VehicleEngines.ToLookup(v => v.OemNorm);
         return catalog.Items.Select(i =>
         {
             var v = vehicles[i.OemNorm].ToList();
@@ -69,6 +72,7 @@ public sealed class ProductIndex(MeiliClient meili)
                 Models: v.Where(x => x.Model != "").Select(x => x.Model).Distinct().ToList(),
                 Vehicles: v.Where(x => x.Model != "").Select(x => $"{x.Brand}|{x.Model}").Distinct().ToList(),
                 Fit: FitKeys(v, y),
+                EngineFit: EngineFitKeys(v, engines[i.OemNorm].ToList()),
                 YearRanges: y.Select(x => $"{x.Brand}|{x.Model}|{x.YearFrom}|{x.YearTo}").Distinct().ToList(),
                 Category: i.Category,
                 Subcategory: i.Subcategory,
@@ -100,13 +104,27 @@ public sealed class ProductIndex(MeiliClient meili)
         return keys;
     }
 
+    /// <summary>Un repuesto sin cilindraje escrito para ese vehículo sigue apareciendo ("*"): solo se oculta lo de otro motor.</summary>
+    internal static List<string> EngineFitKeys(
+        IReadOnlyList<Districauchos.Core.Model.ProductVehicle> vehicles, IReadOnlyList<Districauchos.Core.Model.ProductVehicleEngine> engines)
+    {
+        var keys = new List<string>();
+        foreach (var veh in vehicles.Where(x => x.Model != "").Select(x => (x.Brand, x.Model)).Distinct())
+        {
+            var mine = engines.Where(x => x.Brand == veh.Brand && x.Model == veh.Model).Select(x => x.Engine).Distinct().ToList();
+            if (mine.Count == 0) keys.Add($"{veh.Brand}|{veh.Model}|*");
+            else keys.AddRange(mine.Select(e => $"{veh.Brand}|{veh.Model}|{e}"));
+        }
+        return keys;
+    }
+
     internal static object Settings => new
     {
         searchableAttributes = new[]
         {
             "title", "oem", "oem_aliases", "codes", "alt_codes", "models", "brands", "category", "subcategory", "description",
         },
-        filterableAttributes = new[] { "brands", "models", "vehicles", "fit", "category", "subcategory", "available", "is_vch", "abc_class" },
+        filterableAttributes = new[] { "brands", "models", "vehicles", "fit", "engine_fit", "category", "subcategory", "available", "is_vch", "abc_class" },
         sortableAttributes = new[] { "pvp_min", "abc_rank", "vch_rank", "title" },
         // Relevancia primero; luego clase A > B > C; luego disponibles primero (brief §6.6).
         rankingRules = new[] { "words", "typo", "proximity", "attribute", "sort", "exactness", "vch_rank:desc", "abc_rank:asc", "available_rank:desc" },
@@ -176,7 +194,7 @@ public sealed class ProductIndex(MeiliClient meili)
 
     public sealed record Query(
         string? Q, string? Brand, string? Model, string? Category, string? Subcategory,
-        bool? Available, int Page = 1, int PageSize = 24, bool? IsVch = null, int? Year = null);
+        bool? Available, int Page = 1, int PageSize = 24, bool? IsVch = null, int? Year = null, string? Engine = null);
 
     /// <summary>
     /// Exige todas las palabras ("manguera aveo" = mangueras de Aveo, no todo lo que diga "aveo").
@@ -217,6 +235,8 @@ public sealed class ProductIndex(MeiliClient meili)
             filters.Add(query.Year is { } year
                 ? $"fit IN [{Quote($"{query.Brand}|{query.Model}|{year}")}, {Quote($"{query.Brand}|{query.Model}|*")}]"
                 : $"vehicles = {Quote($"{query.Brand}|{query.Model}")}");
+        if (!string.IsNullOrWhiteSpace(query.Brand) && !string.IsNullOrWhiteSpace(query.Model) && !string.IsNullOrWhiteSpace(query.Engine))
+            filters.Add($"engine_fit IN [{Quote($"{query.Brand}|{query.Model}|{query.Engine}")}, {Quote($"{query.Brand}|{query.Model}|*")}]");
         if (!string.IsNullOrWhiteSpace(query.Category)) filters.Add($"category = {Quote(query.Category)}");
         if (!string.IsNullOrWhiteSpace(query.Subcategory)) filters.Add($"subcategory = {Quote(query.Subcategory)}");
         if (query.Available is { } a) filters.Add($"available = {(a ? "true" : "false")}");

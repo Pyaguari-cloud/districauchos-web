@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { GarageManager } from "@/components/GarageManager";
-import { getVehicles } from "@/lib/api";
+import { getVehicles, vehicleOptions } from "@/lib/api";
 
 export const metadata: Metadata = {
   title: "Mi garaje",
@@ -12,8 +12,6 @@ export const metadata: Metadata = {
 /** "Tu garaje" de Amazon, versión Districauchos. Los vehículos se guardan en el navegador (sin cuenta). */
 export default async function GaragePage() {
   await connection();
-  const options = await getVehicles()
-    .then((brands) => brands.map((b) => ({ brand: b.brand, models: b.models.map((m) => m.name) })))
-    .catch(() => []);
+  const options = await getVehicles().then(vehicleOptions).catch(() => []);
   return <GarageManager options={options} />;
 }

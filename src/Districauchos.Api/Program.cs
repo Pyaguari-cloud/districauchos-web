@@ -51,11 +51,12 @@ app.Use(async (ctx, next) =>
 app.MapGet("/api/catalog", async (
     ProductIndex index, CancellationToken ct,
     string? q, string? brand, string? model, string? category, string? subcategory,
-    bool? available, bool? vch, int? page, int? pageSize, int? year) =>
+    bool? available, bool? vch, int? page, int? pageSize, int? year, string? engine) =>
 {
     var res = await index.SearchAsync(new ProductIndex.Query(
         q, brand, model, category, subcategory, available, page ?? 1, pageSize ?? 24, vch,
-        year is >= 1960 and <= 2100 ? year : null), ct);
+        year is >= 1960 and <= 2100 ? year : null,
+        engine is { Length: 3 } && char.IsAsciiDigit(engine[0]) && engine[1] == '.' && char.IsAsciiDigit(engine[2]) ? engine : null), ct);
 
     return Results.Ok(new
     {

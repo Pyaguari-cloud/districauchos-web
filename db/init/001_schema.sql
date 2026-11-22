@@ -85,6 +85,16 @@ CREATE TABLE IF NOT EXISTS product_vehicle_years (
 CREATE UNIQUE INDEX IF NOT EXISTS ux_product_vehicle_years
     ON product_vehicle_years (oem_norm, brand, model, version, engine, year_from, year_to, source);
 
+-- Cilindraje por vehículo (de la descripción o de la hoja de compatibilidades).
+CREATE TABLE IF NOT EXISTS product_vehicle_engines (
+    oem_norm text NOT NULL REFERENCES catalog_items (oem_norm) ON DELETE CASCADE,
+    brand    text NOT NULL,
+    model    text NOT NULL,
+    engine   text NOT NULL,
+    source   text NOT NULL,
+    PRIMARY KEY (oem_norm, brand, model, engine)
+);
+
 -- Mantenida a mano / importada del Excel de precios sugeridos (pregunta 12.1). La sync no la borra.
 CREATE TABLE IF NOT EXISTS price_overrides (
     oem_norm      text PRIMARY KEY,

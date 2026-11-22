@@ -43,6 +43,7 @@ public sealed class CatalogBuildResult
     public List<CatalogVariant> Variants { get; } = [];
     public List<ProductVehicle> Vehicles { get; } = [];
     public List<ProductVehicleYears> VehicleYears { get; } = [];
+    public List<ProductVehicleEngine> VehicleEngines { get; } = [];
     public List<ProductWithoutVehicle> WithoutVehicle { get; } = [];
     public Dictionary<string, int> AmbiguousModels { get; } = new(StringComparer.Ordinal);
     public List<CategoryAssignment> CategoryAssignments { get; } = [];
@@ -254,6 +255,7 @@ public sealed class CatalogBuilder(
             .GroupBy(i => i.OemNorm.TrimStart('0')).Where(g => g.Count() == 1).ToDictionary(g => g.Key, g => g.First().OemNorm);
         var vehiclesSet = result.Vehicles.Select(v => (v.OemNorm, v.Brand, v.Model)).ToHashSet();
         var yearsSet = result.VehicleYears.ToHashSet();
+        var enginesSet = result.VehicleEngines.Select(e => (e.OemNorm, e.Brand, e.Model, e.Engine)).ToHashSet();
         var maxYear = DateTime.UtcNow.Year + 1;
         var unknownOem = new List<CompatSheetRow>();
         var unknownModel = new List<CompatSheetRow>();
@@ -273,6 +275,9 @@ public sealed class CatalogBuilder(
                 foreach (var m in matches.Where(x => x.Model == model))
                 {
                     if (vehiclesSet.Add((oem, m.Brand, model))) result.Vehicles.Add(new ProductVehicle(oem, m.Brand, model));
+                    foreach (var engine in EngineSize.Parse(row.Engine))
+                        if (enginesSet.Add((oem, m.Brand, model, engine)))
+                            result.VehicleEngines.Add(new ProductVehicleEngine(oem, m.Brand, model, engine, "hoja"));
                     if (row.YearFrom is not { } from) continue;
                     var y = new ProductVehicleYears(oem, m.Brand, model, from, row.YearTo ?? maxYear, "hoja", row.Model, row.Engine);
                     if (yearsSet.Add(y)) result.VehicleYears.Add(y);
@@ -290,10 +295,12 @@ public sealed class CatalogBuilder(
     {
         var found = new HashSet<VehicleMatch>();
         var years = new HashSet<VehicleYears>();
+        var engines = new HashSet<VehicleEngine>();
         var maxYear = DateTime.UtcNow.Year + 1;
         foreach (var r in rows)
         {
             years.UnionWith(vehicles.ExtractYears(r.Description, maxYear));
+            engines.UnionWith(vehicles.ExtractEngines(r.Description));
             var ex = vehicles.Extract(r.Description);
             found.UnionWith(ex.Matches);
             foreach (var amb in ex.AmbiguousModels)
@@ -309,5 +316,7 @@ public sealed class CatalogBuilder(
             result.Vehicles.Add(new ProductVehicle(item.OemNorm, m.Brand, m.Model ?? ""));
         foreach (var y in years.OrderBy(y => y.Brand).ThenBy(y => y.Model).ThenBy(y => y.From))
             result.VehicleYears.Add(new ProductVehicleYears(item.OemNorm, y.Brand, y.Model, y.From, y.To, "descripcion"));
+        foreach (var e in engines.OrderBy(e => e.Brand).ThenBy(e => e.Model).ThenBy(e => e.Engine, StringComparer.Ordinal))
+            result.VehicleEngines.Add(new ProductVehicleEngine(item.OemNorm, e.Brand, e.Model, e.Engine, "descripcion"));
     }
 }

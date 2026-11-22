@@ -14,7 +14,8 @@ public sealed record ItemDto(
     bool Available, string? AbcClass, string? Image, DateTimeOffset UpdatedAt,
     IReadOnlyList<VariantDto> Variants, IReadOnlyList<VehicleDto> Vehicles, decimal Stock,
     IReadOnlyList<VehicleYearsDto>? Years = null);
-public sealed record ModelCount(string Name, int Count);
+/// <summary>Engines: cilindrajes de ese modelo con al menos <see cref="CatalogQueries.MinEngineItems"/> repuestos.</summary>
+public sealed record ModelCount(string Name, int Count, IReadOnlyList<string>? Engines = null);
 public sealed record BrandDto(string Brand, int Count, IReadOnlyList<ModelCount> Models);
 public sealed record SubcategoryCount(string Name, int Count);
 public sealed record CategoryDto(string Name, int Count, IReadOnlyList<SubcategoryCount> Subcategories);
@@ -81,6 +82,8 @@ public sealed class CatalogQueries(NpgsqlDataSource db)
         return item with { Variants = variants, Vehicles = vehicles, Years = years };
     }
 
+    public const int MinEngineItems = 4;
+
     /// <summary>Marcas y modelos para el selector de vehículo (cuántas fichas tiene cada uno).</summary>
     public async Task<IReadOnlyList<BrandDto>> GetVehiclesAsync(CancellationToken ct)
     {
@@ -93,6 +96,20 @@ public sealed class CatalogQueries(NpgsqlDataSource db)
             while (await r.ReadAsync(ct))
                 rows.Add((r.GetString(0), r.GetString(1), (int)r.GetInt64(2)));
 
+        // Cilindrajes por modelo. Con menos de 4 repuestos suele ser ruido de descripciones con varios carros.
+        var engines = new Dictionary<(string, string), List<string>>();
+        await using (var cmd3 = db.CreateCommand($"""
+            SELECT brand, model, engine FROM product_vehicle_engines GROUP BY brand, model, engine
+            HAVING count(DISTINCT oem_norm) >= {MinEngineItems} ORDER BY brand, model, engine::numeric
+            """))
+        await using (var r = await cmd3.ExecuteReaderAsync(ct))
+            while (await r.ReadAsync(ct))
+            {
+                var key = (r.GetString(0), r.GetString(1));
+                if (!engines.TryGetValue(key, out var list)) engines[key] = list = [];
+                list.Add(r.GetString(2));
+            }
+
         // Total por marca con DISTINCT real: una ficha puede tener varios modelos de la misma marca.
         var brandTotals = new Dictionary<string, int>();
         await using (var cmd2 = db.CreateCommand("SELECT brand, count(DISTINCT oem_norm) FROM product_vehicles GROUP BY brand"))
@@ -102,7 +119,7 @@ public sealed class CatalogQueries(NpgsqlDataSource db)
 
         return rows.GroupBy(x => x.Brand)
             .Select(g => new BrandDto(g.Key, brandTotals.GetValueOrDefault(g.Key),
-                g.Where(x => x.Model != "").Select(x => new ModelCount(x.Model, x.Count)).ToList()))
+                g.Where(x => x.Model != "").Select(x => new ModelCount(x.Model, x.Count, engines.GetValueOrDefault((x.Brand, x.Model)) ?? [])).ToList()))
             .OrderByDescending(b => b.Count)
             .ToList();
     }

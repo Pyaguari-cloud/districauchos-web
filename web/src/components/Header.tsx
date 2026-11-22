@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { getVehicles } from "@/lib/api";
+import { getCategories, getVehicles, vehicleOptions } from "@/lib/api";
+import { isRealCategory } from "@/lib/format";
 import { CartLink } from "./CartLink";
 import { HeaderSearch } from "./HeaderSearch";
 import { SearchBox } from "./SearchBox";
@@ -20,9 +21,10 @@ export async function Header() {
   // Siempre al pedir la página (nunca en el build): así "Mi garaje" tiene las marcas aunque la página sea estática.
   await connection();
   // Si la API no responde, la página sigue funcionando sin el selector.
-  const options: VehicleOption[] = await getVehicles()
-    .then((brands) => brands.map((b) => ({ brand: b.brand, models: b.models.map((m) => m.name) })))
-    .catch(() => []);
+  const [options, categories] = await Promise.all([
+    getVehicles().then(vehicleOptions).catch((): VehicleOption[] => []),
+    getCategories().then((cs) => cs.map((c) => c.name).filter(isRealCategory).sort((a, b) => a.localeCompare(b, "es"))).catch(() => []),
+  ]);
 
   return (
     <header className="bg-brand-black text-white">
@@ -53,7 +55,7 @@ export async function Header() {
       </nav>
       {options.length > 0 && (
         <Suspense>
-          <VehicleBar options={options} />
+          <VehicleBar options={options} categories={categories} />
         </Suspense>
       )}
     </header>

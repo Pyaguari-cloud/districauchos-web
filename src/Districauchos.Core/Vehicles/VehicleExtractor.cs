@@ -8,6 +8,9 @@ public sealed record VehicleMatch(string Brand, string? Model);
 /// <summary>Rango de años escrito en la descripción para ese vehículo ("Optra 1.8 07/12" → 2007–2012).</summary>
 public sealed record VehicleYears(string Brand, string Model, int From, int To);
 
+/// <summary>Cilindraje escrito para ese vehículo ("Sail 1.4L" → Chevrolet Sail 1.4).</summary>
+public sealed record VehicleEngine(string Brand, string Model, string Engine);
+
 public sealed record ExtractionResult(IReadOnlyList<VehicleMatch> Matches, IReadOnlyList<string> AmbiguousModels);
 
 /// <summary>
@@ -146,6 +149,56 @@ public sealed partial class VehicleExtractor
                     foreach (var brand in brandsOf[model])
                         result.Add(new VehicleYears(brand, model, from, to));
                 i += 2;
+                continue;
+            }
+            i++;
+        }
+        return result.Distinct().ToList();
+    }
+
+    /// <summary>
+    /// Cilindrajes asignados al modelo (o modelos) mencionado antes, igual que los años:
+    /// "Sail 1.4L / Getz / Mirage 1.5L" → Sail 1.4; Getz, Mirage 1.5. "Aveo 1.4 1.6" → Aveo 1.4 y 1.6.
+    /// Un cilindraje antes de cualquier modelo no se asigna.
+    /// </summary>
+    public IReadOnlyList<VehicleEngine> ExtractEngines(string? description)
+    {
+        if (string.IsNullOrWhiteSpace(description)) return [];
+        var s = TextNorm.StripAccents(TextNorm.RepairEncoding(description)).ToUpperInvariant();
+        var engines = EngineSize.Find(s).ToList();
+        if (engines.Count == 0) return [];
+
+        var brandsOf = Extract(description).Matches.Where(m => m.Model is not null)
+            .GroupBy(m => m.Model!, StringComparer.Ordinal)
+            .ToDictionary(g => g.Key, g => g.Select(m => m.Brand).ToList(), StringComparer.Ordinal);
+        if (brandsOf.Count == 0) return [];
+        var aliasToks = _modelAliases.Where(a => brandsOf.ContainsKey(a.Model))
+            .Select(a => (Toks: a.Alias.Split(' '), a.Model)).ToList();
+
+        var toks = Token().Matches(s).ToList();
+        var result = new List<VehicleEngine>();
+        var pending = new List<string>();
+        var last = new List<string>();
+        var i = 0;
+        while (i < toks.Count)
+        {
+            var at = toks[i].Index;
+            var engine = engines.FirstOrDefault(e => at >= e.Index && at < e.Index + e.Length);
+            if (engine.Value is not null)
+            {
+                if (pending.Count > 0) { last = [.. pending]; pending.Clear(); }
+                foreach (var model in last)
+                    foreach (var brand in brandsOf[model])
+                        result.Add(new VehicleEngine(brand, model, engine.Value));
+                while (i < toks.Count && toks[i].Index < engine.Index + engine.Length) i++;
+                continue;
+            }
+            var hit = aliasToks.FirstOrDefault(a => i + a.Toks.Length <= toks.Count &&
+                a.Toks.Select((t, k) => toks[i + k].Value == t).All(x => x));
+            if (hit.Toks is not null)
+            {
+                if (!pending.Contains(hit.Model)) pending.Add(hit.Model);
+                i += hit.Toks.Length;
                 continue;
             }
             i++;

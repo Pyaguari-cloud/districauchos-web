@@ -69,6 +69,9 @@ public sealed record ProductVehicleYears(
     /// <summary>Versión como la escribió la hoja ("Aveo Family", "D-Max RT50"); vacío si viene de la descripción.</summary>
     string Version = "", string Engine = "");
 
+/// <summary>Cilindraje para un vehículo ("1.4"). Source: "descripcion" u "hoja". Sirve para el filtro "Cilindraje".</summary>
+public sealed record ProductVehicleEngine(string OemNorm, string Brand, string Model, string Engine, string Source);
+
 /// <summary>Fila de la pestaña "Compatibilidades" del cliente marcada Usar = Sí.</summary>
 public sealed record CompatSheetRow(string OemNorm, string Brand, string Model, string Engine, int? YearFrom, int? YearTo, int SourceRow);
 

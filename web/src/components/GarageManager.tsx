@@ -146,31 +146,34 @@ function AddVehicle({ options, onDone, canCancel }: { options: VehicleOption[]; 
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
-  const models = options.find((o) => o.brand === brand)?.models ?? [];
+  const [engine, setEngine] = useState("");
+  const option = options.find((o) => o.brand === brand);
+  const models = option?.models ?? [];
+  const engines = (model && option?.engines?.[model]) || [];
   const ALL = "__all__";
 
   function save(e: React.FormEvent) {
     e.preventDefault();
     if (!brand || !model) return;
-    garage.addAndActivate(brand, model === ALL ? null : model, year ? Number(year) : null);
-    setBrand(""); setModel(""); setYear("");
+    garage.addAndActivate(brand, model === ALL ? null : model, year ? Number(year) : null, engine || null);
+    setBrand(""); setModel(""); setYear(""); setEngine("");
     onDone();
   }
 
   return (
     <form onSubmit={save} id="agregar" className="flex flex-col gap-4 rounded-xl border border-line bg-white p-4">
       <h2 className="font-display text-xl font-bold uppercase tracking-wide">Agregar un vehículo</h2>
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="flex flex-col gap-1">
           <label htmlFor="a-brand" className="font-semibold">Marca</label>
-          <select id="a-brand" className={select} value={brand} onChange={(e) => { setBrand(e.target.value); setModel(""); }} required>
+          <select id="a-brand" className={select} value={brand} onChange={(e) => { setBrand(e.target.value); setModel(""); setEngine(""); }} required>
             <option value="">Elige la marca</option>
             {options.map((o) => <option key={o.brand} value={o.brand}>{o.brand}</option>)}
           </select>
         </div>
         <div className="flex flex-col gap-1">
           <label htmlFor="a-model" className="font-semibold">Modelo</label>
-          <select id="a-model" className={select} value={model} onChange={(e) => setModel(e.target.value)} disabled={!brand} required>
+          <select id="a-model" className={select} value={model} onChange={(e) => { setModel(e.target.value); setEngine(""); }} disabled={!brand} required>
             <option value="">{brand ? "Elige el modelo" : "Primero la marca"}</option>
             {brand && <option value={ALL}>Todos los {brand}</option>}
             {models.map((m) => <option key={m} value={m}>{m}</option>)}
@@ -181,6 +184,13 @@ function AddVehicle({ options, onDone, canCancel }: { options: VehicleOption[]; 
           <select id="a-year" className={select} value={year} onChange={(e) => setYear(e.target.value)}>
             <option value="">Sin año</option>
             {YEARS.map((y) => <option key={y} value={y}>{y}</option>)}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label htmlFor="a-engine" className="font-semibold">Cilindraje <span className="font-normal text-muted">(opcional)</span></label>
+          <select id="a-engine" className={select} value={engine} onChange={(e) => setEngine(e.target.value)} disabled={engines.length === 0}>
+            <option value="">{engines.length ? "Sin cilindraje" : "Sin datos para este modelo"}</option>
+            {engines.map((x) => <option key={x} value={x}>{x}</option>)}
           </select>
         </div>
       </div>
