@@ -48,8 +48,8 @@ Reemplaza la tienda WordPress/WooCommerce actual en `districauchosvch.com`.
 | Página del negocio | ✅ | Inicio, /locales, /como-comprar (FAQ), /nosotros, pie de página, datos estructurados para Google |
 | Importación directa VCH | ✅ | Productos VCH primero en el buscador, sección en el inicio, filtro `/buscar?importado=1` y etiqueta |
 | Envíos | ✅ | Retiro, Quito gratis, provincia +$5 por cooperativa (`ENVIO_NACIONAL`) |
-| Pago en línea PayPhone | 🟢 **Activo en producción** (`PAYMENTS_MODE=payphone`) | Falta la compra real de $1 y anularla |
-| Semana 4: servidor y lanzamiento | ✅ **En vivo desde el 2026-11-19** | VPS ffxf, Caddy, Cloudflare (proxy + Full strict), Brevo y PayPhone activo. Falta la compra real de $1 |
+| Pago en línea PayPhone | ✅ **Activo y probado** (`PAYMENTS_MODE=payphone`) | Compra real de $1 hecha el 2026-11-23 (pedido #1002) |
+| Semana 4: servidor y lanzamiento | ✅ **En vivo desde el 2026-11-19** | VPS ffxf, Caddy, Cloudflare (proxy + Full strict), Brevo y PayPhone activo y probado con una compra real |
 
 Pruebas: 139 en `tests/` (`dotnet test`). Lint de la web: `cd web && npx tsc --noEmit && npx eslint .`
 
@@ -133,7 +133,7 @@ con **usuario y contraseña**, opcional; sin cuenta todo sigue igual). Usuario =
   contraseña, enlace de recuperación (y que no sirve dos veces), eliminar cuenta. **Sin probar en local** (el pago está
   apagado aquí): datos que se llenan solos al pagar y "Mis pedidos" → probar con la compra real de $1.
 - En vivo: páginas 200, /cuenta sin sesión → /cuenta/ingresar, tablas creadas. **Falta**: que el usuario cree su
-  propia cuenta en vivo, pruebe "¿Olvidaste tu contraseña?" (correo real por Brevo) y haga la compra de $1 con sesión.
+  propia cuenta en vivo y pruebe "¿Olvidaste tu contraseña?" (correo real por Brevo). La compra de $1 con sesión ✅.
 - "Repite la contraseña" en registro, recuperar y cambiar (pedido del cliente). El cliente **aprobó la política de privacidad** (2026-11-23).
 - Para después: "repetir pedido", verificar el correo al registrarse, ver la lista de clientes en el panel de pedidos.
 
@@ -306,7 +306,9 @@ Objetivo: el cliente pone su carro y año (ej. Aveo 2007) y ve los repuestos que
 - [x] SMTP para los avisos de pedidos (Brevo, 2026-11-19).
 - [x] El cliente confirmó que recibe el correo de prueba en su Hotmail.
 - [x] `import-prices` corrido contra la base del servidor (65 precios, 2026-11-19).
-- [ ] `PAYMENTS_MODE=payphone` y una compra real de $1, que luego se anula desde PayPhone Business.
+- [x] `PAYMENTS_MODE=payphone` y compra real de $1 (2026-11-23, pedido #1002, con cuenta): pagado, correo al local enviado,
+  ligado a la cuenta y datos guardados. Anularla en PayPhone Business (lo hace el usuario). El #1001 ($4.50, 2026-11-19) es
+  una prueba vieja que quedó Pending: no cobra ni se muestra.
 - [ ] Desactivar la aplicación PayPhone vieja (tipo API) después de la compra de prueba.
 - [ ] Cancelar el plan WordPress.com Personal ($9/mes) **antes del 9-dic-2026**, sin tocar el dominio (que se renueva el 10-dic).
 - [ ] Revisar en el celular real antes del lanzamiento.
