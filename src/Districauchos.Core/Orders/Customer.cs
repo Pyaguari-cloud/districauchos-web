@@ -129,6 +129,8 @@ public static partial class CustomerValidator
         return t.Length > max ? t[..max].Trim() : t;
     }
 
+    public static bool IsValidEmail(string email) => Email().IsMatch(email);
+
     [GeneratedRegex(@"^[^@\s]{1,64}@[^@\s]+\.[a-z]{2,}$", RegexOptions.IgnoreCase)] private static partial Regex Email();
     [GeneratedRegex(@"^[A-Za-z0-9]{5,20}$")] private static partial Regex Passport();
 }

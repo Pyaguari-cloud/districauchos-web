@@ -86,6 +86,35 @@ export const garage = {
   remove(id: string) {
     store.set((g) => ({ vehicles: g.vehicles.filter((x) => x.id !== id), activeId: g.activeId === id ? null : g.activeId }));
   },
+  /** Vehículos guardados en este navegador (para sincronizar con la cuenta). */
+  vehicles: () => store.get().vehicles,
+  /**
+   * Junta los vehículos de la cuenta con los de este navegador (primero los de la cuenta, sin repetir, hasta 5)
+   * y deja activo el que estaba. Pasa todo por la misma limpieza que lo leído de localStorage.
+   */
+  merge(fromAccount: unknown[]) {
+    store.set((g) => {
+      const seen = new Set<string>();
+      const vehicles: GarageVehicle[] = [];
+      for (const x of [...fromAccount, ...g.vehicles]) {
+        const v = x as Partial<GarageVehicle> | null;
+        if (!v || typeof v.brand !== "string" || !v.brand) continue;
+        const model = typeof v.model === "string" && v.model ? v.model : null;
+        const year = cleanYear(v.year);
+        const engine = model ? cleanEngine(v.engine) : null;
+        const id = idOf(v.brand, model, year, engine);
+        if (seen.has(id)) continue;
+        seen.add(id);
+        vehicles.push({ id, brand: v.brand, model, year, engine });
+      }
+      const kept = vehicles.slice(0, MAX_GARAGE);
+      return { vehicles: kept, activeId: kept.some((x) => x.id === g.activeId) ? g.activeId : null };
+    });
+  },
+  /** Al cerrar sesión: este navegador puede ser compartido. */
+  clear() {
+    store.set(EMPTY);
+  },
 };
 
 /** "Chevrolet Aveo 2012 1.6", "Chevrolet Aveo" o "Chevrolet" (toda la marca). */

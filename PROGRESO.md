@@ -3,7 +3,7 @@
 Bitácora para retomar el trabajo en cualquier momento. **Leer primero esto**; el detalle técnico está en
 `README.md` y `web/README.md`, y el encargo original en `BRIEF-districauchos-etapa1.md` (privado, solo local).
 
-Última actualización: 2026-11-22
+Última actualización: 2026-11-23
 
 ---
 
@@ -114,6 +114,25 @@ Probar con el simulador:
 `SITE_URL=http://localhost:3000 PAYMENTS_MODE=fake docker compose --profile web up -d --build api web`
 
 ## 6. Dónde nos quedamos (2026-11-22)
+
+**Sesión 2026-11-23 (en local, falta publicar): cuentas de clientes** (pedido del cliente: registro e ingreso
+con **usuario y contraseña**, opcional; sin cuenta todo sigue igual). Usuario = correo (sin correo no hay cómo recuperar).
+- API: `Core/Accounts/Passwords.cs` (PBKDF2-SHA512 210 000 vueltas, sal propia; reglas: ≥ 8, no obvias, sin el correo),
+  `Data/AccountRepository.cs` (tablas `customers`, `customer_sessions`, `customer_password_resets` y `orders.customer_id`;
+  tokens solo como SHA-256), `Api/Accounts/AccountEndpoints.cs` (`/api/account/*`: register, login, logout, me, profile,
+  garage, orders, password, password/forgot, password/reset, delete) y `AccountMailer` (Brevo, enlace con el token después de
+  `#`, vale 30 min, una vez). Bloqueo: 5 intentos fallidos → 15 min. Límite por IP (X-Client-IP): 10/min ingresar/registro,
+  5/h correos. Sesión 30 días; cambiar/restablecer la contraseña cierra todas. Al pagar con sesión el pedido se liga a la
+  cuenta y, si no tenía datos, se guardan.
+- Web: cookie httpOnly `dc_session` + `dc_name` (solo el primer nombre, para "Hola, Juan" sin volver dinámicas las
+  páginas). `src/lib/session.ts`, `app/api/cuenta/[accion]` (revisa Origin), páginas `/cuenta`, `/cuenta/ingresar`,
+  `/registro`, `/olvide`, `/restablecer` y `/privacidad` (LOPDP; **pedir al cliente que la revise**), "Ingresar" en el
+  encabezado, `GarageSync` (junta el garaje del navegador con el de la cuenta), el pago se llena solo. Cerrar sesión
+  borra el garaje del navegador (equipos compartidos).
+- Probado en local: registro, ingreso, perfil con errores, garaje entre "equipos", contraseña mala, bloqueo, cambio de
+  contraseña, enlace de recuperación (y que no sirve dos veces), eliminar cuenta. **Sin probar en local** (el pago está
+  apagado aquí): datos que se llenan solos al pagar y "Mis pedidos" → probar con la compra real de $1.
+- Para después: "repetir pedido", verificar el correo al registrarse, ver la lista de clientes en el panel de pedidos.
 
 **Sesión 2026-11-22 (✅ publicado, sync 386):**
 - **Inicio con imágenes, como Mansuera** (pedido del cliente, capturas `out/capturas/categorias.jpeg` y `marcas mansuera.jpeg`).

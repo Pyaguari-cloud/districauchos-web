@@ -54,7 +54,8 @@ public static class OrderEndpoints
 
         app.MapPost("/api/orders", async (
             CreateOrderRequest req, QuoteCalculator calc, CatalogQueries queries, OrderRepository orders,
-            StockCheckRepository stockChecks, IPaymentGateway gateway, ILoggerFactory lf, CancellationToken ct) =>
+            StockCheckRepository stockChecks, IPaymentGateway gateway, ILoggerFactory lf, HttpRequest http,
+            AccountRepository accounts, CancellationToken ct) =>
         {
             var log = lf.CreateLogger("Orders");
             if (!Enum.TryParse<Delivery>(req.Delivery, ignoreCase: true, out var delivery) || !Enum.IsDefined(delivery) || delivery == Delivery.None)
@@ -109,6 +110,16 @@ public static class OrderEndpoints
             var number = await orders.CreateAsync(token, customer, delivery, orderLines, quote.Total, quote.Shipping, quote.GrandTotal,
                 quote.MayorApplied, vehicle, s.BackorderDays, ct);
             var order = (await orders.GetByTokenAsync(token, ct))!;
+
+            // Con cuenta: el pedido sale en "Mis pedidos", y si aún no tenía datos guardados se guardan estos.
+            if (await Accounts.AccountEndpoints.CurrentAsync(http, accounts, ct) is { } account)
+            {
+                await accounts.LinkOrderAsync(number, account.Id, ct);
+                if (account.Profile.Phone is null && account.Profile.DocNumber is null)
+                    await accounts.UpdateProfileAsync(account.Id, account.Name, new AccountProfile(
+                        customer.Phone, customer.DocType.ToString().ToLowerInvariant(), customer.DocNumber, customer.Address,
+                        delivery is Delivery.National or Delivery.Galapagos ? customer.City : null), ct);
+            }
 
             try
             {

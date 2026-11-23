@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Districauchos.Api.Accounts;
 using Districauchos.Api.Payments;
 using Districauchos.Core;
 using Districauchos.Core.Pricing;
@@ -21,6 +22,7 @@ builder.Services.AddSingleton(new QuoteCalculator(
     new PricingRules(settings.MayorDescuento, settings.MayorUmbral), nationalShipping: settings.EnvioNacional,
     galapagosShipping: settings.EnvioGalapagos));
 builder.AddPayments(settings);
+builder.AddAccounts();
 builder.Services.ConfigureHttpJsonOptions(o =>
 {
     o.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
@@ -35,6 +37,9 @@ if (OrderEndpoints.Enabled(settings))
     await app.Services.GetRequiredService<OrderRepository>().EnsureSchemaAsync(CancellationToken.None);
     await app.Services.GetRequiredService<StockCheckRepository>().EnsureSchemaAsync(CancellationToken.None);
 }
+// Cuentas de clientes (después de orders: liga cada pedido a su cuenta si la hay).
+await app.Services.GetRequiredService<AccountRepository>().EnsureSchemaAsync(CancellationToken.None);
+app.UseRateLimiter();
 
 // Caché corta en Cloudflare/navegador: los datos cambian como mucho cada 60 min.
 app.Use(async (ctx, next) =>
@@ -132,6 +137,7 @@ app.MapPost("/api/admin/sync", async (HttpRequest http, Npgsql.NpgsqlDataSource 
 });
 
 app.MapOrders(settings);
+app.MapAccounts(settings);
 
 app.Run();
 

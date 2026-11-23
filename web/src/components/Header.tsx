@@ -3,6 +3,7 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { getCategories, getVehicles, vehicleOptions } from "@/lib/api";
 import { isRealCategory } from "@/lib/format";
+import { AccountLink } from "./AccountLink";
 import { CartLink } from "./CartLink";
 import { HeaderSearch } from "./HeaderSearch";
 import { SearchBox } from "./SearchBox";
@@ -38,7 +39,8 @@ export async function Header() {
             <HeaderSearch />
           </Suspense>
         </div>
-        <div className="order-2 ml-auto sm:order-3 sm:ml-0">
+        <div className="order-2 ml-auto flex items-center gap-1 sm:order-3 sm:ml-0">
+          <AccountLink />
           <CartLink />
         </div>
       </div>

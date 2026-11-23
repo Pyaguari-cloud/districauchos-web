@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { sessionToken } from "@/lib/session";
 
 /**
  * Puente del formulario de pago a la API .NET. La API recalcula precios y stock, valida los datos
@@ -31,11 +32,13 @@ export async function POST(req: Request) {
     email: str(c.email, 120), address: str(c.address, 200), city: str(c.city, 60), notes: str(c.notes, 300),
   };
 
+  // Con cuenta, la API liga el pedido a "Mis pedidos" y guarda los datos para la próxima compra.
+  const token = await sessionToken();
   let res: Response;
   try {
     res = await fetch(`${API_URL}/api/orders`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: JSON.stringify({ items, vehicle: str(b.vehicle, 80), delivery: str(b.delivery, 20), customer, acceptBackorder: b.acceptBackorder === true }),
       cache: "no-store",
     });

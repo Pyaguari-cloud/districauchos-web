@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { cuenta, useAccountName } from "@/lib/account";
 import { useCart } from "@/lib/cart";
 import { DELIVERY_OPTIONS, deliveryStore, shippingLabel } from "@/lib/delivery";
 import { estimate, etaText } from "@/lib/eta";
@@ -40,6 +41,28 @@ export function CheckoutForm({ backorderDays }: { backorderDays: number }) {
   const [plate, setPlate] = useState("");
   const plateClean = plate.toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 17);
   const vehicleForOrder = [vehicleText(vehicle), plateClean.length >= 5 ? `Placa/VIN: ${plateClean}` : ""].filter(Boolean).join(" · ");
+
+  const accountName = useAccountName();
+
+  // Con cuenta: llena solo los campos vacíos con los datos guardados (no pisa lo que ya escribió).
+  useEffect(() => {
+    if (!accountName) return;
+    cuenta<{ email: string; name: string; profile: Record<string, string | null | undefined> }>("yo", "GET").then((r) => {
+      if (!r.ok) return;
+      const p = r.data.profile ?? {};
+      const phone = p.phone?.startsWith("+5939") ? `0${p.phone.slice(4)}` : p.phone ?? "";
+      setF((s) => ({
+        ...s,
+        name: s.name || r.data.name || "",
+        email: s.email || r.data.email || "",
+        phone: s.phone || phone,
+        docType: s.docNumber ? s.docType : p.docType || s.docType,
+        docNumber: s.docNumber || p.docNumber || "",
+        address: s.address || p.address || "",
+        city: s.city || p.city || "",
+      }));
+    });
+  }, [accountName]);
 
   const payloadItems = items.map(({ oem, code, qty }) => ({ oem, code, qty }));
   const itemsKey = JSON.stringify(payloadItems);
@@ -131,6 +154,13 @@ export function CheckoutForm({ backorderDays }: { backorderDays: number }) {
       <div className="flex flex-col gap-6">
         <fieldset className="flex flex-col gap-4 rounded-xl border border-line bg-white p-4">
           <legend className="px-1 font-display text-xl font-bold uppercase tracking-wide">Tus datos</legend>
+          {!accountName && (
+            <p className="rounded-lg bg-surface px-3 py-2 text-sm">
+              ¿Tienes cuenta?{" "}
+              <Link href="/cuenta/ingresar?volver=/pagar" className="font-semibold underline underline-offset-2">Ingresa</Link> y tus datos se llenan
+              solos. Si no, sigue sin cuenta.
+            </p>
+          )}
           {field("name", "Nombre y apellido", { autoComplete: "name", required: true })}
           <div className="grid gap-4 sm:grid-cols-2">
             {field("phone", "Celular", { autoComplete: "tel", inputMode: "tel", placeholder: "0987654321", required: true })}
