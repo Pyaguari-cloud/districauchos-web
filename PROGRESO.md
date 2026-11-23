@@ -115,7 +115,7 @@ Probar con el simulador:
 
 ## 6. Dónde nos quedamos (2026-11-22)
 
-**Sesión 2026-11-23 (en local, falta publicar): cuentas de clientes** (pedido del cliente: registro e ingreso
+**Sesión 2026-11-23 (✅ publicado 2026-11-23): cuentas de clientes** (pedido del cliente: registro e ingreso
 con **usuario y contraseña**, opcional; sin cuenta todo sigue igual). Usuario = correo (sin correo no hay cómo recuperar).
 - API: `Core/Accounts/Passwords.cs` (PBKDF2-SHA512 210 000 vueltas, sal propia; reglas: ≥ 8, no obvias, sin el correo),
   `Data/AccountRepository.cs` (tablas `customers`, `customer_sessions`, `customer_password_resets` y `orders.customer_id`;
@@ -132,6 +132,8 @@ con **usuario y contraseña**, opcional; sin cuenta todo sigue igual). Usuario =
 - Probado en local: registro, ingreso, perfil con errores, garaje entre "equipos", contraseña mala, bloqueo, cambio de
   contraseña, enlace de recuperación (y que no sirve dos veces), eliminar cuenta. **Sin probar en local** (el pago está
   apagado aquí): datos que se llenan solos al pagar y "Mis pedidos" → probar con la compra real de $1.
+- En vivo: páginas 200, /cuenta sin sesión → /cuenta/ingresar, tablas creadas. **Falta**: que el usuario cree su
+  propia cuenta en vivo, pruebe "¿Olvidaste tu contraseña?" (correo real por Brevo) y haga la compra de $1 con sesión.
 - "Repite la contraseña" en registro, recuperar y cambiar (pedido del cliente). El cliente **aprobó la política de privacidad** (2026-11-23).
 - Para después: "repetir pedido", verificar el correo al registrarse, ver la lista de clientes en el panel de pedidos.
 
