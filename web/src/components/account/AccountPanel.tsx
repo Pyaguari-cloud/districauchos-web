@@ -155,7 +155,7 @@ function MyGarage() {
 }
 
 function PasswordForm() {
-  const [f, setF] = useState({ current: "", new: "" });
+  const [f, setF] = useState({ current: "", new: "", new2: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [msg, setMsg] = useState<{ ok: boolean; text: string }>();
   const [busy, setBusy] = useState(false);
@@ -163,13 +163,14 @@ function PasswordForm() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (busy) return;
+    setMsg(undefined);
+    if (f.new !== f.new2) { setErrors({ new2: "Las contraseñas no coinciden. Escríbela igual en los dos campos." }); return; }
     setBusy(true);
     setErrors({});
-    setMsg(undefined);
-    const r = await cuenta("contrasena", "PUT", f);
+    const r = await cuenta("contrasena", "PUT", { current: f.current, new: f.new });
     setBusy(false);
     if (r.ok) {
-      setF({ current: "", new: "" });
+      setF({ current: "", new: "", new2: "" });
       setMsg({ ok: true, text: "Contraseña cambiada. Cerramos tu sesión en los demás equipos." });
     } else {
       setErrors(r.data.fields ?? {});
@@ -182,6 +183,7 @@ function PasswordForm() {
       <h2 id="seguridad" className={h2}>Contraseña</h2>
       <PasswordField id="current" label="Contraseña actual" autoComplete="current-password" value={f.current} onChange={(e) => setF((s) => ({ ...s, current: e.target.value }))} error={errors.current} />
       <PasswordField id="new" label="Contraseña nueva" autoComplete="new-password" value={f.new} onChange={(e) => setF((s) => ({ ...s, new: e.target.value }))} error={errors.new} hint="Al menos 8 caracteres." />
+      <PasswordField id="new2" label="Repite la contraseña nueva" autoComplete="new-password" value={f.new2} onChange={(e) => setF((s) => ({ ...s, new2: e.target.value }))} error={errors.new2} />
       {msg && (msg.ok ? <p role="status" className="rounded-lg bg-ok-bg px-3 py-2 text-ok">{msg.text}</p> : !Object.keys(errors).length && <FormError>{msg.text}</FormError>)}
       <SubmitButton busy={busy} busyText="Guardando…">Cambiar contraseña</SubmitButton>
     </form>

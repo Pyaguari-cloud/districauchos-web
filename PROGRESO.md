@@ -132,6 +132,7 @@ con **usuario y contraseña**, opcional; sin cuenta todo sigue igual). Usuario =
 - Probado en local: registro, ingreso, perfil con errores, garaje entre "equipos", contraseña mala, bloqueo, cambio de
   contraseña, enlace de recuperación (y que no sirve dos veces), eliminar cuenta. **Sin probar en local** (el pago está
   apagado aquí): datos que se llenan solos al pagar y "Mis pedidos" → probar con la compra real de $1.
+- "Repite la contraseña" en registro, recuperar y cambiar (pedido del cliente). El cliente **aprobó la política de privacidad** (2026-11-23).
 - Para después: "repetir pedido", verificar el correo al registrarse, ver la lista de clientes en el panel de pedidos.
 
 **Sesión 2026-11-22 (✅ publicado, sync 386):**

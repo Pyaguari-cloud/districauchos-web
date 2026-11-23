@@ -60,7 +60,7 @@ export function LoginForm() {
 export function RegisterForm() {
   const router = useRouter();
   const volver = safeReturn(useSearchParams().get("volver"));
-  const [f, setF] = useState({ name: "", email: "", password: "" });
+  const [f, setF] = useState({ name: "", email: "", password: "", password2: "" });
   const [accept, setAccept] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState<string>();
@@ -72,12 +72,13 @@ export function RegisterForm() {
     if (busy) return;
     const local: Record<string, string> = {};
     if (f.password.length < MIN) local.password = `La contraseña debe tener al menos ${MIN} caracteres.`;
+    else if (f.password !== f.password2) local.password2 = "Las contraseñas no coinciden. Escríbela igual en los dos campos.";
     if (!accept) local.acceptPrivacy = "Para crear la cuenta acepta la política de privacidad.";
     if (Object.keys(local).length) { setErrors(local); setError("Revisa los datos marcados."); return; }
     setBusy(true);
     setErrors({});
     setError(undefined);
-    const r = await cuenta("registro", "POST", { ...f, acceptPrivacy: accept });
+    const r = await cuenta("registro", "POST", { name: f.name, email: f.email, password: f.password, acceptPrivacy: accept });
     if (r.ok) {
       accountChanged();
       router.replace(volver);
@@ -96,6 +97,7 @@ export function RegisterForm() {
         hint="Será tu usuario para ingresar." required />
       <PasswordField id="password" label="Contraseña" autoComplete="new-password" value={f.password} onChange={set("password")} error={errors.password}
         hint={`Al menos ${MIN} caracteres. Mejor si mezclas letras y números.`} required minLength={MIN} />
+      <PasswordField id="password2" label="Repite la contraseña" autoComplete="new-password" value={f.password2} onChange={set("password2")} error={errors.password2} required />
       <div className="flex flex-col gap-1">
         <label className="flex cursor-pointer gap-3 text-sm">
           <input type="checkbox" checked={accept} onChange={(e) => setAccept(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0"
@@ -159,7 +161,9 @@ export function ResetForm() {
   // El token llega después de # (no viaja al servidor ni queda en registros).
   const [token, setToken] = useState<string | null | undefined>(undefined);
   const [password, setPassword] = useState("");
+  const [password2, setPassword2] = useState("");
   const [error, setError] = useState<string>();
+  const [error2, setError2] = useState<string>();
   const [done, setDone] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -173,7 +177,9 @@ export function ResetForm() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (busy || !token) return;
+    setError2(undefined);
     if (password.length < MIN) { setError(`La contraseña debe tener al menos ${MIN} caracteres.`); return; }
+    if (password !== password2) { setError(undefined); setError2("Las contraseñas no coinciden. Escríbela igual en los dos campos."); return; }
     setBusy(true);
     setError(undefined);
     const r = await cuenta("restablecer", "POST", { token, password });
@@ -203,6 +209,7 @@ export function ResetForm() {
     <form onSubmit={submit} noValidate className="flex flex-col gap-4">
       <PasswordField id="password" label="Contraseña nueva" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)}
         hint={`Al menos ${MIN} caracteres.`} required minLength={MIN} />
+      <PasswordField id="password2" label="Repite la contraseña nueva" autoComplete="new-password" value={password2} onChange={(e) => setPassword2(e.target.value)} error={error2} required />
       <FormError>{error}</FormError>
       <SubmitButton busy={busy} busyText="Guardando…">Guardar contraseña</SubmitButton>
     </form>
