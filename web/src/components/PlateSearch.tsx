@@ -74,12 +74,20 @@ export function PlateSearch({ options, onClose }: { options: VehicleOption[]; on
   }
 
   // Modo IA de Google (udm=50) con la pregunta ya escrita: los datos tal como los da la ANT, que son los más exactos.
+  // Formato fijo (tabla + cómo diferenciar + despiece) para que el vendedor lea siempre lo mismo. Probado 2026-11-24.
   const googleHref = result?.found && wanted
     ? `https://www.google.com/search?${new URLSearchParams({
         udm: "50",
-        q: [`Código OEM y diagrama de despiece de: ${wanted}, para`, result.make, result.model,
-          result.year ? `año ${result.year}` : null, result.engine ? `motor ${result.engine}` : null,
-          result.vin ? `chasis ${result.vin}` : null, "(vehículo de Ecuador)"].filter(Boolean).join(" "),
+        q: [
+          `Vehículo de Ecuador: ${[result.make, result.model].filter(Boolean).join(" ")}` +
+            (result.year ? `, año ${result.year}` : "") + (result.engine ? `, motor ${result.engine}` : "") +
+            (result.vin ? `, chasis ${result.vin}` : "") + `. Repuesto: ${wanted}.`,
+          "Responde así:",
+          "1) Una tabla con columnas: Código OEM | Descripción exacta | Cuándo aplica (motor, caja manual/automática, con/sin aire, posición) | Equivalentes alternativos (Gates, INR, otras marcas) | Fuente.",
+          "2) Cómo diferenciar las opciones si hay más de una.",
+          "3) El diagrama de despiece donde aparece la pieza.",
+          "Si no estás seguro de un código, márcalo como \"por confirmar\"; no inventes.",
+        ].join("\n"),
       })}`
     : null;
 
