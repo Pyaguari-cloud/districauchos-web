@@ -115,7 +115,7 @@ Probar con el simulador:
 
 ## 6. Dónde nos quedamos (2026-11-22)
 
-**Sesión 2026-11-23 (b) — Buscar por placa (⏳ probado en local, sin publicar):** pedido del cliente, como Mansuera
+**Sesión 2026-11-23 (b) — Buscar por placa (✅ publicado 2026-11-23, probado en vivo con PBS-8958):** pedido del cliente, como Mansuera
 (captura `out/capturas/mansuera placas.png`). Cambia la decisión de §7 fila 6: el cliente contrata un proveedor.
 - **Proveedores comparados:** consultas.ec (elegido: marca, modelo, año, clase y chasis; **1 crédito por placa**,
   prepago desde $1/20 hasta $80/8.000; $10/500 = $0,02; probado con PBS-8958 = Aveo Emotion 1.6 2011 igual que
@@ -134,7 +134,7 @@ Probar con el simulador:
   cilindraje, tipo, chasis) → "Buscar repuestos para mi vehículo" lo guarda en el garaje y abre /buscar. Ruta
   `/api/placa` (revisa Origin). Si el modelo no está en el catálogo: todos los de la marca; si la marca no está: aviso.
   Política de privacidad: se agregó la placa y Consultas.ec (**avisar al cliente del cambio**).
-- **Para publicar:** copiar `CONSULTASEC_KEY` al `.env` del servidor y `./deploy.sh`.
+- `CONSULTASEC_KEY` y `PLATE_DAILY_LIMIT=150` ya están en el `.env` del servidor (respaldo `.env.bak-*`). **Falta:** recargar créditos (quedan ~15) y avisar al cliente del cambio en la política de privacidad.
 
 **Sesión 2026-11-23 (✅ publicado 2026-11-23): cuentas de clientes** (pedido del cliente: registro e ingreso
 con **usuario y contraseña**, opcional; sin cuenta todo sigue igual). Usuario = correo (sin correo no hay cómo recuperar).
