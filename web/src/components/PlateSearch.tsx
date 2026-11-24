@@ -87,6 +87,8 @@ export function PlateSearch({ options, onClose }: { options: VehicleOption[]; on
           "2) Cómo diferenciar las opciones si hay más de una.",
           "3) El diagrama de despiece donde aparece la pieza.",
           "Si no estás seguro de un código, márcalo como \"por confirmar\"; no inventes.",
+          // A veces el Modo IA devuelve solo "principales resultados web"; pedirlo explícito lo reduce (2026-11-24).
+          "Responde aquí mismo con la información completa; no me des solo una lista de enlaces.",
         ].join("\n"),
       })}`
     : null;
@@ -171,7 +173,7 @@ export function PlateSearch({ options, onClose }: { options: VehicleOption[]; on
           )}
           {googleHref && (
             <p className="mt-1 text-xs text-white/50">
-              La IA de Google sugiere el código y el despiece; confírmalo con nosotros antes de comprar.
+              La IA de Google sugiere el código y el despiece; confírmalo con nosotros antes de comprar. Si Google muestra solo enlaces, vuelve a tocar el botón o escríbele “dame la tabla”.
             </p>
           )}
           {!option && (
