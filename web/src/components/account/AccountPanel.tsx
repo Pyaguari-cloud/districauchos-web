@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { accountChanged, cuenta } from "@/lib/account";
 import { money } from "@/lib/format";
+import { clearLastPlate } from "@/lib/last-plate";
 import { garage, useGarage, vehicleText } from "@/lib/vehicle";
 import { FormError, PasswordField, SubmitButton, TextField } from "./Fields";
 
@@ -197,6 +198,7 @@ function Session() {
     setBusy(true);
     await cuenta("salir", "POST", {});
     garage.clear(); // este equipo puede ser compartido; el garaje sigue guardado en la cuenta
+    clearLastPlate();
     accountChanged();
     router.replace("/");
     router.refresh();
@@ -228,6 +230,7 @@ function DeleteAccount() {
     const r = await cuenta("eliminar", "POST", { password });
     if (r.ok) {
       garage.clear();
+      clearLastPlate();
       accountChanged();
       router.replace("/?cuenta=eliminada");
       router.refresh();

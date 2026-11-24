@@ -115,6 +115,19 @@ Probar con el simulador:
 
 ## 6. Dónde nos quedamos (2026-11-22)
 
+**Sesión 2026-11-24 — OEM con la IA de Google desde la ficha de la placa (⏳ listo en local, falta "publica"):**
+- Prueba a ciegas de 15 piezas del inventario (`out/ia-oem/`): Gemini 5/15 aciertos y 8 errores (4 "seguridad alta"),
+  ChatGPT 0 (11 "no sé"), Claude 0 (13 "no sé"). Conclusión: **no mostrar un OEM de IA como dato de la página**.
+- El cliente ya usa el **Modo IA de Google** (gratis) y pidió: placa → carro exacto → OEM con fotos y despiece.
+- Hecho: en la ficha de la placa, campo "¿Qué repuesto buscas?" + botón "Buscar en nuestro inventario" (búsqueda con
+  el carro exacto) + enlace "Buscar el OEM con la IA de Google" (`google.com/search?udm=50&q=…` con marca, modelo,
+  año, motor y chasis). Sin costo de IA.
+- Al pagar, si el vehículo del garaje es el de la placa consultada, la placa se llena sola y el **chasis va en el
+  pedido** (`web/src/lib/last-plate.ts`, se borra al cerrar sesión).
+- Vendedores: `PLATE_STAFF_EMAILS` (correos de sus cuentas) → 150 placas/día por cuenta en vez de 12/hora por IP.
+- Pendiente: que el cliente cree las cuentas de los vendedores y nos pase los correos → ponerlos en el `.env` del
+  servidor; probar en vivo que el chasis llega en el correo del pedido.
+
 **Sesión 2026-11-23 (b) — Buscar por placa (✅ publicado 2026-11-23, probado en vivo con PBS-8958):** pedido del cliente, como Mansuera
 (captura `out/capturas/mansuera placas.png`). Cambia la decisión de §7 fila 6: el cliente contrata un proveedor.
 - **Proveedores comparados:** consultas.ec (elegido: marca, modelo, año, clase y chasis; **1 crédito por placa**,

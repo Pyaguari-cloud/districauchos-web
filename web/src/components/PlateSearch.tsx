@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
+import { saveLastPlate } from "@/lib/last-plate";
 import { garage, vehicleSearchHref, YEARS } from "@/lib/vehicle";
 import type { VehicleOption } from "./VehicleBar";
 
@@ -15,6 +16,8 @@ type PlateResult = {
  * "Buscar por placa" (pedido del cliente 2026-11-23, como Mansuera): se escribe la placa, sale la ficha del
  * vehículo (marca, modelo, año, cilindraje, chasis) y "Buscar repuestos para mi vehículo" lo guarda en Mi garaje
  * y abre sus repuestos. Si la marca o el modelo no están en el catálogo, se busca lo más cercano que sí está.
+ * "¿Qué repuesto buscas?" (pedido del cliente 2026-11-24): busca ese repuesto en el inventario para el carro exacto, o
+ * abre el Modo IA de Google con la pregunta ya escrita (OEM + despiece), gratis. La IA sugiere; el vendedor confirma.
  */
 export function PlateSearch({ options, onClose }: { options: VehicleOption[]; onClose: () => void }) {
   const router = useRouter();
@@ -24,6 +27,7 @@ export function PlateSearch({ options, onClose }: { options: VehicleOption[]; on
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<PlateResult | null>(null);
+  const [part, setPart] = useState("");
 
   useEffect(() => input.current?.focus(), []);
 
@@ -41,7 +45,12 @@ export function PlateSearch({ options, onClose }: { options: VehicleOption[]; on
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) setError(typeof data.error === "string" ? data.error : "No pudimos consultar la placa. Inténtalo de nuevo.");
-      else setResult(data as PlateResult);
+      else {
+        const r = data as PlateResult;
+        setResult(r);
+        // Para el pedido: placa y chasis del carro que se buscó (solo datos del vehículo).
+        if (r.found && r.brand) saveLastPlate({ plate: r.plate, vin: r.vin, brand: r.brand, model: r.catalogModel });
+      }
     } catch {
       setError("Sin conexión. Revisa tu internet e inténtalo de nuevo.");
     } finally {
@@ -55,12 +64,24 @@ export function PlateSearch({ options, onClose }: { options: VehicleOption[]; on
   const engine = model && result?.engine && option?.engines?.[model]?.includes(result.engine) ? result.engine : null;
   const year = model && result?.year && YEARS.includes(result.year) ? result.year : null;
 
+  const wanted = part.trim().slice(0, 80);
+
   function go() {
     if (!option) return;
     garage.addAndActivate(option.brand, model, year, engine);
     onClose();
-    router.push(vehicleSearchHref({ brand: option.brand, model, year, engine }));
+    router.push(vehicleSearchHref({ brand: option.brand, model, year, engine }, wanted ? { q: wanted } : {}));
   }
+
+  // Modo IA de Google (udm=50) con la pregunta ya escrita: los datos tal como los da la ANT, que son los más exactos.
+  const googleHref = result?.found && wanted
+    ? `https://www.google.com/search?${new URLSearchParams({
+        udm: "50",
+        q: [`Código OEM y diagrama de despiece de: ${wanted}, para`, result.make, result.model,
+          result.year ? `año ${result.year}` : null, result.engine ? `motor ${result.engine}` : null,
+          result.vin ? `chasis ${result.vin}` : null, "(vehículo de Ecuador)"].filter(Boolean).join(" "),
+      })}`
+    : null;
 
   const row = "flex justify-between gap-3 border-b border-white/10 py-1.5 last:border-0";
   const dt = "text-white/60";
@@ -110,6 +131,15 @@ export function PlateSearch({ options, onClose }: { options: VehicleOption[]; on
             {result.vehicleClass && <div className={row}><dt className={dt}>Tipo</dt><dd className={dd}>{result.vehicleClass}</dd></div>}
             {result.vin && <div className={row}><dt className={dt}>Chasis</dt><dd className={`${dd} break-all font-mono text-xs`}>{result.vin}</dd></div>}
           </dl>
+          <div className="mt-3 flex flex-col gap-0.5">
+            <label htmlFor={`${inputId}-parte`} className="text-xs font-semibold text-white/70">¿Qué repuesto buscas? (opcional)</label>
+            <input
+              id={`${inputId}-parte`} value={part} maxLength={80} autoComplete="off" placeholder="Ej.: manguera de calefacción"
+              onChange={(e) => setPart(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); go(); } }}
+              className="h-11 w-full min-w-0 rounded-lg border border-white/20 bg-brand-ink px-3 text-base text-white placeholder:text-white/30 focus:border-brand-yellow focus:outline-none"
+            />
+          </div>
           {option ? (
             <>
               {!model && (
@@ -119,10 +149,24 @@ export function PlateSearch({ options, onClose }: { options: VehicleOption[]; on
               )}
               <button type="button" onClick={go}
                 className="mt-3 h-11 w-full rounded-lg bg-brand-yellow px-5 font-display font-bold uppercase tracking-wide text-brand-black hover:bg-brand-yellow-dark">
-                Buscar repuestos para mi vehículo
+                {wanted ? "Buscar en nuestro inventario" : "Buscar repuestos para mi vehículo"}
               </button>
             </>
+          ) : null}
+          {googleHref ? (
+            <a href={googleHref} target="_blank" rel="noopener noreferrer"
+              className="mt-2 flex h-11 w-full items-center justify-center rounded-lg border border-white/30 px-4 text-center font-display text-sm font-bold uppercase tracking-wide text-white hover:border-brand-yellow hover:text-brand-yellow">
+              Buscar el OEM con la IA de Google ↗
+            </a>
           ) : (
+            <p className="mt-2 text-xs text-white/60">Escribe el repuesto para buscar también su código OEM con la IA de Google.</p>
+          )}
+          {googleHref && (
+            <p className="mt-1 text-xs text-white/50">
+              La IA de Google sugiere el código y el despiece; confírmalo con nosotros antes de comprar.
+            </p>
+          )}
+          {!option && (
             <p className="mt-2 text-sm text-white">
               Todavía no tenemos repuestos registrados para {result.make ?? "esa marca"}. Escríbenos por WhatsApp y te
               ayudamos a conseguirlo.

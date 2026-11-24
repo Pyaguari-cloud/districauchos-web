@@ -9,6 +9,7 @@ import { estimate, etaText } from "@/lib/eta";
 import { useNow } from "@/lib/use-now";
 import { money } from "@/lib/format";
 import type { QuoteResponse } from "@/lib/quote";
+import { useLastPlate } from "@/lib/last-plate";
 import { useMyVehicle, vehicleText } from "@/lib/vehicle";
 
 type Fields = Record<"name" | "docType" | "docNumber" | "phone" | "email" | "address" | "city" | "notes", string>;
@@ -38,9 +39,18 @@ export function CheckoutForm({ backorderDays }: { backorderDays: number }) {
   // Sube cuando el servidor avisa que el stock cambió al pagar: vuelve a pedir la cotización.
   const [refresh, setRefresh] = useState(0);
   // Placa o VIN (opcional): no se valida contra ninguna base; solo ayuda al vendedor a confirmar el repuesto.
-  const [plate, setPlate] = useState("");
+  // Si buscó su placa en la página y es el mismo vehículo, la placa se llena sola y el chasis va en el pedido.
+  // plate === null: todavía no escribió nada, se usa la placa consultada.
+  const [typed, setPlate] = useState<string | null>(null);
+  const lastPlate = useLastPlate();
+  const last = lastPlate && vehicle && lastPlate.brand === vehicle.brand && lastPlate.model === vehicle.model ? lastPlate : null;
+  const plate = typed ?? last?.plate ?? "";
+  const vin = last?.vin ? { plate: last.plate, vin: last.vin } : null;
   const plateClean = plate.toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 17);
-  const vehicleForOrder = [vehicleText(vehicle), plateClean.length >= 5 ? `Placa/VIN: ${plateClean}` : ""].filter(Boolean).join(" · ");
+  const chasis = vin && plateClean === vin.plate ? ` · Chasis: ${vin.vin}` : "";
+  const base = [vehicleText(vehicle), plateClean.length >= 5 ? `Placa/VIN: ${plateClean}` : ""].filter(Boolean).join(" · ");
+  // La API acepta hasta 80 caracteres en el vehículo del pedido.
+  const vehicleForOrder = (base + chasis).length <= 80 ? base + chasis : base;
 
   const accountName = useAccountName();
 
@@ -212,6 +222,7 @@ export function CheckoutForm({ backorderDays }: { backorderDays: number }) {
             />
             <p id="h-plate" className="text-sm text-muted">
               {vehicle ? <>Vehículo: <strong>{vehicleText(vehicle)}</strong>. </> : null}
+              {chasis ? <>Chasis: <strong className="font-mono">{vin!.vin}</strong> (lo tomamos de tu placa). </> : null}
               Nuestro vendedor confirma que el repuesto es el correcto antes de enviarlo.
             </p>
           </div>

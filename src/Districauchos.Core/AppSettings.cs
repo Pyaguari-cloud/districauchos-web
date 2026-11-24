@@ -50,6 +50,8 @@ public sealed record AppSettings
     public string? ConsultasEcKey { get; init; }
     /// <summary>Tope de consultas pagadas al proveedor por día (las placas guardadas no cuentan). Cuida el saldo.</summary>
     public int PlateDailyLimit { get; init; } = 150;
+    /// <summary>Cuentas de los vendedores (correos separados por coma): hasta 150 placas por día cada una, en vez de 12 por hora.</summary>
+    public IReadOnlyList<string> PlateStaffEmails { get; init; } = [];
 
     /// <summary>
     /// Columna de stock en Tabiazo/Cusubamba/Maldonado cuando hay dos "Stock actual" (pregunta abierta 12.4).
@@ -103,6 +105,8 @@ public sealed record AppSettings
         MeiliMasterKey = c["MEILI_MASTER_KEY"],
         ConsultasEcKey = c["CONSULTASEC_KEY"],
         PlateDailyLimit = int.TryParse(c["PLATE_DAILY_LIMIT"], out var pl) && pl >= 0 ? pl : 150,
+        PlateStaffEmails = (c["PLATE_STAFF_EMAILS"] ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(e => e.ToLowerInvariant()).ToList(),
         StockColumnOccurrence = int.TryParse(c["STOCK_COLUMN_OCCURRENCE"], out var o) && o is 1 or 2 ? o : 1,
         LocalCsvDir = c["LOCAL_CSV_DIR"],
         MediaDir = c["MEDIA_DIR"] ?? "media",

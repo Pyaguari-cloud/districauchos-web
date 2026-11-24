@@ -1,9 +1,10 @@
 using System.Net;
 using System.Text.Json;
 using System.Threading.RateLimiting;
+using Districauchos.Api.Accounts;
 using Districauchos.Core;
 using Districauchos.Core.Vehicles;
-using Microsoft.AspNetCore.RateLimiting;
+using Districauchos.Data;
 using Npgsql;
 
 namespace Districauchos.Api.Plates;
@@ -19,12 +20,17 @@ public sealed record PlateResult(
 /// <summary>
 /// Búsqueda por placa (pedido del cliente 2026-11-23, como Mansuera) con consultas.ec (prepago, 1 crédito por
 /// placa). Cada placa encontrada se guarda para siempre: buscarla otra vez no gasta crédito. Límites para cuidar el
-/// saldo: 12 búsquedas por hora por persona y un tope diario de consultas pagadas (PLATE_DAILY_LIMIT).
-/// Solo la web (Next.js) llama a esta ruta; la IP real del visitante llega en X-Client-IP.
+/// saldo: 12 búsquedas por hora por persona y un tope diario de consultas pagadas (PLATE_DAILY_LIMIT). Las cuentas de
+/// los vendedores (PLATE_STAFF_EMAILS) buscan hasta 150 placas por día cada una: en el local todos salen por la misma IP.
+/// Solo la web (Next.js) llama a esta ruta; la IP real del visitante llega en X-Client-IP y la sesión como Bearer.
 /// </summary>
 public static class PlateEndpoints
 {
-    private const string Policy = "plate";
+    private static readonly PartitionedRateLimiter<string> Public = PartitionedRateLimiter.Create<string, string>(key =>
+        RateLimitPartition.GetFixedWindowLimiter(key, _ => new FixedWindowRateLimiterOptions { PermitLimit = 12, Window = TimeSpan.FromHours(1), QueueLimit = 0 }));
+    private static readonly PartitionedRateLimiter<string> Staff = PartitionedRateLimiter.Create<string, string>(key =>
+        RateLimitPartition.GetFixedWindowLimiter(key, _ => new FixedWindowRateLimiterOptions { PermitLimit = 150, Window = TimeSpan.FromDays(1), QueueLimit = 0 }));
+
     public static bool Enabled(AppSettings s) => !string.IsNullOrWhiteSpace(s.ConsultasEcKey);
 
     public static void AddPlates(this WebApplicationBuilder builder, AppSettings settings)
@@ -38,9 +44,6 @@ public static class PlateEndpoints
             c.DefaultRequestHeaders.Accept.ParseAdd("application/json");
             c.DefaultRequestHeaders.UserAgent.ParseAdd("districauchos-web/1.0");
         });
-        builder.Services.AddRateLimiter(o => o.AddPolicy(Policy, ctx => RateLimitPartition.GetFixedWindowLimiter(
-            ctx.Request.Headers["X-Client-IP"].ToString() is { Length: > 0 and <= 64 } ip ? ip : ctx.Connection.RemoteIpAddress?.ToString() ?? "?",
-            _ => new FixedWindowRateLimiterOptions { PermitLimit = 12, Window = TimeSpan.FromHours(1), QueueLimit = 0 })));
     }
 
     public static void MapPlates(this WebApplication app, AppSettings settings)
@@ -48,10 +51,23 @@ public static class PlateEndpoints
         app.MapGet("/api/plate/status", () => Results.Ok(new { enabled = Enabled(settings) }));
 
         app.MapGet("/api/plate/{plate}", async (
-            string plate, PlateRepository repo, PlateProvider provider, PlateVehicles vehicles, ILogger<PlateRepository> log,
-            CancellationToken ct) =>
+            string plate, HttpRequest http, PlateRepository repo, PlateProvider provider, PlateVehicles vehicles,
+            AccountRepository accounts, ILogger<PlateRepository> log, CancellationToken ct) =>
         {
             if (!Enabled(settings)) return Results.NotFound(new { error = "La búsqueda por placa no está disponible." });
+
+            // Vendedor (cuenta en PLATE_STAFF_EMAILS): 150 por día por cuenta. Los demás: 12 por hora por IP.
+            var account = settings.PlateStaffEmails.Count > 0 ? await AccountEndpoints.CurrentAsync(http, accounts, ct) : null;
+            var staff = account is not null && settings.PlateStaffEmails.Contains(account.Email.ToLowerInvariant());
+            using var lease = staff
+                ? Staff.AttemptAcquire("staff:" + account!.Id)
+                : Public.AttemptAcquire(http.Headers["X-Client-IP"].ToString() is { Length: > 0 and <= 64 } ip ? ip : http.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "?");
+            if (!lease.IsAcquired)
+                return Results.Json(new { error = staff
+                        ? "Llegaste al máximo de 150 placas por hoy en esta cuenta. Mañana se renueva."
+                        : "Hiciste muchas búsquedas por placa seguidas. Espera un rato o elige tu vehículo en la lista." },
+                    statusCode: StatusCodes.Status429TooManyRequests);
+
             var norm = Plate.Normalize(plate);
             if (norm is null) return Results.BadRequest(new { error = "Escribe la placa así: ABC-1234 (o AB-123C si es moto)." });
 
@@ -78,7 +94,7 @@ public static class PlateEndpoints
                     return Results.Json(new { error = "No pudimos consultar la placa en este momento (la ANT no responde). Inténtalo en unos minutos o elige tu vehículo en la lista." },
                         statusCode: StatusCodes.Status503ServiceUnavailable);
             }
-        }).RequireRateLimiting(Policy);
+        });
     }
 
     private static IResult Busy() => Results.Json(

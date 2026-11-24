@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
-import { clientIp, sameOrigin } from "@/lib/session";
+import { clientIp, sameOrigin, sessionToken } from "@/lib/session";
 
 /**
  * Búsqueda por placa: puente hacia la API .NET, que guarda cada placa (no se paga dos veces) y pone los límites.
  * Solo desde nuestra propia página (Origin), para que nadie use la ruta como servicio gratis de placas.
+ * La sesión va como Bearer: las cuentas de los vendedores tienen un límite más alto (todos salen por la IP del local).
  */
 const API_URL = process.env.API_URL ?? "http://localhost:8080";
 const noStore = { "Cache-Control": "no-store" };
@@ -14,8 +15,9 @@ export async function POST(req: Request) {
   const placa = typeof body?.placa === "string" ? body.placa.trim().slice(0, 20) : "";
   if (!placa) return NextResponse.json({ error: "Escribe la placa." }, { status: 400, headers: noStore });
   try {
+    const token = await sessionToken();
     const res = await fetch(`${API_URL}/api/plate/${encodeURIComponent(placa)}`, {
-      headers: { "X-Client-IP": clientIp(req) },
+      headers: { "X-Client-IP": clientIp(req), ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       cache: "no-store",
       signal: AbortSignal.timeout(30_000),
     });
