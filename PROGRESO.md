@@ -124,6 +124,11 @@ Probar con el simulador:
   año, motor y chasis). Sin costo de IA.
 - Al pagar, si el vehículo del garaje es el de la placa consultada, la placa se llena sola y el **chasis va en el
   pedido** (`web/src/lib/last-plate.ts`, se borra al cerrar sesión).
+- (2026-11-24, tarde) Pedido del cliente: la pregunta a Google pide **medidas y foto** (no despiece) para comparar
+  con otro repuesto de iguales medidas; y en **los resultados de búsqueda** con vehículo hay un recuadro "Buscar OEM y
+  medidas con la IA de Google" (amarillo arriba si no hay coincidencia exacta, discreto abajo si la hay), con los datos
+  de la última placa si es el mismo carro (`GoogleOemBox`, `lib/google-ai.ts`). Google ahora pide confirmar toda
+  pregunta que llega por enlace ("Sí, continuar"); por eso la pregunta es corta (con la larga había que desplazarse).
 - Vendedores: `PLATE_STAFF_EMAILS` (correos de sus cuentas) → 150 placas/día por cuenta en vez de 12/hora por IP.
 - Pendiente: que el cliente cree las cuentas de los vendedores y nos pase los correos → ponerlos en el `.env` del
   servidor; probar en vivo que el chasis llega en el correo del pedido.

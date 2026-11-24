@@ -7,6 +7,7 @@ import { searchCatalog } from "@/lib/api";
 import { rowsFromRanges } from "@/lib/compat-match";
 import { sentenceCase, vehicleLabel } from "@/lib/format";
 import { askLink } from "@/lib/whatsapp";
+import { GoogleOemBox } from "@/components/GoogleOemBox";
 import { photoCredit, vehiclePhoto } from "@/lib/vehicle-photos";
 
 type Params = { q?: string; marca?: string; modelo?: string; anio?: string; motor?: string; categoria?: string; disponible?: string; importado?: string; pagina?: string };
@@ -64,6 +65,11 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const vehicle = p.marca ? [vehicleLabel(p.marca, p.modelo ?? null), year, engine].filter(Boolean).join(" ") : undefined;
   const photo = p.marca && !vehicleFallback ? vehiclePhoto(p.marca, p.modelo) : null;
   const heading = p.q ? `“${p.q}”` : p.categoria ? sentenceCase(p.categoria) : p.importado ? "Importación directa" : vehicle ?? "Todos los repuestos";
+  const aiMissing = result.total === 0 || result.relaxed || vehicleFallback;
+  const aiBox = p.q && p.marca && vehicle ? (
+    <GoogleOemBox query={p.q} brand={p.marca} model={p.modelo ?? null} year={year ?? null} engine={engine ?? null}
+      label={vehicleLabel(p.marca, p.modelo ?? null)} missing={aiMissing} />
+  ) : null;
   const brands = Object.entries(result.facets.brands ?? {}).sort((a, b) => b[1] - a[1]).slice(0, 12);
 
   return (
@@ -145,11 +151,16 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         </details>
       )}
 
+      {/* IA de Google sin volver a consultar la placa; arriba si no hay coincidencia exacta, al final si la hay. */}
+      {aiBox && aiMissing && aiBox}
+
       {result.total === 0 ? (
         <NoResults query={p.q} vehicle={vehicle} />
       ) : (
         <ProductGrid items={result.items} compat={Object.fromEntries(result.items.map((h) => [h.slug, rowsFromRanges(h.yearRanges)]))} />
       )}
+
+      {aiBox && !aiMissing && aiBox}
 
       {result.totalPages > 1 && (
         <nav aria-label="Páginas" className="flex items-center justify-center gap-3">

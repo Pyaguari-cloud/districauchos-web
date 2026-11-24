@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
+import { googleOemHref } from "@/lib/google-ai";
 import { saveLastPlate } from "@/lib/last-plate";
 import { garage, vehicleSearchHref, YEARS } from "@/lib/vehicle";
 import type { VehicleOption } from "./VehicleBar";
@@ -17,7 +18,7 @@ type PlateResult = {
  * vehículo (marca, modelo, año, cilindraje, chasis) y "Buscar repuestos para mi vehículo" lo guarda en Mi garaje
  * y abre sus repuestos. Si la marca o el modelo no están en el catálogo, se busca lo más cercano que sí está.
  * "¿Qué repuesto buscas?" (pedido del cliente 2026-11-24): busca ese repuesto en el inventario para el carro exacto, o
- * abre el Modo IA de Google con la pregunta ya escrita (OEM + despiece), gratis. La IA sugiere; el vendedor confirma.
+ * abre el Modo IA de Google con la pregunta ya escrita (OEM, medidas y foto), gratis. La IA sugiere; el vendedor confirma.
  */
 export function PlateSearch({ options, onClose }: { options: VehicleOption[]; onClose: () => void }) {
   const router = useRouter();
@@ -49,7 +50,7 @@ export function PlateSearch({ options, onClose }: { options: VehicleOption[]; on
         const r = data as PlateResult;
         setResult(r);
         // Para el pedido: placa y chasis del carro que se buscó (solo datos del vehículo).
-        if (r.found && r.brand) saveLastPlate({ plate: r.plate, vin: r.vin, brand: r.brand, model: r.catalogModel });
+        if (r.found && r.brand) saveLastPlate({ plate: r.plate, vin: r.vin, brand: r.brand, model: r.catalogModel, make: r.make, modelName: r.model, year: r.year, engine: r.engine });
       }
     } catch {
       setError("Sin conexión. Revisa tu internet e inténtalo de nuevo.");
@@ -73,24 +74,9 @@ export function PlateSearch({ options, onClose }: { options: VehicleOption[]; on
     router.push(vehicleSearchHref({ brand: option.brand, model, year, engine }, wanted ? { q: wanted } : {}));
   }
 
-  // Modo IA de Google (udm=50) con la pregunta ya escrita: los datos tal como los da la ANT, que son los más exactos.
-  // Formato fijo (tabla + cómo diferenciar + despiece) para que el vendedor lea siempre lo mismo. Probado 2026-11-24.
+  // Modo IA de Google con la pregunta ya escrita: los datos tal como los da la ANT, que son los más exactos.
   const googleHref = result?.found && wanted
-    ? `https://www.google.com/search?${new URLSearchParams({
-        udm: "50",
-        q: [
-          `Vehículo de Ecuador: ${[result.make, result.model].filter(Boolean).join(" ")}` +
-            (result.year ? `, año ${result.year}` : "") + (result.engine ? `, motor ${result.engine}` : "") +
-            (result.vin ? `, chasis ${result.vin}` : "") + `. Repuesto: ${wanted}.`,
-          "Responde así:",
-          "1) Una tabla con columnas: Código OEM | Descripción exacta | Cuándo aplica (motor, caja manual/automática, con/sin aire, posición) | Equivalentes alternativos (Gates, INR, otras marcas) | Fuente.",
-          "2) Cómo diferenciar las opciones si hay más de una.",
-          "3) El diagrama de despiece donde aparece la pieza.",
-          "Si no estás seguro de un código, márcalo como \"por confirmar\"; no inventes.",
-          // A veces el Modo IA devuelve solo "principales resultados web"; pedirlo explícito lo reduce (2026-11-24).
-          "Responde aquí mismo con la información completa; no me des solo una lista de enlaces.",
-        ].join("\n"),
-      })}`
+    ? googleOemHref({ vehicle: [result.make, result.model].filter(Boolean).join(" "), year: result.year, engine: result.engine, vin: result.vin, part: wanted })
     : null;
 
   const row = "flex justify-between gap-3 border-b border-white/10 py-1.5 last:border-0";
@@ -173,7 +159,7 @@ export function PlateSearch({ options, onClose }: { options: VehicleOption[]; on
           )}
           {googleHref && (
             <p className="mt-1 text-xs text-white/50">
-              La IA de Google sugiere el código y el despiece; confírmalo con nosotros antes de comprar. Si Google muestra solo enlaces, vuelve a tocar el botón o escríbele “dame la tabla”.
+              La IA de Google sugiere el código, las medidas y cómo luce; confírmalo con nosotros antes de comprar. Google te pedirá confirmar la búsqueda: toca “Sí, continuar”. Si muestra solo enlaces, escríbele “dame la tabla”.
             </p>
           )}
           {!option && (
