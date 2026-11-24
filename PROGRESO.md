@@ -115,7 +115,7 @@ Probar con el simulador:
 
 ## 6. Dónde nos quedamos (2026-11-22)
 
-**Sesión 2026-11-24 — OEM con la IA de Google desde la ficha de la placa (⏳ listo en local, falta "publica"):**
+**Sesión 2026-11-24 — OEM con la IA de Google desde la ficha de la placa (✅ publicado 2026-11-24):**
 - Prueba a ciegas de 15 piezas del inventario (`out/ia-oem/`): Gemini 5/15 aciertos y 8 errores (4 "seguridad alta"),
   ChatGPT 0 (11 "no sé"), Claude 0 (13 "no sé"). Conclusión: **no mostrar un OEM de IA como dato de la página**.
 - El cliente ya usa el **Modo IA de Google** (gratis) y pidió: placa → carro exacto → OEM con fotos y despiece.
