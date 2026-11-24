@@ -63,7 +63,8 @@ export default function PrivacyPage() {
       <h2 className={h2}>Cuánto tiempo los guardamos</h2>
       <p>
         Tu cuenta y sus datos, hasta que la elimines. Los pedidos pagados se guardan el tiempo que exige la ley tributaria,
-        aunque elimines tu cuenta, porque los necesitamos para la facturación.
+        aunque elimines tu cuenta, porque los necesitamos para la facturación. Las placas buscadas y los datos de su
+        vehículo se guardan sin límite de tiempo, porque no están ligados a ninguna persona.
       </p>
 
       <h2 className={h2}>Tus derechos</h2>

@@ -18,7 +18,7 @@ public sealed record PlateResult(
 
 /// <summary>
 /// Búsqueda por placa (pedido del cliente 2026-11-23, como Mansuera) con consultas.ec (prepago, 1 crédito por
-/// placa). Cada placa encontrada se guarda 180 días: buscarla otra vez no gasta crédito. Límites para cuidar el
+/// placa). Cada placa encontrada se guarda para siempre: buscarla otra vez no gasta crédito. Límites para cuidar el
 /// saldo: 12 búsquedas por hora por persona y un tope diario de consultas pagadas (PLATE_DAILY_LIMIT).
 /// Solo la web (Next.js) llama a esta ruta; la IP real del visitante llega en X-Client-IP.
 /// </summary>
@@ -161,12 +161,12 @@ public sealed class PlateRepository(NpgsqlDataSource db)
         await cmd.ExecuteNonQueryAsync(ct);
     }
 
-    /// <summary>Encontradas: 180 días. No encontradas: 1 día (puede ser un carro recién matriculado).</summary>
+    /// <summary>Encontradas: para siempre (decisión del cliente 2026-11-23). No encontradas: 1 día (puede ser un carro recién matriculado).</summary>
     public async Task<PlateRow?> GetFreshAsync(string plate, CancellationToken ct)
     {
         await using var cmd = db.CreateCommand("""
             SELECT found, make, model, year, vclass, vin FROM plate_lookups
-            WHERE plate = $1 AND looked_up_at > now() - CASE WHEN found THEN interval '180 days' ELSE interval '1 day' END
+            WHERE plate = $1 AND (found OR looked_up_at > now() - interval '1 day')
             """);
         cmd.Parameters.AddWithValue(plate);
         await using var r = await cmd.ExecuteReaderAsync(ct);

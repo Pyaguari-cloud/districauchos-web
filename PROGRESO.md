@@ -124,7 +124,7 @@ Probar con el simulador:
   DataCil: sin año ni chasis, $0,10–0,26. Verifik: sin precios públicos. Cuenta de consultas.ec: correo del usuario,
   compra de $1 (20 créditos, sin recarga automática ni tarjeta guardada); quedan ~16. Recargar en consultas.ec/cuenta.
 - **API:** `Api/Plates/PlateEndpoints.cs` → `GET /api/plate/{placa}` (y `/api/plate/status`). Tabla `plate_lookups`
-  (encontradas 180 días, no encontradas 1 día: repetir una placa no gasta) y `plate_lookup_usage` (tope diario de
+  (encontradas **para siempre**, decisión del cliente; no encontradas 1 día: repetir una placa no gasta) y `plate_lookup_usage` (tope diario de
   consultas pagadas `PLATE_DAILY_LIMIT`, 150 por defecto). 12 búsquedas/hora por IP. Aviso en el log con ≤ 20 créditos.
   El proveedor responde 503 "la ANT no responde" sin cobrar (también con placas que no existen) → no se guarda.
   `Core/Vehicles/Plate.cs` (normaliza: "POR-039" → POR0039, motos AB123C; año por el 10.º carácter del VIN de respaldo)
