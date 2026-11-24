@@ -7,6 +7,7 @@ import { useState } from "react";
 import { sentenceCase } from "@/lib/format";
 import { garage, useGarage, useMyVehicle, vehicleText, YEARS } from "@/lib/vehicle";
 import { vehiclePhoto } from "@/lib/vehicle-photos";
+import { PlateIcon } from "./icons";
 import { PlateSearch } from "./PlateSearch";
 
 /** engines: cilindrajes conocidos por modelo (solo los que tienen varios repuestos). */
@@ -120,9 +121,10 @@ function BarForm({ options, categories, g, mine, router, onSearch, params, urlCa
             </>
           )}
           {plates && (
+            // Más visible (cliente 2026-11-24: "no encontraban el botón de buscar placa porque estaba muy pequeño").
             <button type="button" onClick={() => setByPlate((v) => !v)} aria-expanded={byPlate}
-              className="rounded-md border border-brand-yellow/70 px-2.5 py-1 text-sm font-semibold text-brand-yellow hover:bg-brand-yellow hover:text-brand-black">
-              Buscar por placa
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-md bg-brand-yellow px-3 font-display text-sm font-bold uppercase tracking-wide text-brand-black hover:bg-brand-yellow-dark">
+              <PlateIcon /> Buscar por placa
             </button>
           )}
           {mine && <button type="button" onClick={clear} className={link}>Quitar filtro</button>}

@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { connection } from "next/server";
+import { FinderCard } from "@/components/FinderCard";
 import { HowItWorks } from "@/components/HowItWorks";
+import { PromoCarousel } from "@/components/PromoCarousel";
+import { promos } from "@/content/promos";
 import { PartImage } from "@/components/PartImage";
 import { brandLogo, categoryExamples } from "@/content/marcas";
 import { ProductGrid } from "@/components/ProductCard";
 import { StoreCard } from "@/components/StoreCard";
 import { negocio } from "@/content/negocio";
-import { SearchBox } from "@/components/SearchBox";
-import { getCategories, getVehicles, searchCatalog } from "@/lib/api";
+import { getCategories, getPlateEnabled, getVehicles, searchCatalog, vehicleOptions } from "@/lib/api";
 import { isRealCategory, sentenceCase } from "@/lib/format";
 import { jsonLd, organizationJsonLd } from "@/lib/structured-data";
 
@@ -15,25 +17,21 @@ export default async function HomePage() {
   // Se renderiza al pedirla (no en el build): los datos vienen de la API y se cachean 5 min.
   await connection();
   // Pedido del cliente: primero lo que importan directamente (Importadora VCH), luego el resto.
-  const [imported, topSellers, categories, brands] = await Promise.all([
+  const [imported, topSellers, categories, brands, plates] = await Promise.all([
     searchCatalog({ available: true, vch: true, pageSize: 8 }),
     searchCatalog({ available: true, vch: false, pageSize: 8 }), // sin texto: clase A primero
     getCategories(),
     getVehicles(),
+    getPlateEnabled().catch(() => false),
   ]);
 
   return (
     <div className="flex flex-col gap-10">
-      <section className="-mx-4 -mt-6 bg-brand-ink px-4 py-8 text-white sm:mx-0 sm:mt-0 sm:rounded-2xl sm:py-12">
-        <div className="mx-auto flex max-w-3xl flex-col gap-4">
-          <h1 className="font-display text-3xl font-bold uppercase leading-tight tracking-wide sm:text-4xl">
-            Encuentra el repuesto <span className="text-brand-yellow">para tu vehículo</span>
-          </h1>
-          <p className="text-gray-300">Busca por nombre, por vehículo o por código OEM. Cotiza al instante por WhatsApp.</p>
-          {/* En celular ya está el buscador del encabezado justo arriba: no se repite. */}
-          <div className="hidden sm:block"><SearchBox size="lg" /></div>
-        </div>
-      </section>
+      {/* Pedido del cliente 2026-11-24 (como Mansuera): promociones a la izquierda y la búsqueda por placa en grande. */}
+      <div className="-mx-4 -mt-6 grid gap-4 sm:mx-0 sm:mt-0 lg:grid-cols-[1.15fr_1fr]">
+        <PromoCarousel slides={promos} />
+        <FinderCard options={vehicleOptions(brands)} plates={plates} />
+      </div>
 
       <ul className="grid grid-cols-2 gap-2 text-center sm:grid-cols-4 sm:gap-4" aria-label="Districauchos en números">
         {negocio.highlights.map((h) => (

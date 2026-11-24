@@ -30,6 +30,8 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  /* Reserva el espacio de la barra: al abrir el menú (que bloquea el desplazamiento) la página no salta. */
+  scrollbar-gutter: stable;
 }
 
 /* Red de seguridad: si algún dato de la hoja fuera más ancho que la pantalla, se recorta en vez de
@@ -92,3 +94,13 @@ main :focus-visible {
   color: var(--color-brand-red);
 }
 
+
+/* Menú lateral (MenuDrawer): entra desde la izquierda. Con "reducir movimiento" no se anima (clase motion-reduce). */
+@keyframes drawer-in {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+/* Carrusel de promociones: sin barra de desplazamiento visible (se mueve con flechas, puntos o deslizando). */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }

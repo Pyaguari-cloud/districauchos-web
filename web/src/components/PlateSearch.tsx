@@ -20,7 +20,14 @@ type PlateResult = {
  * "¿Qué repuesto buscas?" (pedido del cliente 2026-11-24): busca ese repuesto en el inventario para el carro exacto, o
  * abre el Modo IA de Google con la pregunta ya escrita (OEM, medidas y foto), gratis. La IA sugiere; el vendedor confirma.
  */
-export function PlateSearch({ options, onClose }: { options: VehicleOption[]; onClose: () => void }) {
+/**
+ * variant "hero": la versión grande del inicio (cliente 2026-11-24: "no encontraban el botón"). La entrada se ve como
+ * una placa de Ecuador, no toma el foco sola (no salta el teclado al abrir la página) y no tiene "Cerrar".
+ */
+export function PlateSearch({ options, onClose, variant = "bar" }: {
+  options: VehicleOption[]; onClose?: () => void; variant?: "bar" | "hero";
+}) {
+  const hero = variant === "hero";
   const router = useRouter();
   const inputId = useId();
   const input = useRef<HTMLInputElement>(null);
@@ -30,7 +37,7 @@ export function PlateSearch({ options, onClose }: { options: VehicleOption[]; on
   const [result, setResult] = useState<PlateResult | null>(null);
   const [part, setPart] = useState("");
 
-  useEffect(() => input.current?.focus(), []);
+  useEffect(() => { if (!hero) input.current?.focus(); }, [hero]);
 
   async function lookup(e: React.FormEvent) {
     e.preventDefault();
@@ -70,7 +77,7 @@ export function PlateSearch({ options, onClose }: { options: VehicleOption[]; on
   function go() {
     if (!option) return;
     garage.addAndActivate(option.brand, model, year, engine);
-    onClose();
+    onClose?.();
     router.push(vehicleSearchHref({ brand: option.brand, model, year, engine }, wanted ? { q: wanted } : {}));
   }
 
@@ -84,7 +91,26 @@ export function PlateSearch({ options, onClose }: { options: VehicleOption[]; on
   const dd = "text-right font-semibold text-white";
 
   return (
-    <div className="rounded-lg border border-white/15 bg-white/5 p-3">
+    <div className={hero ? "" : "rounded-lg border border-white/15 bg-white/5 p-3"}>
+      {hero ? (
+        <form onSubmit={lookup} className="flex flex-col gap-3">
+          <label htmlFor={inputId} className="sr-only">Placa de tu vehículo</label>
+          {/* Se ve como una placa de Ecuador: franja "ECUADOR" arriba y letras grandes. */}
+          <div className="mx-auto w-full max-w-sm overflow-hidden rounded-xl border-4 border-gray-300 bg-white shadow-inner focus-within:border-brand-yellow">
+            <p aria-hidden="true" className="bg-gray-200 py-0.5 text-center font-display text-xs font-bold tracking-[0.35em] text-gray-600">ECUADOR</p>
+            <input
+              ref={input} id={inputId} value={plate} maxLength={9} autoComplete="off" autoCapitalize="characters" spellCheck={false}
+              inputMode="text" enterKeyHint="search" placeholder="ABC-1234" aria-describedby={`${inputId}-ayuda`}
+              onChange={(e) => { setPlate(e.target.value.toUpperCase()); setError(""); }}
+              className="h-20 w-full bg-transparent text-center font-display text-5xl font-bold tracking-[0.12em] text-brand-ink placeholder:text-gray-300 focus:outline-none sm:h-24 sm:text-6xl"
+            />
+          </div>
+          <button type="submit" disabled={busy}
+            className="flex min-h-14 w-full items-center justify-center gap-2 rounded-lg bg-brand-yellow px-5 font-display text-xl font-bold uppercase tracking-wide text-brand-black hover:bg-brand-yellow-dark disabled:opacity-50">
+            {busy ? "Consultando…" : "Buscar por placa"}
+          </button>
+        </form>
+      ) : (
       <form onSubmit={lookup} className="flex flex-wrap items-end gap-2">
         <div className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-none">
           <label htmlFor={inputId} className="text-xs font-semibold text-white/70">Placa de tu vehículo</label>
@@ -102,7 +128,8 @@ export function PlateSearch({ options, onClose }: { options: VehicleOption[]; on
           Cerrar
         </button>
       </form>
-      <p className="mt-1.5 text-xs text-white/50">
+      )}
+      <p id={`${inputId}-ayuda`} className={`mt-1.5 text-xs text-white/50 ${hero ? "text-center" : ""}`}>
         Solo usamos la placa para saber marca, modelo y año. No pedimos ni guardamos datos del dueño.
       </p>
 
@@ -116,7 +143,7 @@ export function PlateSearch({ options, onClose }: { options: VehicleOption[]; on
       )}
 
       {result?.found && (
-        <div role="status" className="mt-3 max-w-md">
+        <div role="status" className={`mt-3 ${hero ? "" : "max-w-md"}`}>
           <p className="font-display text-sm font-bold uppercase tracking-wide text-brand-yellow">Vehículo encontrado</p>
           <dl className="mt-1 text-sm">
             <div className={row}><dt className={dt}>Placa</dt><dd className={dd}>{result.plate}</dd></div>

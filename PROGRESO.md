@@ -115,6 +115,17 @@ Probar con el simulador:
 
 ## 6. Dónde nos quedamos (2026-11-22)
 
+**Sesión 2026-11-24 (b) — Rediseño "como Mansuera" (⏳ listo en local, falta "publica"):** pedido del cliente.
+- Menú ☰ a la izquierda (`MenuDrawer`, `<dialog>` nativo): secciones, categorías, "Buscar por placa" y redes. La fila
+  de secciones solo se ve en pantallas grandes.
+- Logo más grande + fila de marcas en blanco debajo, como el letrero de los locales (`BrandStrip`, usa public/marcas).
+- Inicio: pantalla de promociones (`PromoCarousel`, contenido en `src/content/promos.ts`: texto, banner o video) a la
+  izquierda y "Encuentra el repuesto" con la placa en grande (estilo placa de Ecuador) a la derecha (`FinderCard`).
+  Botón "Buscar por placa" de la barra de Mi garaje ahora amarillo y con ícono.
+- Pie: WhatsApp, Instagram y TikTok grandes y con sus colores (`SocialLinks`), logo y marcas.
+- Pendiente: que el cliente mande el **video** de promociones y sus **banners** (van en `web/public/promos/` y se
+  agregan en `promos.ts`). Por ahora hay 3 promociones armadas por nosotros (importación, placa, envíos).
+
 **Sesión 2026-11-24 — OEM con la IA de Google desde la ficha de la placa (✅ publicado 2026-11-24):**
 - Prueba a ciegas de 15 piezas del inventario (`out/ia-oem/`): Gemini 5/15 aciertos y 8 errores (4 "seguridad alta"),
   ChatGPT 0 (11 "no sé"), Claude 0 (13 "no sé"). Conclusión: **no mostrar un OEM de IA como dato de la página**.

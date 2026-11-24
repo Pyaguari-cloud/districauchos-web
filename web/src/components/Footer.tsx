@@ -1,19 +1,21 @@
 import Link from "next/link";
 import { negocio, phoneDisplay } from "@/content/negocio";
-import { contactLink } from "@/lib/whatsapp";
-import { WhatsAppButton } from "./WhatsAppButton";
+import { BrandStrip } from "./BrandStrip";
+import { SocialLinks } from "./SocialLinks";
 
 export function Footer() {
-  const wa = contactLink();
   const link = "underline-offset-2 hover:text-brand-yellow hover:underline";
   return (
     <footer className="mt-12 bg-brand-black text-white">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
         <div className="flex flex-col gap-3">
-          <p className="font-display text-xl font-bold uppercase tracking-wide text-brand-yellow">{negocio.name}</p>
-          <p className="text-sm text-gray-300">{negocio.tagline} · {negocio.city}, Ecuador</p>
-          <p className="text-sm text-gray-300">{negocio.shipping.quito} · envíos a todo el Ecuador</p>
-          {wa && <WhatsAppButton href={wa} label="WhatsApp" />}
+          {/* eslint-disable-next-line @next/next/no-img-element -- SVG vectorial liviano */}
+          <img src="/brand/logo.svg" alt={`${negocio.name} · ${negocio.tagline}`} width={1902} height={472} loading="lazy" className="h-14 w-auto self-start" />
+          <BrandStrip className="h-4 w-[226px]" />
+          <p className="text-sm text-gray-300">{negocio.city}, Ecuador · {negocio.shipping.quito} · envíos a todo el Ecuador</p>
+          {/* Pedido del cliente 2026-11-24: WhatsApp, Instagram y TikTok juntos, grandes y con sus colores. */}
+          <p className="mt-2 font-display text-sm font-bold uppercase tracking-wider text-white/60">Escríbenos y síguenos</p>
+          <SocialLinks />
         </div>
 
         {negocio.stores.map((s) => (
@@ -39,10 +41,6 @@ export function Footer() {
             <li><Link href="/creditos" className={link}>Créditos de fotos</Link></li>
             <li><Link href="/privacidad" className={link}>Política de privacidad</Link></li>
             <li><a href={`mailto:${negocio.email}`} className={link}>{negocio.email}</a></li>
-          </ul>
-          <ul className="flex gap-4">
-            <li><a href={negocio.social.instagram} target="_blank" rel="noopener noreferrer" className={link}>Instagram</a></li>
-            <li><a href={negocio.social.tiktok} target="_blank" rel="noopener noreferrer" className={link}>TikTok</a></li>
           </ul>
         </div>
         <p className="mx-auto max-w-6xl px-4 pb-4 text-xs text-gray-400">© {new Date().getFullYear()} {negocio.name}. Precios con IVA incluido.</p>
