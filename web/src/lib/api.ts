@@ -121,5 +121,7 @@ export const vehicleOptions = (brands: Brand[]) =>
     models: b.models.map((m) => m.name),
     engines: Object.fromEntries(b.models.filter((m) => m.engines?.length).map((m) => [m.name, m.engines!])),
   }));
+/** ¿Está activa la búsqueda por placa? (hay clave del proveedor en el servidor). */
+export const getPlateEnabled = () => get<{ enabled: boolean }>("/api/plate/status", 300).then((r) => r.enabled === true);
 export const getCategories = () => get<Category[]>("/api/categories", 3600);
 export const getSlugs = () => get<{ slug: string; updatedAt: string }[]>("/api/catalog/slugs", 3600);

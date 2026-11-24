@@ -71,8 +71,10 @@ services:
       MEILI_URL: http://search:7700
       SITE_URL: ${SITE_URL:-https://districauchosvch.com}
       PAYMENTS_MODE: ${PAYMENTS_MODE:-off}
+      VEHICLES_JSON_PATH: /app/data/vehicles.json   # para llevar la placa a la marca/modelo del catálogo
     volumes:
       - ./media:/app/media:ro
+      - ./data:/app/data:ro
     ports: ["127.0.0.1:8080:8080"]
     depends_on:
       db: { condition: service_healthy }

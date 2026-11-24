@@ -115,6 +115,27 @@ Probar con el simulador:
 
 ## 6. Dónde nos quedamos (2026-11-22)
 
+**Sesión 2026-11-23 (b) — Buscar por placa (⏳ probado en local, sin publicar):** pedido del cliente, como Mansuera
+(captura `out/capturas/mansuera placas.png`). Cambia la decisión de §7 fila 6: el cliente contrata un proveedor.
+- **Proveedores comparados:** consultas.ec (elegido: marca, modelo, año, clase y chasis; **1 crédito por placa**,
+  prepago desde $1/20 hasta $80/8.000; $10/500 = $0,02; probado con PBS-8958 = Aveo Emotion 1.6 2011 igual que
+  Mansuera, PDP3622, POR0039; **no devuelve datos del dueño**). Placa API.ec/RegCheck: $0,02 pero compra mínima real
+  **$20/1.000** (la web dice "bloques de 100": texto genérico), 0 créditos de prueba, soporte fuera hasta el 28-nov.
+  DataCil: sin año ni chasis, $0,10–0,26. Verifik: sin precios públicos. Cuenta de consultas.ec: correo del usuario,
+  compra de $1 (20 créditos, sin recarga automática ni tarjeta guardada); quedan ~16. Recargar en consultas.ec/cuenta.
+- **API:** `Api/Plates/PlateEndpoints.cs` → `GET /api/plate/{placa}` (y `/api/plate/status`). Tabla `plate_lookups`
+  (encontradas 180 días, no encontradas 1 día: repetir una placa no gasta) y `plate_lookup_usage` (tope diario de
+  consultas pagadas `PLATE_DAILY_LIMIT`, 150 por defecto). 12 búsquedas/hora por IP. Aviso en el log con ≤ 20 créditos.
+  El proveedor responde 503 "la ANT no responde" sin cobrar (también con placas que no existen) → no se guarda.
+  `Core/Vehicles/Plate.cs` (normaliza: "POR-039" → POR0039, motos AB123C; año por el 10.º carácter del VIN de respaldo)
+  y `VehicleExtractor.MatchSingle` (marca + modelo de la ANT → catálogo por el alias más largo: "LUV D-MAX" → D-Max).
+  La API ahora monta `./data` (vehicles.json). Clave `CONSULTASEC_KEY` en `.env` (sin clave el botón no aparece).
+- **Web:** botón "Buscar por placa" en la barra Mi garaje → `PlateSearch.tsx` (ficha: placa, marca, modelo, año,
+  cilindraje, tipo, chasis) → "Buscar repuestos para mi vehículo" lo guarda en el garaje y abre /buscar. Ruta
+  `/api/placa` (revisa Origin). Si el modelo no está en el catálogo: todos los de la marca; si la marca no está: aviso.
+  Política de privacidad: se agregó la placa y Consultas.ec (**avisar al cliente del cambio**).
+- **Para publicar:** copiar `CONSULTASEC_KEY` al `.env` del servidor y `./deploy.sh`.
+
 **Sesión 2026-11-23 (✅ publicado 2026-11-23): cuentas de clientes** (pedido del cliente: registro e ingreso
 con **usuario y contraseña**, opcional; sin cuenta todo sigue igual). Usuario = correo (sin correo no hay cómo recuperar).
 - API: `Core/Accounts/Passwords.cs` (PBKDF2-SHA512 210 000 vueltas, sal propia; reglas: ≥ 8, no obvias, sin el correo),

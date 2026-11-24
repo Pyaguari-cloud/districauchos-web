@@ -38,6 +38,7 @@ export default function PrivacyPage() {
         <li><strong>Si los agregas en tu cuenta:</strong> celular, cédula, RUC o pasaporte, dirección y ciudad, y los vehículos de &quot;Mi garaje&quot;.</li>
         <li><strong>Si compras en línea:</strong> los datos del pedido (repuestos, montos, forma de entrega) y los datos para la factura y la entrega.</li>
         <li><strong>Sin cuenta:</strong> el carrito y &quot;Mi garaje&quot; se guardan solo en tu navegador, no en nuestros servidores.</li>
+        <li><strong>Si buscas por placa:</strong> la placa y los datos de ese vehículo (marca, modelo, año, tipo y chasis), para no consultarla de nuevo. No pedimos ni guardamos datos del dueño, y la placa no queda ligada a tu nombre ni a tu cuenta.</li>
       </ul>
       <p>No guardamos los datos de tu tarjeta: el pago lo procesa PayPhone en su propia página segura.</p>
 
@@ -54,6 +55,7 @@ export default function PrivacyPage() {
       <ul className="list-disc pl-6">
         <li><strong>PayPhone</strong>, para cobrar los pagos con tarjeta.</li>
         <li><strong>Brevo</strong>, para enviar los correos.</li>
+        <li><strong>Consultas.ec</strong>, solo la placa cuando usas &quot;Buscar por placa&quot;, para saber qué vehículo es.</li>
         <li><strong>Cloudflare</strong> y nuestro proveedor de servidor, que guardan y protegen la página. Algunos de estos servicios están fuera del Ecuador.</li>
       </ul>
       <p>También los entregaremos a una autoridad cuando la ley lo exija.</p>

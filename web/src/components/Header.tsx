@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { getCategories, getVehicles, vehicleOptions } from "@/lib/api";
+import { getCategories, getPlateEnabled, getVehicles, vehicleOptions } from "@/lib/api";
 import { isRealCategory } from "@/lib/format";
 import { AccountLink } from "./AccountLink";
 import { CartLink } from "./CartLink";
@@ -22,9 +22,10 @@ export async function Header() {
   // Siempre al pedir la página (nunca en el build): así "Mi garaje" tiene las marcas aunque la página sea estática.
   await connection();
   // Si la API no responde, la página sigue funcionando sin el selector.
-  const [options, categories] = await Promise.all([
+  const [options, categories, plates] = await Promise.all([
     getVehicles().then(vehicleOptions).catch((): VehicleOption[] => []),
     getCategories().then((cs) => cs.map((c) => c.name).filter(isRealCategory).sort((a, b) => a.localeCompare(b, "es"))).catch(() => []),
+    getPlateEnabled().catch(() => false),
   ]);
 
   return (
@@ -57,7 +58,7 @@ export async function Header() {
       </nav>
       {options.length > 0 && (
         <Suspense>
-          <VehicleBar options={options} categories={categories} />
+          <VehicleBar options={options} categories={categories} plates={plates} />
         </Suspense>
       )}
     </header>

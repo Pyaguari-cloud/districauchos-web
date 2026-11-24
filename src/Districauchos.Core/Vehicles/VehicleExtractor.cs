@@ -101,6 +101,23 @@ public sealed partial class VehicleExtractor
     }
 
     /// <summary>
+    /// Un solo vehículo (búsqueda por placa: marca "CHEVROLET" y modelo "AVEO EMOTION 1.6L STD") llevado a la
+    /// marca y modelo del catálogo: el alias más largo que aparece, de la marca dicha. Marca que no está en el
+    /// diccionario → null; marca conocida sin modelo reconocido → solo la marca.
+    /// </summary>
+    public VehicleMatch? MatchSingle(string? make, string? model)
+    {
+        var makeText = " " + TextNorm.NormalizeForMatch(make) + " ";
+        var brands = _brandAliases.Where(b => ContainsWord(makeText, b.Alias)).Select(b => b.Brand).Distinct().ToList();
+        if (brands.Count == 0) return null;
+        var text = " " + TextNorm.NormalizeForMatch($"{make} {model}") + " ";
+        foreach (var m in _modelAliases) // del alias más largo al más corto
+            if (brands.Contains(m.Brand) && ContainsWord(text, m.Alias))
+                return new VehicleMatch(m.Brand, m.Model);
+        return new VehicleMatch(brands[0], null);
+    }
+
+    /// <summary>
     /// Años escritos en la descripción, asignados al modelo (o modelos) mencionado justo antes:
     /// "Mazda B2200 85/98 - B2600 85/98", "Accent/Rio 11/17" (ambos), "Hilux 2.5 11-15", "Corolla 2004-2008".
     /// Solo rangos (dos años separados por "-" o "/"); un año suelto no se toma, para no ocultar repuestos por error.

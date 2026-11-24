@@ -45,6 +45,12 @@ public sealed record AppSettings
     public string? OrdersEmailTo { get; init; }
     public string? MeiliMasterKey { get; init; }
 
+    // ---- Búsqueda por placa (consultas.ec) ----
+    /// <summary>Clave de consultas.ec (X-Credits-Token). Sin clave, la búsqueda por placa está apagada.</summary>
+    public string? ConsultasEcKey { get; init; }
+    /// <summary>Tope de consultas pagadas al proveedor por día (las placas guardadas no cuentan). Cuida el saldo.</summary>
+    public int PlateDailyLimit { get; init; } = 150;
+
     /// <summary>
     /// Columna de stock en Tabiazo/Cusubamba/Maldonado cuando hay dos "Stock actual" (pregunta abierta 12.4).
     /// 1 = la primera (columna J), 2 = la segunda (columna M).
@@ -95,6 +101,8 @@ public sealed record AppSettings
         SmtpFrom = c["SMTP_FROM"],
         OrdersEmailTo = c["ORDERS_EMAIL_TO"],
         MeiliMasterKey = c["MEILI_MASTER_KEY"],
+        ConsultasEcKey = c["CONSULTASEC_KEY"],
+        PlateDailyLimit = int.TryParse(c["PLATE_DAILY_LIMIT"], out var pl) && pl >= 0 ? pl : 150,
         StockColumnOccurrence = int.TryParse(c["STOCK_COLUMN_OCCURRENCE"], out var o) && o is 1 or 2 ? o : 1,
         LocalCsvDir = c["LOCAL_CSV_DIR"],
         MediaDir = c["MEDIA_DIR"] ?? "media",
