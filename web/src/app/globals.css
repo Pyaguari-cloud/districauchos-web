@@ -104,3 +104,34 @@ main :focus-visible {
 /* Carrusel de promociones: sin barra de desplazamiento visible (se mueve con flechas, puntos o deslizando). */
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Botón "IA de Google" (GoogleOemBox, pedido del cliente 2026-11-25): píldora negra con un halo de colores alrededor,
+   como el diseño que mandó, para que los vendedores lo encuentren de una. El halo gira despacio; con "reducir
+   movimiento" queda quieto. */
+@property --ai-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes ai-spin { to { --ai-angle: 360deg; } }
+.ai-glow {
+  position: relative;
+  isolation: isolate;
+  border-radius: 9999px;
+  padding: 3px;
+  background: conic-gradient(from var(--ai-angle), #4285f4, #9b72cb, #d96570, #f4b400, #34a853, #22d3ee, #4285f4);
+  animation: ai-spin 4s linear infinite;
+}
+.ai-glow::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  z-index: -1;
+  border-radius: inherit;
+  background: inherit;
+  filter: blur(14px);
+  opacity: 0.7;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ai-glow { animation: none; }
+}

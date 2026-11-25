@@ -3,7 +3,7 @@
 Bitácora para retomar el trabajo en cualquier momento. **Leer primero esto**; el detalle técnico está en
 `README.md` y `web/README.md`, y el encargo original en `BRIEF-districauchos-etapa1.md` (privado, solo local).
 
-Última actualización: 2026-11-25 (clave de consultas.ec del cliente puesta en el servidor; nada pendiente de publicar)
+Última actualización: 2026-11-25 (clave de consultas.ec del cliente en el servidor; botón grande de la IA sin publicar)
 
 ---
 
@@ -114,6 +114,12 @@ Probar con el simulador:
 `SITE_URL=http://localhost:3000 PAYMENTS_MODE=fake docker compose --profile web up -d --build api web`
 
 ## 6. Dónde nos quedamos (2026-11-25)
+
+**Sesión 2026-11-25 — Botón grande de la IA de Google (⏳ sin publicar):** pedido del cliente (captura
+`out/capturas/requisito.jpeg`): en los locales no encontraban el botón chico de los resultados. Ahora es una píldora
+negra grande con destellos y halo de colores que gira (`.ai-glow` en globals.css; quieto con "reducir movimiento") y
+debajo el aviso grande: toca **"Sí, continuar"** (algunos vendedores tocaban "No, gracias"). Esa ventana es de
+Google y no se puede quitar desde la página. Revisado en compu; falta verlo en un celular.
 
 **Sesión 2026-11-24 (e) — Margen en celular (✅ publicado 2026-11-24):** la tarjeta de la placa y el
 carrusel iban de borde a borde con esquinas redondeadas (se veía "pegado"); ahora llevan el margen de 16 px de la página.
