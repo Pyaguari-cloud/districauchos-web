@@ -3,7 +3,7 @@
 Bitácora para retomar el trabajo en cualquier momento. **Leer primero esto**; el detalle técnico está en
 `README.md` y `web/README.md`, y el encargo original en `BRIEF-districauchos-etapa1.md` (privado, solo local).
 
-Última actualización: 2026-11-23
+Última actualización: 2026-11-25 (todo lo del 2026-11-24 publicado y en GitHub; nada pendiente de publicar)
 
 ---
 
@@ -113,7 +113,7 @@ Modos (`PAYMENTS_MODE`):
 Probar con el simulador:
 `SITE_URL=http://localhost:3000 PAYMENTS_MODE=fake docker compose --profile web up -d --build api web`
 
-## 6. Dónde nos quedamos (2026-11-22)
+## 6. Dónde nos quedamos (2026-11-25)
 
 **Sesión 2026-11-24 (e) — Margen en celular (✅ publicado 2026-11-24):** la tarjeta de la placa y el
 carrusel iban de borde a borde con esquinas redondeadas (se veía "pegado"); ahora llevan el margen de 16 px de la página.
@@ -362,6 +362,11 @@ Objetivo: el cliente pone su carro y año (ej. Aveo 2007) y ve los repuestos que
 ## 7. Pendientes
 
 **Del cliente**
+- [ ] **Correos de las cuentas de los vendedores** para `PLATE_STAFF_EMAILS` en el `.env` del servidor (150 consultas de
+  placa al día por vendedor; el público tiene 12 por hora por IP).
+- [ ] **Comprar créditos de consultas.ec** y cambiar la clave en el `.env` del servidor (la búsqueda por placa la usa).
+- [ ] **Banners originales** (sin pasar por Instagram) para reemplazar los de `web/public/promos/`; promociones nuevas
+  se piden por separado (mensaje ya enviado 2026-11-24).
 - [x] Token de una aplicación **Web** en PayPhone Developer (2026-11-19).
 - [x] **Barra de vehículo con 5 filtros** (pedido del cliente 2026-11-21, captura `out/capturas/mansuera categorias.jpeg`): "Mi garaje" es ahora una sola barra con Marca, Modelo, Año, Cilindraje y Categoría + Buscar (antes: marca y modelo; el año solo en Administrar; la categoría abajo en "Filtrar resultados", que se quitó de ahí). Año y cilindraje son opcionales y **solo ocultan lo que sabemos que es de otro año/motor**; lo que no tiene el dato sigue apareciendo. Cilindraje: `EngineSize` + `VehicleExtractor.ExtractEngines` lo sacan de la descripción y se asigna al modelo de antes, igual que los años ("Sail 1.4L / Aveo 1.6"), más la columna Motor de la hoja de compatibilidades. Tabla `product_vehicle_engines`, campo `engine_fit` en Meilisearch, `?motor=1.6` en /buscar, `engine` en la API. En la lista solo salen cilindrajes con ≥4 repuestos de ese modelo (`MinEngineItems`; con 3 salía ruido como Sail 3.0). El garaje guarda también el cilindraje. ✅ **Publicado 2026-11-21** (sync 305; 117 modelos con cilindraje; Aveo 2010 1.6 + Mangueras = 88). No se pudo probar la vista de celular (Chrome maximizado y la página no se deja mostrar en iframe): revisarla en un teléfono.
 - [ ] **Fotos de productos** (pedido 2026-11-20). Primero se pidieron fotos propias por OEM (solo Importadora VCH; lista `out/fotos-productos/FOTOS-VCH-TANDA-01.csv`, 338). El cliente mandó 259 fotos sacadas de internet y retocadas con IA y **afirma tener consentimiento de los dueños** (2026-11-20; pedirle el respaldo por escrito y guardarlo). Igual se excluyeron **84** con marca de agua, logo/caja/etiqueta de otra marca u original (Toyota, GM, Kia…), carros o dibujos, o que no son el producto: `out/fotos-productos/FOTOS-VCH-TANDA-01-NO-USADAS.csv` (con motivo). **175 fotos → 188 fichas**. Técnico: `web/scripts/fotos-productos.mjs` (recorta, centra, 1000×1000 WebP) → `media/productos/CLAVE.webp` (no va a git); el Worker las asigna en cada sync (`ProductImages`, clave = OEM solo letras y números) y Caddy las sirve en `/fotos/`. ✅ **Publicado 2026-11-20** (sync 151: 188 con foto). **2026-11-21:** el cliente mandó versión nueva de las 84 rechazadas (sin etiquetas ni marcas de agua); se subieron 256 de 259 (fuera `684263` y `8941303540`, que muestran un carro, y `F01R00A013`, una manguera en un capuchón de bobina: `out/fotos-productos/NO-SUBIR.txt`). Sync 223: **274 fichas con foto**. **Tanda 2 (2026-11-21):** lista `FOTOS-VCH-TANDA-02.csv` (OEM, nombre, descripción; 83 VCH con stock sin foto) → el cliente mandó 82 fotos (`fotos_vch_02_pulidas/`, cubren las 83 claves) → sync 260: **360 fichas con foto; 0 VCH disponibles con OEM sin foto**. Fotos nuevas: `./deploy.sh --fotos`. Lista de los 10 VCH sin stock: `FOTOS-VCH-SIN-STOCK.csv`. **Fotos automáticas desde Drive ✅ publicado 2026-11-21 (sync 268: 368 con foto):** el cliente creó una carpeta de Drive donde sube fotos con el OEM como nombre (o el código del local si no tiene OEM). El Worker la revisa cada 5 min (`DrivePhotoService` → `DrivePhotoSync` + `PhotoProcessor` con SkiaSharp, mismo resultado que el script) y publica solas las nuevas, reemplazadas y borradas; ya no hace falta avisar. Las fichas sin OEM (`COD:`) ahora también llevan foto, con clave sacada del código. Drive gana si la misma foto está también en `media/productos`. Configurado: `DRIVE_FOLDER_FOTOS` en el .env del servidor (copia en `.env.bak-*`), carpeta compartida con `catalogo-lector@districauchos-catalogo.iam.gserviceaccount.com`, API de Drive activa. Sin OEM también vale el **código alterno** (primeras fotos: `C2058` → DB001, `C2062` → DB002); con OEM solo el OEM, porque hay códigos del local que son el OEM de otro producto (MD797 tiene código HPA0001PR). En la carpeta hay un `LOGO.jpg` que no es de ningún producto (no sale en la página). Ojo: lo de Drive sale sin revisión; revisar de vez en cuando que no suban fotos con marcas de agua o de otras marcas.
