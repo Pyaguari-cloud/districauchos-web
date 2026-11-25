@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type { Vehicle } from "@/lib/api";
-import { fitFor, rowText, yearRanges, type CompatRow } from "@/lib/compat-match";
+import { fitFor, rowText, sameModel, yearRanges, type CompatRow } from "@/lib/compat-match";
 import { useMyVehicle, vehicleText } from "@/lib/vehicle";
 
 /**
@@ -62,14 +62,24 @@ export function VehicleFit({ vehicles, compat = [] }: { vehicles: Vehicle[]; com
   );
 }
 
-/** Insignia pequeña para las tarjetas: solo aparece si hay datos por año para el vehículo activo. */
-export function CardFit({ compat }: { compat?: CompatRow[] }) {
+/**
+ * Insignia de las tarjetas para el vehículo activo (Mi garaje / placa). Con datos por año dice si sirve para ese año;
+ * sin ellos, "Compatible con tu …" si el inventario lo registra para esa marca y modelo (pedido 2026-11-24: que vuelva
+ * el visto en cada tarjeta). Si no figura, no se dice nada en la tarjeta (el detalle lo explica en la ficha).
+ */
+export function CardFit({ compat, brands = [], models = [] }: { compat?: CompatRow[]; brands?: string[]; models?: string[] }) {
   const mine = useMyVehicle();
-  if (!compat?.length || !mine?.year) return null;
-  const fit = fitFor(compat, mine);
-  if (fit.kind === "yes") return <p className="text-sm font-semibold text-ok">✓ Sirve para tu {mine.model} {mine.year}</p>;
+  if (!mine) return null;
+  const fit = fitFor(compat ?? [], mine);
+  const ok = "w-fit rounded bg-ok-bg px-1.5 py-0.5 text-sm font-semibold text-ok";
+  if (fit.kind === "yes") return <p className={ok}>✓ Sirve para tu {mine.model} {mine.year}</p>;
   if (fit.kind === "otherYears") {
-    return <p className="text-sm font-semibold text-ask">Es para {mine.model} {yearRanges(fit.rows)}</p>;
+    return <p className="w-fit rounded bg-ask-bg px-1.5 py-0.5 text-sm font-semibold text-ask">Es para {mine.model} {yearRanges(fit.rows)}</p>;
+  }
+  const brand = brands.some((b) => b.toLowerCase() === mine.brand.toLowerCase());
+  const model = !mine.model || models.some((m) => sameModel(m, mine.model!));
+  if (fit.kind === "noYear" || (brand && model)) {
+    return <p className={ok}>✓ Compatible con tu {mine.model ?? mine.brand}</p>;
   }
   return null;
 }

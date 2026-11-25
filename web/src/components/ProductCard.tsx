@@ -41,7 +41,7 @@ export function ProductCard({ item, compat }: { item: CatalogHit; compat?: Compa
             )}
           </div>
           <Availability available={item.available} stock={item.stock} />
-          <CardFit compat={compat} />
+          <CardFit compat={compat} brands={item.brands} models={item.models} />
         </div>
       </Link>
     </li>

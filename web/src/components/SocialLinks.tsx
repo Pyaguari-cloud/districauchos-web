@@ -5,18 +5,16 @@ import { InstagramIcon, TikTokIcon } from "./icons";
  * Instagram y TikTok grandes y con el color de cada marca (pedido del cliente 2026-11-24: "están poco visibles").
  * Cada uno es una tarjeta táctil con nombre y usuario. WhatsApp no va aquí: es el globo fijo (WhatsAppFloat).
  */
-const handle = (url: string) => "@" + url.replace(/\/+$/, "").split("/").pop()!.replace(/^@/, "");
-
 export function SocialLinks({ compact = false }: { compact?: boolean }) {
   const items = [
-    { href: negocio.social.instagram, name: "Instagram", sub: handle(negocio.social.instagram), icon: <InstagramIcon className="h-7 w-7" />,
+    { href: negocio.social.instagram, name: "Instagram", icon: <InstagramIcon className="h-7 w-7" />,
       tile: "bg-[radial-gradient(circle_at_30%_107%,#fdf497_0%,#fdf497_5%,#fd5949_45%,#d6249f_60%,#285aeb_90%)]" },
-    { href: negocio.social.tiktok, name: "TikTok", sub: handle(negocio.social.tiktok), icon: <TikTokIcon className="h-7 w-7 [filter:drop-shadow(-2px_-2px_0_#25f4ee)_drop-shadow(2px_2px_0_#fe2c55)]" />,
+    { href: negocio.social.tiktok, name: "TikTok", icon: <TikTokIcon className="h-7 w-7 [filter:drop-shadow(-2px_-2px_0_#25f4ee)_drop-shadow(2px_2px_0_#fe2c55)]" />,
       tile: "bg-black ring-1 ring-white/20" },
   ];
 
   return (
-    <ul className={`grid gap-2 ${compact ? "grid-cols-2" : "grid-cols-1"}`} aria-label="Síguenos">
+    <ul className={`grid gap-2 grid-cols-2`} aria-label="Síguenos">
       {items.map((i) => (
         <li key={i.name}>
           <a href={i.href} target="_blank" rel="noopener noreferrer"
@@ -26,7 +24,6 @@ export function SocialLinks({ compact = false }: { compact?: boolean }) {
             </span>
             <span className="min-w-0 leading-tight">
               <span className="block font-display text-base font-bold uppercase tracking-wide text-white">{i.name}</span>
-              {!compact && <span className="block truncate text-sm text-gray-300">{i.sub}</span>}
             </span>
             <span className="sr-only"> (se abre en otra pestaña)</span>
           </a>

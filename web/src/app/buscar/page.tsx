@@ -151,16 +151,15 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         </details>
       )}
 
-      {/* IA de Google sin volver a consultar la placa; arriba si no hay coincidencia exacta, al final si la hay. */}
-      {aiBox && aiMissing && aiBox}
+      {/* IA de Google sin volver a consultar la placa: siempre arriba de los resultados (pedido 2026-11-24: al final
+          no se veía). Amarillo si no hay coincidencia exacta; discreto si la hay. */}
+      {aiBox}
 
       {result.total === 0 ? (
         <NoResults query={p.q} vehicle={vehicle} />
       ) : (
         <ProductGrid items={result.items} compat={Object.fromEntries(result.items.map((h) => [h.slug, rowsFromRanges(h.yearRanges)]))} />
       )}
-
-      {aiBox && !aiMissing && aiBox}
 
       {result.totalPages > 1 && (
         <nav aria-label="Páginas" className="flex items-center justify-center gap-3">

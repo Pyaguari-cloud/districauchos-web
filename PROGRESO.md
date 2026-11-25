@@ -115,6 +115,12 @@ Probar con el simulador:
 
 ## 6. Dónde nos quedamos (2026-11-22)
 
+**Sesión 2026-11-24 (d) — Ajustes de resultados y pie (⏳ listo en local, falta "publica"):** pedido del usuario.
+- Recuadro de la IA de Google siempre **arriba** de los resultados (antes, si había coincidencia, iba al final y no se veía).
+- Tarjetas: vuelve el visto **"✓ Compatible con tu …"** cuando el inventario registra la marca y modelo del vehículo
+  activo (antes solo salía con datos por año: "✓ Sirve para tu Aveo 2011").
+- Pie: Instagram y TikTok uno al lado del otro y sin el usuario (se cortaba).
+
 **Sesión 2026-11-24 (c) — Ficha de la placa en ventana emergente (✅ publicado 2026-11-24):** pedido del
 usuario: la ficha hacía crecer la tarjeta del inicio y descuadraba el carrusel. Ahora sale en un `<dialog>` (hoja desde
 abajo en celular, centrada en compu; ✕, Esc o tocar afuera la cierran) y queda "Ver de nuevo" sin gastar otra consulta.
