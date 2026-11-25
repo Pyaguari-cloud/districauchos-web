@@ -3,7 +3,7 @@
 Bitácora para retomar el trabajo en cualquier momento. **Leer primero esto**; el detalle técnico está en
 `README.md` y `web/README.md`, y el encargo original en `BRIEF-districauchos-etapa1.md` (privado, solo local).
 
-Última actualización: 2026-11-25 (clave de consultas.ec del cliente en el servidor; botón grande de la IA sin publicar)
+Última actualización: 2026-11-25 (clave de consultas.ec del cliente en el servidor; botón grande de la IA publicado; nada pendiente de publicar)
 
 ---
 
@@ -115,7 +115,7 @@ Probar con el simulador:
 
 ## 6. Dónde nos quedamos (2026-11-25)
 
-**Sesión 2026-11-25 — Botón grande de la IA de Google (⏳ sin publicar):** pedido del cliente (captura
+**Sesión 2026-11-25 — Botón grande de la IA de Google (✅ publicado 2026-11-25):** pedido del cliente (captura
 `out/capturas/requisito.jpeg`): en los locales no encontraban el botón chico de los resultados. Ahora es una píldora
 negra grande con destellos y halo de colores que gira (`.ai-glow` en globals.css; quieto con "reducir movimiento") y
 debajo el aviso grande: toca **"Sí, continuar"** (algunos vendedores tocaban "No, gracias"). Esa ventana es de
