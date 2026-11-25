@@ -3,7 +3,7 @@
 Bitácora para retomar el trabajo en cualquier momento. **Leer primero esto**; el detalle técnico está en
 `README.md` y `web/README.md`, y el encargo original en `BRIEF-districauchos-etapa1.md` (privado, solo local).
 
-Última actualización: 2026-11-25 (todo lo del 2026-11-24 publicado y en GitHub; nada pendiente de publicar)
+Última actualización: 2026-11-25 (clave de consultas.ec del cliente puesta en el servidor; nada pendiente de publicar)
 
 ---
 
@@ -364,7 +364,9 @@ Objetivo: el cliente pone su carro y año (ej. Aveo 2007) y ve los repuestos que
 **Del cliente**
 - [ ] **Correos de las cuentas de los vendedores** para `PLATE_STAFF_EMAILS` en el `.env` del servidor (150 consultas de
   placa al día por vendedor; el público tiene 12 por hora por IP).
-- [ ] **Comprar créditos de consultas.ec** y cambiar la clave en el `.env` del servidor (la búsqueda por placa la usa).
+- [x] **Clave de consultas.ec del cliente** puesta en el `.env` local y en el del servidor (2026-11-25, respaldo
+  `.env.bak-20261125-160216`; API reiniciada, `/api/plate/status` = enabled, sin errores). Falta probar una placa nueva en
+  la página para confirmar que la clave tiene créditos (si no, el log dice "no hay saldo").
 - [ ] **Banners originales** (sin pasar por Instagram) para reemplazar los de `web/public/promos/`; promociones nuevas
   se piden por separado (mensaje ya enviado 2026-11-24).
 - [x] Token de una aplicación **Web** en PayPhone Developer (2026-11-19).
