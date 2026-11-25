@@ -119,7 +119,7 @@ Probar con el simulador:
 - Recuadro de la IA de Google siempre **arriba** de los resultados (antes, si había coincidencia, iba al final y no se veía).
 - Tarjetas: vuelve el visto **"✓ Compatible con tu …"** cuando el inventario registra la marca y modelo del vehículo
   activo (antes solo salía con datos por año: "✓ Sirve para tu Aveo 2011").
-- Pie: Instagram y TikTok uno al lado del otro y sin el usuario (se cortaba).
+- Pie: Instagram y TikTok uno al lado del otro, ícono arriba y nombre abajo (en compu "INSTAGRAM" se salía), sin el usuario.
 
 **Sesión 2026-11-24 (c) — Ficha de la placa en ventana emergente (✅ publicado 2026-11-24):** pedido del
 usuario: la ficha hacía crecer la tarjeta del inicio y descuadraba el carrusel. Ahora sale en un `<dialog>` (hoja desde
