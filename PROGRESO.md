@@ -115,7 +115,7 @@ Probar con el simulador:
 
 ## 6. Dónde nos quedamos (2026-11-22)
 
-**Sesión 2026-11-24 (b) — Rediseño "como Mansuera" (⏳ listo en local, falta "publica"):** pedido del cliente.
+**Sesión 2026-11-24 (b) — Rediseño "como Mansuera" (✅ publicado 2026-11-24):** pedido del cliente.
 - Menú ☰ a la izquierda (`MenuDrawer`, `<dialog>` nativo): secciones, categorías, "Buscar por placa" y redes. La fila
   de secciones solo se ve en pantallas grandes.
 - Logo más grande + fila de marcas en blanco debajo, como el letrero de los locales (`BrandStrip`, usa public/marcas).
