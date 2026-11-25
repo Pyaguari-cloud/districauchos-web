@@ -115,7 +115,7 @@ Probar con el simulador:
 
 ## 6. Dónde nos quedamos (2026-11-22)
 
-**Sesión 2026-11-24 (d) — Ajustes de resultados y pie (⏳ listo en local, falta "publica"):** pedido del usuario.
+**Sesión 2026-11-24 (d) — Ajustes de resultados y pie (✅ publicado 2026-11-24):** pedido del usuario.
 - Recuadro de la IA de Google siempre **arriba** de los resultados (antes, si había coincidencia, iba al final y no se veía).
 - Tarjetas: vuelve el visto **"✓ Compatible con tu …"** cuando el inventario registra la marca y modelo del vehículo
   activo (antes solo salía con datos por año: "✓ Sirve para tu Aveo 2011").
