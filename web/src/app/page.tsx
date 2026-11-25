@@ -28,7 +28,7 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col gap-10">
       {/* Pedido del cliente 2026-11-24 (como Mansuera): promociones a la izquierda y la búsqueda por placa en grande. */}
-      <div className="-mx-4 -mt-6 grid gap-4 sm:mx-0 sm:mt-0 lg:grid-cols-[1.15fr_1fr]">
+      <div className="grid gap-4 lg:grid-cols-[1.15fr_1fr]">
         {/* En celular la placa va primero (es lo que más buscan); en pantalla grande, promociones a la izquierda. */}
         <div className="order-2 lg:order-1"><PromoCarousel slides={promos} /></div>
         <div className="order-1 lg:order-2 lg:h-full"><FinderCard options={vehicleOptions(brands)} plates={plates} /></div>
