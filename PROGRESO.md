@@ -115,7 +115,7 @@ Probar con el simulador:
 
 ## 6. Dónde nos quedamos (2026-11-22)
 
-**Sesión 2026-11-24 (c) — Ficha de la placa en ventana emergente (⏳ listo en local, falta "publica"):** pedido del
+**Sesión 2026-11-24 (c) — Ficha de la placa en ventana emergente (✅ publicado 2026-11-24):** pedido del
 usuario: la ficha hacía crecer la tarjeta del inicio y descuadraba el carrusel. Ahora sale en un `<dialog>` (hoja desde
 abajo en celular, centrada en compu; ✕, Esc o tocar afuera la cierran) y queda "Ver de nuevo" sin gastar otra consulta.
 
