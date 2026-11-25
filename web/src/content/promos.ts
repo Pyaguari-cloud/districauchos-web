@@ -21,12 +21,6 @@ export const promos: Promo[] = [
     cta: { label: "Ver importados", href: "/buscar?importado=1" }, image: "/fotos/1784165J00.webp?v=1795265122",
   },
   {
-    kind: "text", id: "placa", kicker: "Nuevo",
-    title: "Busca con la placa de", highlight: "tu carro",
-    text: "Escribe tu placa y te decimos marca, modelo, año y motor. Así llevas el repuesto exacto.",
-    cta: { label: "Buscar por placa", href: "/#buscar" },
-  },
-  {
     kind: "text", id: "envios", kicker: "Envíos",
     title: "Gratis dentro de", highlight: "Quito",
     text: "A todo el Ecuador en 24 a 48 horas. Despachamos el mismo día de lunes a viernes hasta las 5 de la tarde.",

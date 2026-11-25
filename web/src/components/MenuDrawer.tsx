@@ -42,7 +42,8 @@ export function MenuDrawer({ nav, categories, plates, social }: {
 
       <dialog ref={dialog} aria-label="Menú"
         onClose={() => { document.documentElement.style.overflow = ""; }}
-        onClick={(e) => { if (e.target === dialog.current) close(); }}
+        // Cierra al tocar fuera o cualquier enlace (también "/#buscar" estando ya en el inicio: ahí no cambia la ruta).
+        onClick={(e) => { if (e.target === dialog.current || (e.target as HTMLElement).closest("a")) close(); }}
         className="m-0 h-dvh max-h-none w-[min(22rem,88vw)] max-w-none overflow-hidden border-0 bg-brand-ink p-0 text-white [color-scheme:dark] shadow-2xl backdrop:bg-black/60 open:animate-[drawer-in_.2s_ease-out] motion-reduce:open:animate-none">
         <div className="flex h-full flex-col overflow-y-auto">
           <div className="sticky top-0 z-10 flex items-center justify-between gap-3 bg-brand-black px-4 py-3">
@@ -86,7 +87,7 @@ export function MenuDrawer({ nav, categories, plates, social }: {
           )}
 
           <div className="mt-auto p-4 pt-6">
-            <p className="pb-2 font-display text-sm font-bold uppercase tracking-wider text-white/60">Escríbenos y síguenos</p>
+            <p className="pb-2 font-display text-sm font-bold uppercase tracking-wider text-white/60">Síguenos</p>
             {social}
           </div>
         </div>

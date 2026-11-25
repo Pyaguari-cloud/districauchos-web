@@ -123,6 +123,11 @@ Probar con el simulador:
   izquierda y "Encuentra el repuesto" con la placa en grande (estilo placa de Ecuador) a la derecha (`FinderCard`).
   Botón "Buscar por placa" de la barra de Mi garaje ahora amarillo y con ícono.
 - Pie: WhatsApp, Instagram y TikTok grandes y con sus colores (`SocialLinks`), logo y marcas.
+- Limpieza (pedido 2026-11-24): se quitó lo repetido. Placa solo en grande en el inicio (el botón chico de Mi garaje
+  se fue; el menú lleva a `/#buscar`); sin pestaña "por nombre" (ya está el buscador del encabezado); sin la fila de
+  secciones del encabezado (están en el menú); sin la promoción "busca por placa"; WhatsApp como **globo fijo abajo a
+  la derecha** (`WhatsAppFloat`) en vez de botones en pie y menú; marcas solo bajo el logo de arriba. En celular la
+  placa va antes que las promociones.
 - Pendiente: que el cliente mande el **video** de promociones y sus **banners** (van en `web/public/promos/` y se
   agregan en `promos.ts`). Por ahora hay 3 promociones armadas por nosotros (importación, placa, envíos).
 

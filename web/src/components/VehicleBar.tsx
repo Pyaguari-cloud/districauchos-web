@@ -7,8 +7,6 @@ import { useState } from "react";
 import { sentenceCase } from "@/lib/format";
 import { garage, useGarage, useMyVehicle, vehicleText, YEARS } from "@/lib/vehicle";
 import { vehiclePhoto } from "@/lib/vehicle-photos";
-import { PlateIcon } from "./icons";
-import { PlateSearch } from "./PlateSearch";
 
 /** engines: cilindrajes conocidos por modelo (solo los que tienen varios repuestos). */
 export type VehicleOption = { brand: string; models: string[]; engines?: Record<string, string[]> };
@@ -20,9 +18,8 @@ const ALL = "__all__";
  * categoría (pedido del cliente 2026-11-21, como Mansuera). Al buscar, el vehículo queda guardado en el garaje
  * (máx. 5) y filtra las búsquedas siguientes. Año y cilindraje son opcionales y solo ocultan lo que sabemos que
  * es de otro año o motor. Listas nativas: en el celular abren el selector del sistema.
- * plates: muestra "Buscar por placa" (solo si el servidor tiene la clave del proveedor).
  */
-export function VehicleBar({ options, categories, plates = false }: { options: VehicleOption[]; categories: string[]; plates?: boolean }) {
+export function VehicleBar({ options, categories }: { options: VehicleOption[]; categories: string[] }) {
   const g = useGarage();
   const mine = useMyVehicle();
   const router = useRouter();
@@ -33,17 +30,15 @@ export function VehicleBar({ options, categories, plates = false }: { options: V
   // La barra muestra el vehículo activo (y en resultados, la categoría filtrada ahora). Si cambian, se rearma.
   const urlCategory = onSearch ? params.get("categoria") ?? "" : "";
   const key = `${mine?.brand}|${mine?.model}|${mine?.year}|${mine?.engine}|${urlCategory}`;
-  return <BarForm key={key} {...{ options, categories, g, mine, router, onSearch, params, urlCategory, plates }} />;
+  return <BarForm key={key} {...{ options, categories, g, mine, router, onSearch, params, urlCategory }} />;
 }
 
 type FormProps = {
   options: VehicleOption[]; categories: string[]; g: ReturnType<typeof useGarage>; mine: ReturnType<typeof useMyVehicle>;
   router: ReturnType<typeof useRouter>; onSearch: boolean; params: ReturnType<typeof useSearchParams>; urlCategory: string;
-  plates: boolean;
 };
 
-function BarForm({ options, categories, g, mine, router, onSearch, params, urlCategory, plates }: FormProps) {
-  const [byPlate, setByPlate] = useState(false);
+function BarForm({ options, categories, g, mine, router, onSearch, params, urlCategory }: FormProps) {
   const [brand, setBrand] = useState(mine?.brand ?? "");
   const [model, setModel] = useState(mine ? mine.model ?? ALL : "");
   const [year, setYear] = useState(mine?.year ? String(mine.year) : "");
@@ -120,13 +115,6 @@ function BarForm({ options, categories, g, mine, router, onSearch, params, urlCa
               </select>
             </>
           )}
-          {plates && (
-            // Más visible (cliente 2026-11-24: "no encontraban el botón de buscar placa porque estaba muy pequeño").
-            <button type="button" onClick={() => setByPlate((v) => !v)} aria-expanded={byPlate}
-              className="inline-flex min-h-9 items-center gap-1.5 rounded-md bg-brand-yellow px-3 font-display text-sm font-bold uppercase tracking-wide text-brand-black hover:bg-brand-yellow-dark">
-              <PlateIcon /> Buscar por placa
-            </button>
-          )}
           {mine && <button type="button" onClick={clear} className={link}>Quitar filtro</button>}
           <Link href="/mi-garaje" className={`${link} ml-auto`}>Administrar</Link>
         </div>
@@ -182,11 +170,6 @@ function BarForm({ options, categories, g, mine, router, onSearch, params, urlCa
           </button>
         </div>
       </form>
-      {plates && byPlate && (
-        <div className="mx-auto max-w-6xl px-4 pb-3">
-          <PlateSearch options={options} onClose={() => setByPlate(false)} />
-        </div>
-      )}
     </div>
   );
 }

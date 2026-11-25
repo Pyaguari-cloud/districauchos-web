@@ -70,7 +70,7 @@ export function PromoCarousel({ slides }: { slides: Promo[] }) {
 
   return (
     <section aria-roledescription="carrusel" aria-label="Ofertas y comunicados"
-      className="relative overflow-hidden rounded-2xl bg-brand-ink text-white lg:self-start"
+      className="relative overflow-hidden rounded-2xl bg-brand-ink text-white"
       onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
       onFocus={() => setHover(true)} onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setHover(false); }}
       onKeyDown={(e) => { if (e.key === "ArrowRight") go(index + 1); if (e.key === "ArrowLeft") go(index - 1); }}>

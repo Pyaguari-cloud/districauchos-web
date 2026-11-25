@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { negocio, phoneDisplay } from "@/content/negocio";
-import { BrandStrip } from "./BrandStrip";
 import { SocialLinks } from "./SocialLinks";
 
 export function Footer() {
@@ -11,10 +10,9 @@ export function Footer() {
         <div className="flex flex-col gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element -- SVG vectorial liviano */}
           <img src="/brand/logo.svg" alt={`${negocio.name} · ${negocio.tagline}`} width={1902} height={472} loading="lazy" className="h-14 w-auto self-start" />
-          <BrandStrip className="h-4 w-[226px]" />
           <p className="text-sm text-gray-300">{negocio.city}, Ecuador · {negocio.shipping.quito} · envíos a todo el Ecuador</p>
-          {/* Pedido del cliente 2026-11-24: WhatsApp, Instagram y TikTok juntos, grandes y con sus colores. */}
-          <p className="mt-2 font-display text-sm font-bold uppercase tracking-wider text-white/60">Escríbenos y síguenos</p>
+          {/* Pedido del cliente 2026-11-24: redes grandes y con sus colores. WhatsApp es el globo de abajo a la derecha. */}
+          <p className="mt-2 font-display text-sm font-bold uppercase tracking-wider text-white/60">Síguenos</p>
           <SocialLinks />
         </div>
 
