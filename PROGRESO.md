@@ -115,7 +115,7 @@ Probar con el simulador:
 
 ## 6. Dónde nos quedamos (2026-11-22)
 
-**Sesión 2026-11-24 (e) — Margen en celular (⏳ listo en local, falta "publica"):** la tarjeta de la placa y el
+**Sesión 2026-11-24 (e) — Margen en celular (✅ publicado 2026-11-24):** la tarjeta de la placa y el
 carrusel iban de borde a borde con esquinas redondeadas (se veía "pegado"); ahora llevan el margen de 16 px de la página.
 
 **Sesión 2026-11-24 (d) — Ajustes de resultados y pie (✅ publicado 2026-11-24):** pedido del usuario.
