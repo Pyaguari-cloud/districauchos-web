@@ -128,8 +128,13 @@ Probar con el simulador:
   secciones del encabezado (están en el menú); sin la promoción "busca por placa"; WhatsApp como **globo fijo abajo a
   la derecha** (`WhatsAppFloat`) en vez de botones en pie y menú; marcas solo bajo el logo de arriba. En celular la
   placa va antes que las promociones.
-- Pendiente: que el cliente mande el **video** de promociones y sus **banners** (van en `web/public/promos/` y se
-  agregan en `promos.ts`). Por ahora hay 3 promociones armadas por nosotros (importación, placa, envíos).
+- Material del cliente en el carrusel (6 promociones): video de importación (del "video estándares de calidad",
+  seg. 24–56, sin barras negras, 3 MB), banners Hilux buje 48655-0K010, mangueras de radiador y Aveo/Sail guardapolvo
+  96391553 (capturas de Instagram recortadas para quitar el ícono de silencio), video de horarios y locales, y envíos.
+  Cada una con botón a su producto o página. Detrás de los banners/videos verticales va la misma imagen difuminada; los
+  controles y el botón van en una franja debajo (no tapan nada). Originales en `out/videos/` (no se versiona; se
+  ignoró el video largo y el de bujes, que es una entrevista larga). Si el cliente manda los banners originales (sin
+  Instagram), reemplazar en `web/public/promos/`.
 
 **Sesión 2026-11-24 — OEM con la IA de Google desde la ficha de la placa (✅ publicado 2026-11-24):**
 - Prueba a ciegas de 15 piezas del inventario (`out/ia-oem/`): Gemini 5/15 aciertos y 8 errores (4 "seguridad alta"),

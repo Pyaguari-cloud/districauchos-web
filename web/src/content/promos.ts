@@ -10,15 +10,35 @@
  */
 export type Promo =
   | { kind: "text"; id: string; kicker?: string; title: string; highlight?: string; text: string; cta: { label: string; href: string }; image?: string }
-  | { kind: "image"; id: string; src: string; alt: string; href?: string }
-  | { kind: "video"; id: string; src: string; poster?: string; label: string; href?: string };
+  | { kind: "image"; id: string; src: string; alt: string; href?: string; cta?: string }
+  | { kind: "video"; id: string; src: string; poster?: string; label: string; href?: string; cta?: string };
 
+// Material del cliente (2026-11-24). Videos: recortados y comprimidos con FFmpeg desde out/videos/ (la importación es
+// del "video estándares de calidad", segundos 24 a 56, sin las barras negras). Banners: capturas de Instagram, recortadas
+// para quitar el ícono de silencio que traían. Si el cliente manda los originales, reemplazar los archivos.
 export const promos: Promo[] = [
   {
-    kind: "text", id: "importacion", kicker: "Importación directa VCH",
-    title: "Repuestos desde Corea, Japón y", highlight: "Tailandia",
-    text: "Precio al por mayor en compras desde $200. Calidad que conocemos porque la importamos nosotros.",
-    cta: { label: "Ver importados", href: "/buscar?importado=1" }, image: "/fotos/1784165J00.webp?v=1795265122",
+    kind: "video", id: "importacion", src: "/promos/importacion.mp4", poster: "/promos/importacion.webp",
+    label: "Video: llegada y descarga de nuestra importación directa", href: "/buscar?importado=1", cta: "Ver importados",
+  },
+  {
+    kind: "image", id: "hilux-buje", src: "/promos/hilux-buje.webp",
+    alt: "Buje de tijera inferior delantera para Toyota Hilux Vigo 4x2, código 48655-0K010",
+    href: "/buscar?q=48655-0K010", cta: "Ver buje Hilux",
+  },
+  {
+    kind: "image", id: "mangueras", src: "/promos/mangueras-radiador.webp",
+    alt: "Mangueras de radiador con refuerzo textil, resistentes a altas temperaturas, y abrazaderas de acero inoxidable",
+    href: "/buscar?q=manguera%20radiador", cta: "Ver mangueras",
+  },
+  {
+    kind: "image", id: "sail-guardapolvo", src: "/promos/sail-guardapolvo.webp",
+    alt: "Guardapolvo de eje izquierdo y derecho para Chevrolet Aveo y Sail, código 96391553",
+    href: "/buscar?q=96391553", cta: "Ver guardapolvo",
+  },
+  {
+    kind: "video", id: "locales", src: "/promos/locales.mp4", poster: "/promos/locales.webp",
+    label: "Video: horarios y nuestros tres locales en Quito", href: "/locales", cta: "Ver locales",
   },
   {
     kind: "text", id: "envios", kicker: "Envíos",

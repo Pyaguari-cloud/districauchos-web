@@ -66,20 +66,22 @@ export function PromoCarousel({ slides }: { slides: Promo[] }) {
 
   if (n === 0) return null;
 
-  const btn = "flex h-11 w-11 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur hover:bg-black/80";
+  const btn = "flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20";
+  // Botón de la promoción actual (banners y videos del cliente): va en la franja de abajo, nunca encima del banner.
+  const action = current && current.kind !== "text" && current.href && current.cta ? current : null;
 
   return (
     <section aria-roledescription="carrusel" aria-label="Ofertas y comunicados"
-      className="relative overflow-hidden rounded-2xl bg-brand-ink text-white"
+      className="flex flex-col overflow-hidden rounded-2xl bg-brand-ink text-white"
       onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
       onFocus={() => setHover(true)} onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setHover(false); }}
       onKeyDown={(e) => { if (e.key === "ArrowRight") go(index + 1); if (e.key === "ArrowLeft") go(index - 1); }}>
       <div ref={track} onScroll={onScroll}
-        className="no-scrollbar flex h-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain">
+        className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain">
         {slides.map((s, i) => (
           <div key={s.id} role="group" aria-roledescription="promoción" aria-label={`${i + 1} de ${n}`}
             aria-hidden={i !== index} inert={i !== index}
-            className="relative aspect-[4/3] w-full shrink-0 snap-start sm:aspect-[16/9] lg:aspect-auto lg:h-[36rem]">
+            className="relative aspect-square w-full shrink-0 snap-start overflow-hidden sm:aspect-[16/9] lg:aspect-auto lg:h-[31rem]">
             <Slide s={s} first={i === 0} muted={muted}
               videoRef={(v) => { videos.current[i] = v; }}
               onEnded={() => (n > 1 ? go(i + 1) : videos.current[i]?.play().catch(() => {}))} />
@@ -87,28 +89,35 @@ export function PromoCarousel({ slides }: { slides: Promo[] }) {
         ))}
       </div>
 
+      {/* Controles en una franja propia, debajo: no tapan nada del banner ni del video. */}
       {n > 1 && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 p-3 [&>*]:pointer-events-auto">
-          <div className="flex gap-2">
+        <div className="bg-black">
+          {/* Avance tipo "historias": una rayita por promoción (cada una se puede tocar, 24 px de alto). */}
+          <ol className="flex gap-1 px-3">
+            {slides.map((s, i) => (
+              <li key={s.id} className="flex-1">
+                <button type="button" onClick={() => go(i)} aria-current={i === index} className="flex h-6 w-full items-center">
+                  <span className={`block h-1 w-full rounded-full transition-colors ${i === index ? "bg-brand-yellow" : "bg-white/30 hover:bg-white/60"}`} />
+                  <span className="sr-only">Ir a la promoción {i + 1}</span>
+                </button>
+              </li>
+            ))}
+          </ol>
+          <div className="flex items-center gap-2 px-3 pb-3">
             <button type="button" className={btn} onClick={() => go(index - 1)}>
               <ChevronIcon dir="left" /><span className="sr-only">Promoción anterior</span>
             </button>
             <button type="button" className={btn} onClick={() => go(index + 1)}>
               <ChevronIcon /><span className="sr-only">Promoción siguiente</span>
             </button>
-          </div>
-          <ol className="flex items-center gap-0.5 rounded-full bg-black/50 px-1.5 backdrop-blur">
-            {slides.map((s, i) => (
-              <li key={s.id}>
-                <button type="button" onClick={() => go(i)} aria-current={i === index}
-                  className="flex h-9 w-7 items-center justify-center">
-                  <span className={`block h-2 rounded-full transition-all ${i === index ? "w-5 bg-brand-yellow" : "w-2 bg-white/60"}`} />
-                  <span className="sr-only">Ir a la promoción {i + 1}</span>
-                </button>
-              </li>
-            ))}
-          </ol>
-          <div className="flex gap-2">
+            <div className="flex min-w-0 flex-1 justify-center">
+              {action && (
+                <Link href={action.href!}
+                  className="flex min-h-11 items-center truncate rounded-lg bg-brand-yellow px-4 font-display font-bold uppercase tracking-wide text-brand-black hover:bg-brand-yellow-dark sm:px-6 sm:text-lg">
+                  {action.cta}
+                </Link>
+              )}
+            </div>
             {isVideo && (
               <button type="button" className={btn} onClick={() => setMuted((m) => !m)} aria-pressed={!muted}>
                 <span aria-hidden="true" className="text-lg">{muted ? "🔇" : "🔊"}</span>
@@ -129,28 +138,36 @@ export function PromoCarousel({ slides }: { slides: Promo[] }) {
 function Slide({ s, first, muted, videoRef, onEnded }: {
   s: Promo; first: boolean; muted: boolean; videoRef: (v: HTMLVideoElement | null) => void; onEnded: () => void;
 }) {
+  // Banners y videos del cliente vienen cuadrados o verticales (hechos para Instagram/TikTok): detrás va la misma
+  // imagen agrandada y difuminada, así no quedan franjas negras a los lados (como Instagram en pantalla ancha).
+  const backdrop = (src?: string) => src && (
+    // eslint-disable-next-line @next/next/no-img-element -- decorativa
+    <img src={src} alt="" aria-hidden="true" loading={first ? "eager" : "lazy"}
+      className="absolute inset-0 h-full w-full scale-110 object-cover opacity-50 blur-2xl" />
+  );
+
   if (s.kind === "image") {
-    // eslint-disable-next-line @next/next/no-img-element -- banner del cliente tal cual, sin recortar
-    const img = <img src={s.src} alt={s.alt} loading={first ? "eager" : "lazy"} className="absolute inset-0 h-full w-full object-contain" />;
-    return s.href ? <Link href={s.href} className="absolute inset-0">{img}</Link> : img;
+    return (
+      <>
+        {backdrop(s.src)}
+        {/* eslint-disable-next-line @next/next/no-img-element -- banner del cliente tal cual, sin recortar */}
+        <img src={s.src} alt={s.alt} loading={first ? "eager" : "lazy"} className="absolute inset-0 h-full w-full object-contain drop-shadow-2xl" />
+      </>
+    );
   }
   if (s.kind === "video") {
     return (
       <>
-        <video ref={videoRef} src={s.src} poster={s.poster} muted={muted} playsInline preload={first ? "auto" : "metadata"}
-          onEnded={onEnded} aria-label={s.label} className="absolute inset-0 h-full w-full bg-black object-contain" />
-        {s.href && (
-          <Link href={s.href} className="absolute right-3 top-3 rounded-lg bg-brand-yellow px-4 py-2 font-display font-bold uppercase tracking-wide text-brand-black hover:bg-brand-yellow-dark">
-            Ver productos
-          </Link>
-        )}
+        {backdrop(s.poster)}
+        <video ref={videoRef} src={s.src} poster={s.poster} muted={muted} playsInline preload="metadata"
+          onEnded={onEnded} aria-label={s.label} className="absolute inset-0 h-full w-full object-contain" />
       </>
     );
   }
   return (
     <div className="absolute inset-0 flex items-center bg-[radial-gradient(circle_at_85%_30%,#2a2a2a_0%,#111_60%)]">
       <div aria-hidden="true" className="absolute inset-y-0 left-0 w-2 bg-brand-yellow" />
-      <div className="relative z-10 flex max-w-[62%] flex-col gap-2 p-5 pb-16 sm:gap-3 sm:p-8 sm:pb-20">
+      <div className="relative z-10 flex max-w-[62%] flex-col gap-2 p-5 sm:gap-3 sm:p-8">
         {s.kicker && <p className="font-display text-sm font-bold uppercase tracking-[0.2em] text-brand-yellow">{s.kicker}</p>}
         <p className="font-display text-2xl font-bold uppercase leading-[1.05] tracking-wide sm:text-4xl">
           {s.title} {s.highlight && <span className="text-brand-yellow">{s.highlight}</span>}
