@@ -41,9 +41,8 @@ export const promos: Promo[] = [
     label: "Video: horarios y nuestros tres locales en Quito", href: "/locales", cta: "Ver locales",
   },
   {
-    kind: "text", id: "envios", kicker: "Envíos",
-    title: "Gratis dentro de", highlight: "Quito",
-    text: "A todo el Ecuador en 24 a 48 horas. Despachamos el mismo día de lunes a viernes hasta las 5 de la tarde.",
-    cta: { label: "Cómo comprar", href: "/como-comprar" }, image: "/fotos/486320K010.webp?v=1795265128",
+    kind: "image", id: "estabilizadoras", src: "/promos/estabilizadoras.webp",
+    alt: "Cauchos de barra estabilizadora para Chevrolet LUV, Chevette, Sprint, Spark, LUV D-Max y caja de dirección de Aveo y Cronos",
+    href: "/buscar?q=estabilizadora", cta: "Ver estabilizadoras",
   },
 ];
